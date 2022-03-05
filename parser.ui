@@ -36,16 +36,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>20</y>
-      <width>41</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QToolButton" name="toolButton">
     <property name="geometry">
      <rect>
@@ -183,6 +173,19 @@
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>43</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>1</number>
     </property>
    </widget>
   </widget>

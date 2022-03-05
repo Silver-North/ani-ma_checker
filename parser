@@ -2,8 +2,14 @@
 
 
 from PyQt5 import QtWidgets
-from sys import exit
+from PyQt5.QtWidgets import QMessageBox, QSystemTrayIcon
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QTimer, QDateTime, QTime
 from design import Ui_MainWindow
+from sys import exit
+from requests import get
+from subprocess import call
+from os import system, path, remove
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -12,11 +18,67 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
+        self.showed()
+        self.ui.toolButton.clicked.connect(self.saved)
+        self.ui.toolButton_2.clicked.connect(self.deleted)
         self.ui.toolButton_3.clicked.connect(self.closed)
 
     
     def closed(self):
         self.close()
+
+
+    def saved(self):
+        url = self.ui.lineEdit.text()
+        series = self.ui.spinBox.value()
+        alert = QMessageBox()
+        try:
+            get(url)
+            if url != "":
+                with open('list.txt', 'a') as f:
+                    f.write(f"{url},{series}\n")
+                
+                self.ui.comboBox.addItem(url)
+        except:
+            alert.setText(f"URL does not exist on Internet")
+            alert.exec_()
+            self.ui.lineEdit.setText('')
+
+
+    def showed(self):
+        if path.exists(path.join(path.dirname(__file__), 'list.txt')):
+            with open('list.txt', 'r') as f:
+                data = f.readlines()
+            for i in data:
+                listing = i.split(',')
+                self.ui.comboBox.addItem(listing[0])
+
+
+    def deleted(self):
+        index = self.ui.comboBox.currentIndex()
+        data = []
+        listing = []
+        del_path = path.join(path.dirname(__file__), 'list.txt')
+
+        for i in range(self.ui.comboBox.count()):
+            data.append(self.ui.comboBox.itemText(i))
+        
+        with open('list.txt', 'r') as f:
+            current = f.readlines()
+        
+        for i in current:
+            listing.append(i.split(','))
+        
+        del(data[index])
+        del(listing[index])
+        remove(del_path)
+
+        for i in range(len(data)):
+            with open('list.txt', 'a') as f:
+                f.write(f"{data[i]},{listing[i][1]}")
+    
+        self.ui.comboBox.clear()
+        self.showed()
 
 
 app = QtWidgets.QApplication([])

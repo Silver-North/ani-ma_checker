@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+
+
+from selenium import webdriver
+from os import path, system, rename
+from time import sleep, localtime, strftime
+
+
+def checkUpload(f, url, dir):
+    if path.exists(path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')):
+        curent_time = strftime("%H:%M", localtime())
+        system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
+        name_dir = '_'.join(dir.split())
+        
+        old = path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')
+        new = path.join(f'{path.dirname(__file__)}/downloads', f'{name_dir}-{series}.mp4')
+        
+        rename(old, new)
+
+        if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{name_dir}'):
+            pass
+        else:
+            system(f'mkdir /home/north/data/projects/Python/IsDev/Anime-parser/downloads/{name_dir}')
+        
+        system(f'mv {path_down}/{name_dir}-{series}.mp4 {path_down}/{name_dir}/')
+        with open('list.txt', 'w') as ff:
+            for el in enumerate(url):
+                if url[el[0]] == i[1]:
+                    ff.write(f'{i[1]},{series}\n')
+                else:
+                    ff.write(f'{el[1]},{numbers[el[0]]}\n')
+    else:
+        print('Wait!! Reconnect!!')
+        sleep(40)
+        checkUpload(f, url, dir)
+
+
+path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
+prefs = {'download.default_directory': path_down, "download.prompt_for_download": False}
+
+option = webdriver.ChromeOptions()
+option.add_experimental_option("prefs", prefs)
+option.add_argument('--headless')
+
+while True:
+    driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
+    url = []
+    numbers = []
+    listing = []
+
+    if path.exists(path.join(path.dirname(__file__), 'list.txt')):
+
+        with open('list.txt', 'r') as f:
+            data = f.readlines()
+            
+        for i in data:
+            listing.append(i.split(','))
+
+    if len(listing) > 0:
+        
+        for i in listing:
+            url.append(i[0])
+            numbers.append(int(i[1][:-1:]))
+            
+        for i in enumerate(url):
+            try:
+                series = numbers[i[0]] + 1
+                print(i)
+                driver.get(i[1])
+                print(0)
+                sleep(2)
+                print(1)
+                search_count_series = driver.find_elements_by_class_name('epizode')
+                name = driver.find_element_by_class_name('shortstoryHead').text
+                next = driver.find_element_by_class_name('next')
+                name_dir = name.split(' /')
+
+                print(name_dir)
+
+            # print(len(down), type(name.text), name.text) 
+                if len(search_count_series) == series:
+                    if len(search_count_series) > 6:
+                        next.click()
+                    search_count_series[-1].click()
+                    sleep(15)
+                    frame = driver.find_elements_by_tag_name('iframe')
+                    driver.switch_to.frame(frame[-1])
+                    down = driver.find_elements_by_class_name('butt')
+                    let = down[-2].get_attribute("href").split('?')
+                    let = let[0].split('/')
+                    sleep(3)
+                    print(10)
+                    down[2].click()
+                    print(100)
+                    checkUpload(let[-1], url, name_dir[0])
+                driver.switch_to.default_content()
+                sleep(5)
+            except:
+                print("!!! << Error >> !!!")
+        # driver.quit()
+        sleep(1800)
