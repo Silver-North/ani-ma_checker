@@ -9,7 +9,11 @@ from design import Ui_MainWindow
 from sys import exit
 from requests import get
 from subprocess import call
-from os import system, path, remove
+from os import system, path, remove, popen
+from time import sleep
+from main_selenium import allParsing, oneParsing, extraClose, listLinkOrNumbers
+from threading import Thread, currentThread
+from asyncio import get_event_loop, wait
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -17,14 +21,122 @@ class myWindow(QtWidgets.QMainWindow):
         super(myWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timeNumber)
+        self.timeNumber()
+        self.current_path = path.dirname(path.realpath(__file__))
+        self.tray = QSystemTrayIcon(self)
+        self.tray.activated.connect(self.triggerFocus)
+        self.tray.setToolTip(u"AnimeVostOrg - parser")
+        self.tray.show()
         
         self.showed()
         self.ui.toolButton.clicked.connect(self.saved)
         self.ui.toolButton_2.clicked.connect(self.deleted)
         self.ui.toolButton_3.clicked.connect(self.closed)
+        self.ui.toolButton_4.clicked.connect(self.allDown)
+        self.ui.toolButton_5.clicked.connect(self.oneDown)
+        self.ui.toolButton_6.clicked.connect(extraClose)
+        self.ui.toolButton_7.clicked.connect(self.loging)
+        self.ui.toolButton_8.clicked.connect(self.logOne)
+        self.defaultIcon()
 
+
+    def timeNumber(self):
+        _, num = listLinkOrNumbers()
+        self.timer.start(1000)
+        self.ui.lcdNumber.display(num[self.ui.comboBox.currentIndex()])
+
+
+# Set Icon for toolButton
+    def defaultIcon(self):
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
+        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
+        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
+        self.ui.toolButton_6.setIcon(QIcon(f'{self.current_path}/icons/lose.png'))
+        self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/log.png'))
+        self.ui.toolButton_8.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
+        self.ui.toolButton_7.setToolTip(u"Log All parse URL")
+        self.ui.toolButton_8.setToolTip(u"Log One parse URL")
+
+
+    def check(self):
+        proc = popen('ps ax').read()
+        if proc.find("chromedriver") == -1:
+            return False
+        else:
+            print("процесс висит")
+            return True
+
+
+    def whileStart(self):
+        while True:
+            if self.check():
+                pass
+            else:
+                self.defaultIcon()
+                break
+            sleep(7)
+
+
+    def loging(self):
+        alert = QMessageBox()
+        text = ''
+        if path.exists(path.join(path.dirname(__file__), 'log.txt')):
+            with open('log.txt') as l:
+                arr = l.readlines()
+            for i in arr:
+                text = f'{text}{i}\n'
+            alert.setText(text)
+        else:
+            alert.setText('No file exist...')
+        alert.exec_()
+
+
+    def logOne(self):
+        alert = QMessageBox()
+        if path.exists(path.join(path.dirname(__file__), 'loger.txt')):
+            with open('loger.txt') as l:
+                text = l.readline()
+            alert.setText(text)
+        else:
+            alert.setText('No file exist...')
+        alert.exec_()
+
+
+    def oneDown(self):
+        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
+        print()
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/search.png'))
+        sleep(1)
+        Thread(target = oneParsing, args = (self.ui.comboBox.currentText(), self.ui.lcdNumber.intValue()), name = 'Selenium-one', daemon = True).start()
+        sleep(2)
+        Thread(target = self.whileStart).start()        
+
+
+    def allDown(self):
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/search.png'))
+        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
+        sleep(1)
+        Thread(target = allParsing, name = 'Selenium-all', daemon = True).start()
+        sleep(2)
+        Thread(target = self.whileStart).start()        
+
+
+    def triggerFocus(self, reason):
+        if reason == QSystemTrayIcon.MiddleClick:
+            self.show()
+        elif reason == QSystemTrayIcon.Trigger:
+            self.hidded()
     
+    
+    def hidded(self):
+        self.hide()
+
+
     def closed(self):
+        extraClose()
         self.close()
 
 
