@@ -4,16 +4,14 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QSystemTrayIcon
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer, QDateTime, QTime
+from PyQt5.QtCore import QTimer
 from design import Ui_MainWindow
 from sys import exit
 from requests import get
-from subprocess import call
-from os import system, path, remove, popen
+from os import path, remove, popen
 from time import sleep
 from main_selenium import allParsing, oneParsing, extraClose, listLinkOrNumbers
-from threading import Thread, currentThread
-from asyncio import get_event_loop, wait
+from threading import Thread
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -21,7 +19,8 @@ class myWindow(QtWidgets.QMainWindow):
         super(myWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
+        
+        self.click = 0
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
         self.timeNumber()
@@ -125,10 +124,13 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def triggerFocus(self, reason):
-        if reason == QSystemTrayIcon.MiddleClick:
-            self.show()
-        elif reason == QSystemTrayIcon.Trigger:
-            self.hidded()
+        # elif reason == QSystemTrayIcon.MiddleClick:
+        if reason == QSystemTrayIcon.Trigger:
+            if self.click % 2 == 0:
+                self.show()
+            else:
+                self.hidded()
+            self.click += 1
     
     
     def hidded(self):
@@ -195,6 +197,6 @@ class myWindow(QtWidgets.QMainWindow):
 
 app = QtWidgets.QApplication([])
 application = myWindow()
-application.show()
+# application.show()
 
 exit(app.exec())
