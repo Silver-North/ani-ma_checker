@@ -3,33 +3,6 @@ from os import path, system, rename
 from time import sleep, localtime, strftime
 
 
-def checkUpload(f, url, dir, link):
-    if path.exists(path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')):
-        curent_time = strftime("%H:%M", localtime())
-        system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
-        names_dir = '_'.join(dir.split())
-
-        old = path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')
-        new = path.join(f'{path.dirname(__file__)}/downloads', f'{names_dir}-{series}.mp4')
-
-        rename(old, new)
-
-        if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}'):
-            pass
-        else:
-            system(f'mkdir /home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}')
-
-        system(f'mv {path_down}/{names_dir}-{series}.mp4 {path_down}/{names_dir}/')
-        with open('list.txt', 'w') as ff:
-            for el in enumerate(url):
-                if url[el[0]] == i[1]:
-                    ff.write(f'{link},{series}\n')
-                else:
-                    ff.write(f'{el[1]},{numbers[el[0]]}\n')
-    else:
-        print('Wait!! Reconnect!!')
-        sleep(40)
-        checkUpload(f, url, dir)
 
 
 path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
@@ -80,7 +53,7 @@ def allParsing():
                         print(10)
                         down[2].click()
                         print(100)
-                        checkUpload(let[-1], url, name_dir[0], i[1])
+                        checkUpload(let[-1], url, name_dir[0], i[1], name, series, numbers)
                         w.write(f'{i[0]} - {name_dir[0]} - New series {series}\n')
                     else:
                         print('No new series!')
@@ -150,7 +123,7 @@ def oneParsing(url, digit):
                 print(10)
                 down[2].click()
                 print(100)
-                checkUpload(let[-1], urls, name_dir[0], url)
+                checkUpload(let[-1], urls, name_dir[0], url, name, series, numbers)
                 w.write(f'{name_dir[0]} - New series {series}')
             else:
                 print('No new series!')
@@ -161,6 +134,34 @@ def oneParsing(url, digit):
             w.write("!!! << Error >> !!!")
             print("!!! << Error >> !!!")
     driver.quit()
+
+
+def checkUpload(f, url, dir, link, name, series, numbers):
+    if path.exists(path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')):
+        curent_time = strftime("%H:%M", localtime())
+        system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
+        names_dir = '_'.join(dir.split())
+        old = path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')
+        new = path.join(f'{path.dirname(__file__)}/downloads', f'{names_dir}-{series}.mp4')
+
+        rename(old, new)
+
+        if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}'):
+            pass
+        else:
+            system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}"')
+
+        system(f'mv "{path_down}/{names_dir}-{series}.mp4" "{path_down}/{names_dir}/"')
+        with open('list.txt', 'w') as ff:
+            for el in enumerate(url):
+                if url[el[0]] == link:
+                    ff.write(f'{link},{series}\n')
+                else:
+                    ff.write(f'{el[1]},{numbers[el[0]]}\n')
+    else:
+        print('Wait!! Reconnect!!')
+        sleep(40)
+        checkUpload(f, url, dir, link, name, series, numbers)
 
 
 def extraClose():

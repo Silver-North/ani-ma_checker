@@ -19,7 +19,7 @@ class myWindow(QtWidgets.QMainWindow):
         super(myWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         self.click = 0
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
@@ -29,7 +29,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.tray.activated.connect(self.triggerFocus)
         self.tray.setToolTip(u"AnimeVostOrg - parser")
         self.tray.show()
-        
+
         self.showed()
         self.ui.toolButton.clicked.connect(self.saved)
         self.ui.toolButton_2.clicked.connect(self.deleted)
@@ -40,6 +40,13 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_7.clicked.connect(self.loging)
         self.ui.toolButton_8.clicked.connect(self.logOne)
         self.defaultIcon()
+
+
+    def keyPressEvent(self, QKeyEvent):
+        int_key = QKeyEvent.key()
+        print(int_key)
+        if int_key == 16777216:
+            self.hidded()
 
 
     def timeNumber(self):
@@ -111,7 +118,7 @@ class myWindow(QtWidgets.QMainWindow):
         sleep(1)
         Thread(target = oneParsing, args = (self.ui.comboBox.currentText(), self.ui.lcdNumber.intValue()), name = 'Selenium-one', daemon = True).start()
         sleep(2)
-        Thread(target = self.whileStart).start()        
+        Thread(target = self.whileStart).start()
 
 
     def allDown(self):
@@ -120,7 +127,7 @@ class myWindow(QtWidgets.QMainWindow):
         sleep(1)
         Thread(target = allParsing, name = 'Selenium-all', daemon = True).start()
         sleep(2)
-        Thread(target = self.whileStart).start()        
+        Thread(target = self.whileStart).start()
 
 
     def triggerFocus(self, reason):
@@ -131,8 +138,8 @@ class myWindow(QtWidgets.QMainWindow):
             else:
                 self.hidded()
             self.click += 1
-    
-    
+
+
     def hidded(self):
         self.hide()
 
@@ -151,7 +158,7 @@ class myWindow(QtWidgets.QMainWindow):
             if url != "":
                 with open('list.txt', 'a') as f:
                     f.write(f"{url},{series}\n")
-                
+
                 self.ui.comboBox.addItem(url)
         except:
             alert.setText(f"URL does not exist on Internet")
@@ -176,13 +183,13 @@ class myWindow(QtWidgets.QMainWindow):
 
         for i in range(self.ui.comboBox.count()):
             data.append(self.ui.comboBox.itemText(i))
-        
+
         with open('list.txt', 'r') as f:
             current = f.readlines()
-        
+
         for i in current:
             listing.append(i.split(','))
-        
+
         del(data[index])
         del(listing[index])
         remove(del_path)
@@ -190,7 +197,7 @@ class myWindow(QtWidgets.QMainWindow):
         for i in range(len(data)):
             with open('list.txt', 'a') as f:
                 f.write(f"{data[i]},{listing[i][1]}")
-    
+
         self.ui.comboBox.clear()
         self.showed()
 
