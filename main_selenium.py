@@ -3,8 +3,6 @@ from os import path, system, rename
 from time import sleep, localtime, strftime
 
 
-
-
 path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
 prefs = {'download.default_directory': path_down, "download.prompt_for_download": False}
 

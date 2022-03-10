@@ -12,6 +12,8 @@ from os import path, remove, popen
 from time import sleep
 from main_selenium import allParsing, oneParsing, extraClose, listLinkOrNumbers
 from threading import Thread
+from notifications import checking, checkingWrite
+from json import dumps, load
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -19,18 +21,27 @@ class myWindow(QtWidgets.QMainWindow):
         super(myWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setFocus()
+        self.setGeometry(480, 55, 400, 300)
 
         self.click = 0
+        self.color = 0
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
-        self.timeNumber()
         self.current_path = path.dirname(path.realpath(__file__))
+        self.ui.toolButton_11.setIcon(QIcon(f'{self.current_path}/icons/lamp.png'))
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.triggerFocus)
         self.tray.setToolTip(u"AnimeVostOrg - parser")
         self.tray.show()
-
+        self.timeNumber()
+        self.defaultIcon()
         self.showed()
+        
+        self.timer_check = QTimer()
+        self.timer_check.timeout.connect(self.update)
+        self.update()
+
         self.ui.toolButton.clicked.connect(self.saved)
         self.ui.toolButton_2.clicked.connect(self.deleted)
         self.ui.toolButton_3.clicked.connect(self.closed)
@@ -39,7 +50,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_6.clicked.connect(extraClose)
         self.ui.toolButton_7.clicked.connect(self.loging)
         self.ui.toolButton_8.clicked.connect(self.logOne)
-        self.defaultIcon()
+        self.ui.toolButton_9.clicked.connect(self.updateClick)
+        self.ui.toolButton_10.clicked.connect(self.notifyCheck)
+        self.ui.toolButton_11.clicked.connect(self.modeColorSheme)
+        self.ui.toolButton_12.clicked.connect(self.update)
 
 
     def keyPressEvent(self, QKeyEvent):
@@ -49,10 +63,103 @@ class myWindow(QtWidgets.QMainWindow):
             self.hidded()
 
 
+    def uploadGlobalSettings(self):
+        with open('setting.json', 'r') as r:
+            data = load(r)
+        return data
+
+
+    def setGlobalSettings(self, to_json: dict, mode: str, var:str):
+        to_json[mode] = var
+        with open('setting.json', 'w') as js:
+            js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+
+
+    def updateClick(self):
+        print('Yes')
+        self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
+        self.ui.toolButton_9.setToolTip(u"Checking..")
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+        Thread(target = self.clicker).start()
+
+
+    def clicker(self, check=True):
+        urls, num = listLinkOrNumbers()
+        if check:
+            checkingWrite(urls, num)
+        else:
+            checking(urls, num)
+        self.defaultIcon()
+
+
+    def update(self):
+        self.timer_check.start(900_000)
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+        print('Yes')
+        Thread(target = self.clicker, args = (False,)).start()
+
+
     def timeNumber(self):
         _, num = listLinkOrNumbers()
         self.timer.start(1000)
         self.ui.lcdNumber.display(num[self.ui.comboBox.currentIndex()])
+        # if self.hasFocus() == False:
+            # self.hidded()
+            # self.click += 1
+        reads = self.uploadGlobalSettings()
+        if reads['notify'] == 'unchecked':
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
+        elif reads['notify'] == 'checked':
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
+
+
+
+    def notifyCheck(self):
+        alert = QMessageBox()
+        datas = self.uploadGlobalSettings()    
+        if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
+            with open('notify.txt', 'r') as f:
+                data = f.readlines()
+            str = ''
+            
+            for i in data:
+                str = f'{str}{i}'
+            
+            if len(data) == 0:
+                alert.setGeometry(600, 95, 300, 100)
+                alert.setText("No notifications..")
+            else:
+                alert.setGeometry(490, 95, 300, 100)
+                alert.setText(str)
+                self.setGlobalSettings(datas, 'notify', 'checked')
+        else:
+            alert.setText('No log file..')
+        alert.exec_()
+
+
+    def modeColorSheme(self):
+        data = self.uploadGlobalSettings()
+        if self.color % 2 == 0:
+            self.changeSheme('dark', 'background: rgb(49, 49, 49)', 'background: rgb(136, 136, 136)', 'color: rgb(136, 136, 136)')
+            self.ui.toolButton_11.setToolTip(u"Darkmode")
+            self.setGlobalSettings(data, 'mode', 'darkmode')
+        else:
+            self.changeSheme('lamp', 'background: rgb(255, 255, 255)', 'background: rgb(220, 220, 220)', 'color: rgb(0, 0, 0)')
+            self.ui.toolButton_11.setToolTip(u"Lightmode")
+            self.setGlobalSettings(data, 'mode', 'lightmode')
+        self.color += 1
+
+
+    def changeSheme(self, ico, win, back, color):
+        self.ui.toolButton_11.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
+        self.setStyleSheet(win)
+        self.ui.label.setStyleSheet(color)
+        self.ui.label_2.setStyleSheet(color)
+        self.ui.lineEdit.setStyleSheet(back)
+        self.ui.comboBox.setStyleSheet(back)
+        self.ui.spinBox.setStyleSheet(back)
+        self.ui.lcdNumber.setStyleSheet(back)
+
 
 
 # Set Icon for toolButton
@@ -63,8 +170,13 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_6.setIcon(QIcon(f'{self.current_path}/icons/lose.png'))
         self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/log.png'))
         self.ui.toolButton_8.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
+        self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+        self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
+        # self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         self.ui.toolButton_7.setToolTip(u"Log All parse URL")
         self.ui.toolButton_8.setToolTip(u"Log One parse URL")
+        self.ui.toolButton_9.setToolTip(u"Update")
+        self.ui.lcdNumber.setToolTip(u"Current Series")
 
 
     def check(self):
@@ -79,7 +191,7 @@ class myWindow(QtWidgets.QMainWindow):
     def whileStart(self):
         while True:
             if self.check():
-                pass
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
             else:
                 self.defaultIcon()
                 break
@@ -93,7 +205,9 @@ class myWindow(QtWidgets.QMainWindow):
             with open('log.txt') as l:
                 arr = l.readlines()
             for i in arr:
-                text = f'{text}{i}\n'
+                text = f'{text}{i}'
+            # text = '\n'.join(arr)
+            print(text)
             alert.setText(text)
         else:
             alert.setText('No file exist...')
@@ -112,17 +226,17 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def oneDown(self):
+        url, _ = listLinkOrNumbers()
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
-        print()
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/search.png'))
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
         sleep(1)
-        Thread(target = oneParsing, args = (self.ui.comboBox.currentText(), self.ui.lcdNumber.intValue()), name = 'Selenium-one', daemon = True).start()
+        Thread(target = oneParsing, args = (url[self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), name = 'Selenium-one', daemon = True).start()
         sleep(2)
         Thread(target = self.whileStart).start()
 
 
     def allDown(self):
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/search.png'))
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
         sleep(1)
         Thread(target = allParsing, name = 'Selenium-all', daemon = True).start()
@@ -134,6 +248,7 @@ class myWindow(QtWidgets.QMainWindow):
         # elif reason == QSystemTrayIcon.MiddleClick:
         if reason == QSystemTrayIcon.Trigger:
             if self.click % 2 == 0:
+                self.setFocus()
                 self.show()
             else:
                 self.hidded()
@@ -150,7 +265,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def saved(self):
-        url = self.ui.lineEdit.text()
+        url = f'https://{self.ui.lineEdit.text()}'
         series = self.ui.spinBox.value()
         alert = QMessageBox()
         try:
@@ -167,12 +282,29 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def showed(self):
-        if path.exists(path.join(path.dirname(__file__), 'list.txt')):
-            with open('list.txt', 'r') as f:
+        if path.exists(path.join(path.dirname(__file__), 'name.txt')):
+            with open('name.txt', 'r') as f:
                 data = f.readlines()
             for i in data:
-                listing = i.split(',')
-                self.ui.comboBox.addItem(listing[0])
+                self.ui.comboBox.addItem(i)
+
+        reads = self.uploadGlobalSettings()
+        if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
+            with open('notify.txt', 'r') as f:
+                data = f.readlines()
+            if reads['notify'] == 'unchecked':
+                self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
+            elif reads['notify'] == 'checked':
+                self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
+
+        if reads['mode'] == 'lightmode':
+            self.changeSheme('lamp', 'background: rgb(255, 255, 255)', 'background: rgb(220, 220, 220)', 'color: rgb(0, 0, 0)')
+            self.ui.toolButton_11.setToolTip(u"Lightmode")
+            self.color = 0
+        elif reads['mode'] == 'darkmode':
+            self.changeSheme('dark', 'background: rgb(49, 49, 49)', 'background: rgb(136, 136, 136)', 'color: rgb(136, 136, 136)')
+            self.ui.toolButton_11.setToolTip(u"Darkmode")
+            self.color = 1
 
 
     def deleted(self):
