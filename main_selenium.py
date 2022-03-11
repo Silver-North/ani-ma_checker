@@ -30,7 +30,7 @@ def allParsing():
                     next = driver.find_element_by_class_name('next')
                     name_dir = name.split(' /')
 
-                    print(name_dir)
+                    print(name_dir[0])
 
                     if len(search_count_series) == series:
                         if len(search_count_series) > 6:
@@ -100,11 +100,17 @@ def oneParsing(url, digit):
             next = driver.find_element_by_class_name('next')
             name_dir = name.split(' /')
 
-            print(name_dir)
+            print(name_dir[0])
 
             if len(search_count_series) == series:
                 if len(search_count_series) > 6:
                     next.click()
+                    if len(search_count_series) > 12:
+                        next.click()
+                        if len(search_count_series) > 18:
+                            next.click()
+                            if len(search_count_series) > 24:
+                                next.click()
                 search_count_series[-1].click()
                 sleep(15)
                 frame = driver.find_elements_by_tag_name('iframe')
@@ -143,6 +149,10 @@ def checkUpload(f, url, dir, link, name, series, numbers):
         new = path.join(f'{path.dirname(__file__)}/downloads', f'{names_dir}-{series}.mp4')
 
         rename(old, new)
+
+        if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/'):
+            system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/downloads/"')
+
 
         if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}'):
             pass

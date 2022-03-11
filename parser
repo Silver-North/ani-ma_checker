@@ -38,6 +38,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.defaultIcon()
         self.showed()
         
+        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
+        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
+
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
         self.update()
@@ -77,6 +80,10 @@ class myWindow(QtWidgets.QMainWindow):
 
     def updateClick(self):
         print('Yes')
+        self.ui.toolButton_5.setEnabled(False)
+        self.ui.toolButton_4.setEnabled(False)
+        self.ui.toolButton_12.setEnabled(False)
+        self.ui.toolButton_9.setEnabled(False)
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
         self.ui.toolButton_9.setToolTip(u"Checking..")
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
@@ -89,13 +96,25 @@ class myWindow(QtWidgets.QMainWindow):
             checkingWrite(urls, num)
         else:
             checking(urls, num)
+        self.ui.toolButton_12.setEnabled(True)
+        self.ui.toolButton_9.setEnabled(True)
+        self.ui.toolButton_5.setEnabled(True)
+        self.ui.toolButton_4.setEnabled(True)
+
         self.defaultIcon()
 
 
     def update(self):
-        self.timer_check.start(900_000)
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
         print('Yes')
+        if self.ui.toolButton_12.isEnabled() == False:
+            self.timer_check.stop()
+        else:
+            self.timer_check.start(900_000)
+        self.ui.toolButton_5.setEnabled(False)
+        self.ui.toolButton_4.setEnabled(False)
+        self.ui.toolButton_12.setEnabled(False)
+        self.ui.toolButton_9.setEnabled(False)
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
         Thread(target = self.clicker, args = (False,)).start()
 
 
@@ -161,18 +180,14 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lcdNumber.setStyleSheet(back)
 
 
-
 # Set Icon for toolButton
     def defaultIcon(self):
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
-        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
-        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
         self.ui.toolButton_6.setIcon(QIcon(f'{self.current_path}/icons/lose.png'))
         self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/log.png'))
         self.ui.toolButton_8.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
-        # self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         self.ui.toolButton_7.setToolTip(u"Log All parse URL")
         self.ui.toolButton_8.setToolTip(u"Log One parse URL")
         self.ui.toolButton_9.setToolTip(u"Update")
@@ -191,11 +206,21 @@ class myWindow(QtWidgets.QMainWindow):
     def whileStart(self):
         while True:
             if self.check():
+                self.ui.toolButton_5.setEnabled(False)
+                self.ui.toolButton_4.setEnabled(False)
+                self.ui.toolButton_12.setEnabled(False)
+                self.ui.toolButton_9.setEnabled(False)
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
             else:
                 self.defaultIcon()
+                self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
+                self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
+                self.ui.toolButton_12.setEnabled(True)
+                self.ui.toolButton_5.setEnabled(True)
+                self.ui.toolButton_4.setEnabled(True)
+                self.ui.toolButton_9.setEnabled(True)
                 break
-            sleep(7)
+            sleep(1)
 
 
     def loging(self):
@@ -229,18 +254,14 @@ class myWindow(QtWidgets.QMainWindow):
         url, _ = listLinkOrNumbers()
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
-        sleep(1)
-        Thread(target = oneParsing, args = (url[self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), name = 'Selenium-one', daemon = True).start()
-        sleep(2)
+        Thread(target = oneParsing, args = (url[self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
         Thread(target = self.whileStart).start()
 
 
     def allDown(self):
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
-        sleep(1)
-        Thread(target = allParsing, name = 'Selenium-all', daemon = True).start()
-        sleep(2)
+        Thread(target = allParsing).start()
         Thread(target = self.whileStart).start()
 
 
