@@ -46,9 +46,14 @@ def checking(urls, numbers):
 
 
 def checkingWrite(urls, numbers):
-    with open('name.txt', 'w') as f:
-        for i in enumerate(urls):
-            series = numbers[i[0]] + 1 
-            names = checkURL(i[1], series)
-            f.write(f'{names}\n')
+    names = []
+    for i in enumerate(urls):
+        series = numbers[i[0]] + 1 
+        names.append(checkURL(i[1], series))
     print(True)
+    
+    with open('setting.json', 'r') as reads:
+        data = load(reads)
+    data['name'] = names
+    with open('setting.json', 'w') as js:
+        js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")

@@ -1,4 +1,65 @@
 {
     "mode": "darkmode",
-    "notify": "checked"
+    "notify": "checked",
+    "urls": [
+        "https://animevost.am/tip/tv/2759-tribe-nine.html",
+        "https://animevost.am/tip/tv/2762-princess-connect-redive-2nd-season.html",
+        "https://animevost.am/tip/tv/2745-tensai-ouji-no-akaji-kokka-saisei-jutsu.html",
+        "https://animevost.am/tip/tv/2747-kenja-no-deshi-wo-nanoru-kenja.html",
+        "https://animevost.am/tip/tv/2748-fantasy-bishoujo-juniku-ojisan-to.html",
+        "https://animevost.am/tip/tv/2731-leadale-no-daichi-nite.html",
+        "https://animevost.am/tip/tv/2734-orient.html",
+        "https://animevost.am/tip/tv/2740-arifureta-shokugyou-de-sekai-saikyou-2nd-season.html",
+        "https://animevost.am/tip/tv/2702-platinum-end.html",
+        "https://animevost.am/tip/tv/2685-shuumatsu-no-harem.html",
+        "https://animevost.am/tip/tv/2758-shikkakumon-no-saikyou-kenja.html",
+        "https://animevost.am/tip/tv/2738-sono-bisque-doll-wa-koi-wo-suru.html",
+        "https://animevost.am/tip/tv/2754-genjitsu-shugi-yuusha-no-oukoku-saikenki-2nd-season.html"
+    ],
+    "series": [
+        9,
+        9,
+        9,
+        9,
+        9,
+        10,
+        10,
+        9,
+        22,
+        10,
+        9,
+        9,
+        9
+    ],
+    "name": [
+        "Клан девяти",
+        "Связь принцесс: Повторное погружение (второй сезон)",
+        "Руководство гениального принца по вызволению страны из долгов",
+        "Она представилась как ученик мудреца",
+        "Фантастический мир с обращённым в красавицу мужчиной и…",
+        "Мир Лидейл",
+        "Ориент",
+        "Арифурэта: Сильнейший ремесленник в мире (второй сезон)",
+        "Платиновый предел",
+        "Тотальный гарем",
+        "Сильнейший мудрец низшей эмблемы",
+        "Эта фарфоровая кукла влюбилась",
+        "Герой-рационал перестраивает королевство (второй сезон)"
+    ],
+    "logs": [
+        "0 - Клан девяти - No new < 10 > series\n",
+        "1 - Связь принцесс: Повторное погружение (второй сезон) - No new < 10 > series\n",
+        "2 - Руководство гениального принца по вызволению страны из долгов - No new < 10 > series\n",
+        "3 - Она представилась как ученик мудреца - No new < 10 > series\n",
+        "4 - Фантастический мир с обращённым в красавицу мужчиной и… - No new < 10 > series\n",
+        "5 - Мир Лидейл - No new < 11 > series\n",
+        "6 - Ориент - No new < 11 > series\n",
+        "7 - Арифурэта: Сильнейший ремесленник в мире (второй сезон) - No new < 10 > series\n",
+        "8 - Платиновый предел - No new < 23 > series\n",
+        "9 - Тотальный гарем - No new < 10 > series\n",
+        "10 - Сильнейший мудрец низшей эмблемы - No new < 10 > series\n",
+        "11 - Эта фарфоровая кукла влюбилась - No new < 10 > series\n",
+        "12 - Герой-рационал перестраивает королевство (второй сезон) - No new < 10 > series\n"
+    ],
+    "log": "Тотальный гарем - New series 10"
 }

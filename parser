@@ -8,9 +8,9 @@ from PyQt5.QtCore import QTimer
 from design import Ui_MainWindow
 from sys import exit
 from requests import get
-from os import path, remove, popen
+from os import path, popen
 from time import sleep
-from main_selenium import allParsing, oneParsing, extraClose, listLinkOrNumbers
+from main_selenium import allParsing, oneParsing, extraClose
 from threading import Thread
 from notifications import checking, checkingWrite
 from json import dumps, load
@@ -67,13 +67,19 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def uploadGlobalSettings(self):
-        with open('setting.json', 'r') as r:
-            data = load(r)
+        with open('setting.json', 'r') as reads:
+            data = load(reads)
         return data
 
 
-    def setGlobalSettings(self, to_json: dict, mode: str, var:str):
-        to_json[mode] = var
+    def setGlobalSettings(self, to_json: dict, mode: str, var, flag=False, state=False):
+        if state:
+            pass
+        else:
+            if flag:
+                to_json[mode].append(var)
+            else:
+                to_json[mode] = var
         with open('setting.json', 'w') as js:
             js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
 
@@ -91,11 +97,11 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def clicker(self, check=True):
-        urls, num = listLinkOrNumbers()
+        data = self.uploadGlobalSettings()
         if check:
-            checkingWrite(urls, num)
+            checkingWrite(data['urls'], data['series'])
         else:
-            checking(urls, num)
+            checking(data['urls'], data['series'])
         self.ui.toolButton_12.setEnabled(True)
         self.ui.toolButton_9.setEnabled(True)
         self.ui.toolButton_5.setEnabled(True)
@@ -106,29 +112,25 @@ class myWindow(QtWidgets.QMainWindow):
 
     def update(self):
         print('Yes')
+        self.timer_check.start(900_000)
         if self.ui.toolButton_12.isEnabled() == False:
-            self.timer_check.stop()
+            pass
         else:
-            self.timer_check.start(900_000)
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+            Thread(target = self.clicker, args = (False,)).start()
         self.ui.toolButton_5.setEnabled(False)
-        self.ui.toolButton_4.setEnabled(False)
         self.ui.toolButton_12.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-        Thread(target = self.clicker, args = (False,)).start()
+        self.ui.toolButton_4.setEnabled(False)
 
 
     def timeNumber(self):
-        _, num = listLinkOrNumbers()
+        data = self.uploadGlobalSettings()
         self.timer.start(1000)
-        self.ui.lcdNumber.display(num[self.ui.comboBox.currentIndex()])
-        # if self.hasFocus() == False:
-            # self.hidded()
-            # self.click += 1
-        reads = self.uploadGlobalSettings()
-        if reads['notify'] == 'unchecked':
+        self.ui.lcdNumber.display(data['series'][self.ui.comboBox.currentIndex()])
+        if data['notify'] == 'unchecked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
-        elif reads['notify'] == 'checked':
+        elif data['notify'] == 'checked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
 
 
@@ -226,13 +228,10 @@ class myWindow(QtWidgets.QMainWindow):
     def loging(self):
         alert = QMessageBox()
         text = ''
-        if path.exists(path.join(path.dirname(__file__), 'log.txt')):
-            with open('log.txt') as l:
-                arr = l.readlines()
-            for i in arr:
+        data = self.uploadGlobalSettings()
+        if len(data['logs']) != 0:
+            for i in data['logs']:
                 text = f'{text}{i}'
-            # text = '\n'.join(arr)
-            print(text)
             alert.setText(text)
         else:
             alert.setText('No file exist...')
@@ -241,20 +240,19 @@ class myWindow(QtWidgets.QMainWindow):
 
     def logOne(self):
         alert = QMessageBox()
-        if path.exists(path.join(path.dirname(__file__), 'loger.txt')):
-            with open('loger.txt') as l:
-                text = l.readline()
-            alert.setText(text)
+        data = self.uploadGlobalSettings()
+        if data['log'] != '':
+            alert.setText(data['log'])
         else:
             alert.setText('No file exist...')
         alert.exec_()
 
 
     def oneDown(self):
-        url, _ = listLinkOrNumbers()
+        data = self.uploadGlobalSettings()
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
-        Thread(target = oneParsing, args = (url[self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
+        Thread(target = oneParsing, args = (data['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
         Thread(target = self.whileStart).start()
 
 
@@ -266,7 +264,6 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def triggerFocus(self, reason):
-        # elif reason == QSystemTrayIcon.MiddleClick:
         if reason == QSystemTrayIcon.Trigger:
             if self.click % 2 == 0:
                 self.setFocus()
@@ -274,6 +271,7 @@ class myWindow(QtWidgets.QMainWindow):
             else:
                 self.hidded()
             self.click += 1
+        # elif reason == QSystemTrayIcon.MiddleClick:
 
 
     def hidded(self):
@@ -286,33 +284,29 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def saved(self):
-        url = f'https://{self.ui.lineEdit.text()}'
+        url = self.ui.lineEdit.text()
+        print(url)
         series = self.ui.spinBox.value()
-        alert = QMessageBox()
         try:
             get(url)
-            if url != "":
-                with open('list.txt', 'a') as f:
-                    f.write(f"{url},{series}\n")
-
-                self.ui.comboBox.addItem(url)
+            data = self.uploadGlobalSettings()
+            self.setGlobalSettings(data, 'urls', url, True)
+            self.setGlobalSettings(data, 'series', series, True)
+            self.ui.comboBox.addItem(url)
         except:
+            alert = QMessageBox()
             alert.setText(f"URL does not exist on Internet")
             alert.exec_()
             self.ui.lineEdit.setText('')
 
 
     def showed(self):
-        if path.exists(path.join(path.dirname(__file__), 'name.txt')):
-            with open('name.txt', 'r') as f:
-                data = f.readlines()
-            for i in data:
-                self.ui.comboBox.addItem(i)
-
         reads = self.uploadGlobalSettings()
+        
+        for i in reads['name']:
+            self.ui.comboBox.addItem(i)
+
         if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
-            with open('notify.txt', 'r') as f:
-                data = f.readlines()
             if reads['notify'] == 'unchecked':
                 self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
             elif reads['notify'] == 'checked':
@@ -330,27 +324,17 @@ class myWindow(QtWidgets.QMainWindow):
 
     def deleted(self):
         index = self.ui.comboBox.currentIndex()
-        data = []
-        listing = []
-        del_path = path.join(path.dirname(__file__), 'list.txt')
+        data = self.uploadGlobalSettings()
 
-        for i in range(self.ui.comboBox.count()):
-            data.append(self.ui.comboBox.itemText(i))
+        del(data['urls'][index])
+        del(data['series'][index])
 
-        with open('list.txt', 'r') as f:
-            current = f.readlines()
+        try:
+            del(data['name'][index])
+        except:
+            print('error name link!!!')
 
-        for i in current:
-            listing.append(i.split(','))
-
-        del(data[index])
-        del(listing[index])
-        remove(del_path)
-
-        for i in range(len(data)):
-            with open('list.txt', 'a') as f:
-                f.write(f"{data[i]},{listing[i][1]}")
-
+        self.setGlobalSettings(data, '', '', False, True)
         self.ui.comboBox.clear()
         self.showed()
 
