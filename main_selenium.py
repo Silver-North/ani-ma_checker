@@ -8,8 +8,8 @@ path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
 prefs = {'download.default_directory': path_down, "download.prompt_for_download": False}
 
 option = webdriver.ChromeOptions()
-option.add_experimental_option("prefs", prefs)
 option.add_argument('--headless')
+option.add_experimental_option("prefs", prefs)
 
 def allParsing():
     driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
@@ -28,7 +28,7 @@ def allParsing():
                 name = driver.find_element_by_class_name('shortstoryHead').text
                 next = driver.find_element_by_class_name('next')
                 name_dir = name.split(' /')
-                
+
                 print(name_dir[0])
 
                 if len(search_count_series) == series:
@@ -63,15 +63,17 @@ def allParsing():
                     logs.append(f'{i[0]} - {name_dir[0]} - No new < {series} > series\n')
                 driver.switch_to.default_content()
                 sleep(5)
-            except:
-                print("!!! << Error >> !!!")
-                logs.append(f'{i[0]} - !!! << Error >> !!!\n')
+            except Exception as e:
+                print(f"!!! << Error: {e} >> !!!")
+                logs.append(f'{i[0]} - !!! << Error: {e} >> !!!\n')
+
+    driver.quit()
+
     with open('setting.json', 'r') as reads:
         data = load(reads)
     data['logs'] = logs
     with open('setting.json', 'w') as js:
         js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-    driver.quit()
 
 
 def listLinkOrNumbers():
@@ -107,6 +109,7 @@ def oneParsing(url, digit):
                         next.click()
                         if len(search_count_series) > 24:
                             next.click()
+            print(search_count_series[-1].text)
             search_count_series[-1].click()
             sleep(15)
             frame = driver.find_elements_by_tag_name('iframe')
@@ -129,17 +132,17 @@ def oneParsing(url, digit):
             print('No new series!')
             log = f'{name_dir[0]} - No new < {series} > series'
         driver.switch_to.default_content()
-        sleep(5)
-    except:
-        log = "!!! << Error >> !!!"
-        print("!!! << Error >> !!!")
+    except Exception as e:
+        driver.quit()
+        log = f"!!! << Error: {e} >> !!!"
+        print(f"!!! << Error: {e} >> !!!")
 
+    driver.quit()
     with open('setting.json', 'r') as reads:
         data = load(reads)
     data['log'] = log
     with open('setting.json', 'w') as js:
         js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-    driver.quit()
 
 
 def checkUpload(f, url, dir, link, name, series, numbers):
@@ -152,7 +155,7 @@ def checkUpload(f, url, dir, link, name, series, numbers):
 
         rename(old, new)
 
-        if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/'):
+        if not path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/'):
             system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/downloads/"')
 
         if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}'):

@@ -14,6 +14,7 @@ from main_selenium import allParsing, oneParsing, extraClose
 from threading import Thread
 from notifications import checking, checkingWrite
 from json import dumps, load
+from datetime import date
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -37,7 +38,12 @@ class myWindow(QtWidgets.QMainWindow):
         self.timeNumber()
         self.defaultIcon()
         self.showed()
-        
+
+        name = date.today().strftime("%A")
+        if name == "Monday" or name == "Понедельник":
+            with open('notify.txt', 'w') as clear:
+                clear.write('')
+        print(name)
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
 
@@ -64,6 +70,7 @@ class myWindow(QtWidgets.QMainWindow):
         print(int_key)
         if int_key == 16777216:
             self.hidded()
+            self.click += 1
 
 
     def uploadGlobalSettings(self):
@@ -124,6 +131,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_4.setEnabled(False)
 
 
+
+
     def timeNumber(self):
         data = self.uploadGlobalSettings()
         self.timer.start(1000)
@@ -137,20 +146,20 @@ class myWindow(QtWidgets.QMainWindow):
 
     def notifyCheck(self):
         alert = QMessageBox()
-        datas = self.uploadGlobalSettings()    
+        datas = self.uploadGlobalSettings()
         if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
             with open('notify.txt', 'r') as f:
                 data = f.readlines()
             str = ''
-            
+
             for i in data:
                 str = f'{str}{i}'
-            
+
             if len(data) == 0:
                 alert.setGeometry(600, 95, 300, 100)
                 alert.setText("No notifications..")
             else:
-                alert.setGeometry(490, 95, 300, 100)
+                alert.setGeometry(420, 95, 300, 100)
                 alert.setText(str)
                 self.setGlobalSettings(datas, 'notify', 'checked')
         else:
@@ -201,7 +210,6 @@ class myWindow(QtWidgets.QMainWindow):
         if proc.find("chromedriver") == -1:
             return False
         else:
-            print("процесс висит")
             return True
 
 
@@ -302,7 +310,7 @@ class myWindow(QtWidgets.QMainWindow):
 
     def showed(self):
         reads = self.uploadGlobalSettings()
-        
+
         for i in reads['name']:
             self.ui.comboBox.addItem(i)
 
