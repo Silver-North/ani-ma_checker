@@ -5,10 +5,12 @@ from time import strftime, localtime
 from datetime import date
 from json import dumps, load
 from pyttsx3 import init
+from os import path
 
 
 check = 0
 tts = init()
+current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
 def checkURL(url, series):
@@ -36,19 +38,19 @@ def checkURL(url, series):
             check += 1
             current_date = date.today()
             current_time = strftime("%H:%M", localtime())
-            with open('setting.json', 'r') as js:
+            with open(f'{current_path}/setting.json', 'r') as js:
                 to_json = load(js)
             to_json['notify'] = 'unchecked'
-            with open('setting.json', 'w') as js:
+            with open(f'{current_path}/setting.json', 'w') as js:
                 js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-            with open('notify.txt', 'a') as d:
+            with open(f'{current_path}/notify.txt', 'a') as d:
                 d.write(f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n')
         return names[0]
     except Exception as e:
-        with open('setting.json', 'r') as reads:
+        with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
         data['log'] = f'Error: {e}'
-        with open('setting.json', 'w') as js:
+        with open(f'{current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
 
 
@@ -73,8 +75,8 @@ def checkingWrite(urls, numbers):
         names.append(checkURL(i[1], series))
     print(True)
 
-    with open('setting.json', 'r') as reads:
+    with open(f'{current_path}/setting.json', 'r') as reads:
         data = load(reads)
     data['name'] = names
-    with open('setting.json', 'w') as js:
+    with open(f'{current_path}/setting.json', 'w') as js:
         js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")

@@ -22,14 +22,14 @@
         10,
         10,
         10,
+        11,
+        11,
         10,
-        10,
-        9,
-        22,
-        10,
-        10,
-        10,
-        10
+        23,
+        11,
+        11,
+        11,
+        11
     ],
     "name": [
         "Клан девяти",
@@ -46,6 +46,20 @@
         "Эта фарфоровая кукла влюбилась",
         "Герой-рационал перестраивает королевство (второй сезон)"
     ],
-    "logs": [],
-    "log": ""
+    "logs": [
+        "0 - !!! << Error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')) >> !!!\n",
+        "1 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f0f40>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "2 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1d50>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "3 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f2260>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "4 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1f00>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "5 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1f90>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "6 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1240>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "7 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f29b0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "8 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f2f80>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "9 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f30d0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "10 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f2b00>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "11 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1000>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
+        "12 - !!! << Error: HTTPConnectionPool(host='localhost', port=54671): Max retries exceeded with url: /session/537c7e83c18ccb413365f9ba62c1aee1/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc13f2f1b10>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n"
+    ],
+    "log": "Error: HTTPSConnectionPool(host='animevost.org', port=443): Max retries exceeded with url: /tip/tv/2754-genjitsu-shugi-yuusha-no-oukoku-saikenki-2nd-season.html (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7ff7d3a59c60>: Failed to establish a new connection: [Errno -3] Временный сбой в разрешении имен'))"
 }

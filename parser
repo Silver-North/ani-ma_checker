@@ -8,9 +8,10 @@ from PyQt5.QtCore import QTimer
 from design import Ui_MainWindow
 from sys import exit
 from requests import get
-from os import path, popen
+from genericpath import isfile
+from os import listdir, path, popen
 from time import sleep
-from main_selenium import allParsing, oneParsing, extraClose
+from main_selenium import allParsing, oneParsing, extraClose, extraStopDownloading
 from threading import Thread
 from notifications import checking, checkingWrite
 from json import dumps, load
@@ -41,7 +42,7 @@ class myWindow(QtWidgets.QMainWindow):
 
         name = date.today().strftime("%A")
         if name == "Monday" or name == "Понедельник":
-            with open('notify.txt', 'w') as clear:
+            with open(f'{self.current_path}/notify.txt', 'w') as clear:
                 clear.write('')
         print(name)
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
@@ -56,7 +57,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_3.clicked.connect(self.closed)
         self.ui.toolButton_4.clicked.connect(self.allDown)
         self.ui.toolButton_5.clicked.connect(self.oneDown)
-        self.ui.toolButton_6.clicked.connect(extraClose)
+        self.ui.toolButton_6.clicked.connect(self.stoped)
         self.ui.toolButton_7.clicked.connect(self.loging)
         self.ui.toolButton_8.clicked.connect(self.logOne)
         self.ui.toolButton_9.clicked.connect(self.updateClick)
@@ -74,7 +75,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def uploadGlobalSettings(self):
-        with open('setting.json', 'r') as reads:
+        with open(f'{self.current_path}/setting.json', 'r') as reads:
             data = load(reads)
         return data
 
@@ -87,7 +88,7 @@ class myWindow(QtWidgets.QMainWindow):
                 to_json[mode].append(var)
             else:
                 to_json[mode] = var
-        with open('setting.json', 'w') as js:
+        with open(f'{self.current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
 
 
@@ -148,17 +149,14 @@ class myWindow(QtWidgets.QMainWindow):
         alert = QMessageBox()
         datas = self.uploadGlobalSettings()
         if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
-            with open('notify.txt', 'r') as f:
+            with open(f'{self.current_path}/notify.txt', 'r') as f:
                 data = f.readlines()
-            str = ''
-
-            for i in data:
-                str = f'{str}{i}'
 
             if len(data) == 0:
                 alert.setGeometry(600, 95, 300, 100)
                 alert.setText("No notifications..")
             else:
+                str = ''.join(data)
                 alert.setGeometry(420, 95, 300, 100)
                 alert.setText(str)
                 self.setGlobalSettings(datas, 'notify', 'checked')
@@ -194,6 +192,9 @@ class myWindow(QtWidgets.QMainWindow):
 # Set Icon for toolButton
     def defaultIcon(self):
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
+        self.ui.toolButton.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
+        self.ui.toolButton_2.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
+        self.ui.toolButton_3.setIcon(QIcon(f'{self.current_path}/icons/close.png'))
         self.ui.toolButton_6.setIcon(QIcon(f'{self.current_path}/icons/lose.png'))
         self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/log.png'))
         self.ui.toolButton_8.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
@@ -216,11 +217,19 @@ class myWindow(QtWidgets.QMainWindow):
     def whileStart(self):
         while True:
             if self.check():
+                filename = [f for f in listdir(f'{self.current_path}/downloads') if isfile(path.join(f'{self.current_path}/downloads', f))]
+                if len(filename) > 0:
+                    for i in filename:
+                        if '.mp4.crdownload' in i:
+                            self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
+                        else:
+                            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+                else:
+                    self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
                 self.ui.toolButton_5.setEnabled(False)
                 self.ui.toolButton_4.setEnabled(False)
                 self.ui.toolButton_12.setEnabled(False)
                 self.ui.toolButton_9.setEnabled(False)
-                self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
             else:
                 self.defaultIcon()
                 self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
@@ -259,13 +268,13 @@ class myWindow(QtWidgets.QMainWindow):
     def oneDown(self):
         data = self.uploadGlobalSettings()
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
         Thread(target = oneParsing, args = (data['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
         Thread(target = self.whileStart).start()
 
 
     def allDown(self):
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
+        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
         Thread(target = allParsing).start()
         Thread(target = self.whileStart).start()
@@ -345,6 +354,11 @@ class myWindow(QtWidgets.QMainWindow):
         self.setGlobalSettings(data, '', '', False, True)
         self.ui.comboBox.clear()
         self.showed()
+
+
+    def stoped(self):
+        extraStopDownloading()
+        extraClose()
 
 
 app = QtWidgets.QApplication([])
