@@ -70,7 +70,7 @@ def allParsing():
 
     with open(f'{current_path}/setting.json', 'r') as reads:
         data = load(reads)
-    data['logs'] = logs
+    data['anime']['logs'] = logs
     with open(f'{current_path}/setting.json', 'w') as js:
         js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
 
@@ -78,7 +78,7 @@ def allParsing():
 def listLinkOrNumbers():
     with open(f'{current_path}/setting.json', 'r') as reads:
         data = load(reads)
-    return data['urls'], data['series']
+    return data['anime']['urls'], data['anime']['series']
 
 
 def oneParsing(url, digit):
@@ -136,7 +136,7 @@ def oneParsing(url, digit):
     driver.quit()
     with open(f'{current_path}/setting.json', 'r') as reads:
         data = load(reads)
-    data['log'] = log
+    data['anime']['log'] = log
     with open(f'{current_path}/setting.json', 'w') as js:
         js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
 
@@ -164,7 +164,7 @@ def checkUpload(f, url, dir, link, name, series, numbers):
 
         with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
-        data['series'][url.index(link)] = series
+        data['anime']['series'][url.index(link)] = series
         with open(f'{current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
     elif check_flag == True:
