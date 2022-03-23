@@ -458,12 +458,22 @@ class myWindow(QtWidgets.QMainWindow):
         del(data['anime']['series'][index])
 
         try:
+            del(data['anime']['images'][index])
+            system(f'rm {self.current_path}/description/{data["anime"]["images"][index]}')
+        except:
+            pass
+        try:
+            del(data['anime']['description'][index])
+        except:
+            print('error name link!!!')
+        try:
             del(data['anime']['name'][index])
         except:
             print('error name link!!!')
 
         self.setGlobalSettings(data, '', '', '', False, True)
         self.ui.comboBox.clear()
+        self.ui.comboBox_3.clear()
         self.showed()
 
 

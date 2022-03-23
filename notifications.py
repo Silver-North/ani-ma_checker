@@ -112,6 +112,7 @@ def checking(urls, numbers):
         if flag:
             series = numbers[i[0]] + 1
             checkURL(i[1], series)
+    flag = True
     if check > 0:
         tts.say("Something new came out... check the natification log...")
         tts.runAndWait()
@@ -127,6 +128,7 @@ def checkingWrite(urls, numbers):
         if flag:
             series = numbers[i[0]] + 1
             names.append(checkURL(i[1], series))
+    flag = True
     print(True)
 
     with open(f'{current_path}/setting.json', 'r') as reads:
