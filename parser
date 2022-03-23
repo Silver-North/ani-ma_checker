@@ -36,7 +36,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
         self.current_path = path.dirname(path.realpath(__file__))
-        
+
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.triggerFocus)
         self.tray.show()
@@ -137,6 +137,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_5.setEnabled(False)
         self.ui.toolButton_4.setEnabled(False)
         self.ui.toolButton_12.setEnabled(False)
+        self.ui.toolButton_17.setEnabled(False)
+        self.ui.toolButton_20.setEnabled(False)
+        self.ui.toolButton_23.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
         self.ui.toolButton_9.setToolTip(u"Checking..")
@@ -153,6 +156,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_12.setEnabled(True)
         self.ui.toolButton_9.setEnabled(True)
         self.ui.toolButton_5.setEnabled(True)
+        self.ui.toolButton_17.setEnabled(True)
+        self.ui.toolButton_20.setEnabled(True)
+        self.ui.toolButton_23.setEnabled(True)
         self.ui.toolButton_4.setEnabled(True)
         self.flag = True
         self.defaultIcon()
@@ -170,6 +176,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_5.setEnabled(False)
         self.ui.toolButton_12.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
+        self.ui.toolButton_17.setEnabled(False)
+        self.ui.toolButton_20.setEnabled(False)
+        self.ui.toolButton_23.setEnabled(False)
         self.ui.toolButton_4.setEnabled(False)
 
 
@@ -187,7 +196,7 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         # self.updateNumber()
         self.iconTab()
-        
+
 
     def iconTab(self):
         index = self.ui.tabWidget.currentIndex()
