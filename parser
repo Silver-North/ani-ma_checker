@@ -9,12 +9,14 @@ from design import Ui_MainWindow
 from sys import exit
 from requests import get
 from selenium import webdriver
+from shutil import copyfileobj
 from genericpath import isfile
+from webbrowser import open as open_url
 from os import listdir, path, popen, system
 from time import sleep
 from main_selenium import allParsing, oneParsing, extraClose, extraStopDownloading
 from threading import Thread
-from notifications import checking, checkingWrite, setDescription, stopCheck
+from notifications import checking, checkingWrite, setDescription, stopCheck, loadImage
 from json import dumps, load
 from datetime import date
 from validators import url as check_url
@@ -43,6 +45,14 @@ class myWindow(QtWidgets.QMainWindow):
         self.defaultIcon()
         self.showed()
         self.showCombo()
+        self.viewDescription()
+        self.updateNumber()
+        self.upComboAnime()
+        self.viewDescriptionManga()
+        self.ui.comboBox.activated[str].connect(self.upComboAnime)
+        self.ui.comboBox_2.activated[str].connect(self.updateNumber)
+        self.ui.comboBox_3.activated[str].connect(self.viewDescription)
+        self.ui.comboBox_4.activated[str].connect(self.viewDescriptionManga)
 
         name = date.today().strftime("%A")
         if name == "Monday" or name == "Понедельник":
@@ -67,9 +77,11 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_10.clicked.connect(self.notifyCheck)
         self.ui.toolButton_11.clicked.connect(self.modeColorSheme)
         self.ui.toolButton_12.clicked.connect(self.update)
+        self.ui.toolButton_16.clicked.connect(self.openURLAnime)
         self.ui.toolButton_18.clicked.connect(self.hidded)
 #### << Manga-module >> ####
         self.ui.toolButton_13.clicked.connect(self.loged)
+        self.ui.toolButton_14.clicked.connect(self.openURLManga)
         self.ui.toolButton_15.clicked.connect(self.savedUrl)
         self.ui.toolButton_17.clicked.connect(self.currentUpdate)
         self.ui.toolButton_19.clicked.connect(self.delItem)
@@ -77,6 +89,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_21.clicked.connect(self.checkUpdateItem)
 #### <<< View Anime-description module >> ####
         self.ui.toolButton_22.clicked.connect(self.uploadDescription)
+#### <<< View Manga-description module >> ####
+        self.ui.toolButton_23.clicked.connect(self.uploadDescriptionManga)
 
 
     def keyPressEvent(self, QKeyEvent):
@@ -109,6 +123,12 @@ class myWindow(QtWidgets.QMainWindow):
                     to_json[tab][mode] = var
         with open(f'{self.current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+
+
+    def openURLAnime(self):
+        index = self.ui.comboBox.currentIndex()
+        data = self.uploadGlobalSettings()
+        open_url(data['anime']['urls'][index])
 
 
     def updateClick(self):
@@ -153,17 +173,20 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_4.setEnabled(False)
 
 
+    def upComboAnime(self):
+        data = self.uploadGlobalSettings()
+        self.ui.lcdNumber.display(data['anime']['series'][self.ui.comboBox.currentIndex()])
+
+
     def timeNumber(self):
         data = self.uploadGlobalSettings()
         self.timer.start(1000)
-        self.ui.lcdNumber.display(data['anime']['series'][self.ui.comboBox.currentIndex()])
         if data['anime']['notify'] == 'unchecked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
         elif data['anime']['notify'] == 'checked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
-        self.updateNumber()
+        # self.updateNumber()
         self.iconTab()
-        self.viewDescription()
         
 
     def iconTab(self):
@@ -243,6 +266,9 @@ class myWindow(QtWidgets.QMainWindow):
     def defaultIcon(self):
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
         self.ui.toolButton_22.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+        self.ui.toolButton_23.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+        self.ui.toolButton_14.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
+        self.ui.toolButton_16.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
         self.ui.toolButton_18.setIcon(QIcon(f'{self.current_path}/icons/hide.png'))
         self.ui.tabWidget.setTabIcon(0, QIcon(f'{self.current_path}/icons/animevost.png'))
@@ -295,18 +321,21 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.toolButton_5.setEnabled(False)
                 self.ui.toolButton_17.setEnabled(False)
                 self.ui.toolButton_20.setEnabled(False)
+                self.ui.toolButton_23.setEnabled(False)
                 self.ui.toolButton_4.setEnabled(False)
                 self.ui.toolButton_12.setEnabled(False)
                 self.ui.toolButton_9.setEnabled(False)
             else:
                 self.defaultIcon()
                 self.flag = True
+                self.upComboAnime()
                 self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
                 self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
                 self.ui.toolButton_17.setEnabled(True)
                 self.ui.toolButton_20.setEnabled(True)
                 self.ui.toolButton_12.setEnabled(True)
                 self.ui.toolButton_5.setEnabled(True)
+                self.ui.toolButton_23.setEnabled(True)
                 self.ui.toolButton_4.setEnabled(True)
                 self.ui.toolButton_9.setEnabled(True)
                 break
@@ -462,15 +491,17 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def checkUpdateItem(self):
-        value = self.ui.doubleSpinBox().value()
-        index = self.ui.comboBox_2.currentIndex()
         data = self.uploadGlobalSettings()
+        value = self.ui.doubleSpinBox.value()
+        index = self.ui.comboBox_2.currentIndex()
         if value != 0.0:
-            if '.00' in str(value):
+            if '.00' in str(value) or '.0' in str(value):
                 value = int(value)
             data['manga']['numbers'][index] = value
             with open(f'{self.current_path}/setting.json', 'w') as w:
                 w.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+            self.ui.doubleSpinBox.setValue(0)
+            self.updateNumber()
 
 
     def loged(self):
@@ -573,6 +604,7 @@ class myWindow(QtWidgets.QMainWindow):
         while True:
             proc = popen('ps ax').read()
             if proc.find("chromedriver") == -1:
+                self.ui.toolButton_23.setEnabled(True)
                 self.ui.toolButton_20.setEnabled(True)
                 self.ui.toolButton_17.setEnabled(True)
                 self.ui.toolButton_4.setEnabled(True)
@@ -583,6 +615,7 @@ class myWindow(QtWidgets.QMainWindow):
                 self.tray.setToolTip('Check..')
                 break
             else:
+                self.ui.toolButton_23.setEnabled(False)
                 self.ui.toolButton_4.setEnabled(False)
                 self.ui.toolButton_5.setEnabled(False)
                 self.ui.toolButton_9.setEnabled(False)
@@ -642,7 +675,13 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.lcdNumber_3.setStyleSheet('background: rgb(192, 16, 16)')
 
 
-#### <<< Tab Description >>> ####
+    def openURLManga(self):
+        index = self.ui.comboBox_2.currentIndex()
+        data = self.uploadGlobalSettings()
+        open_url(data['manga']['urls'][index])
+
+
+#### <<< Tab Anime Description >>> ####
     def viewDescription(self):
         index = self.ui.comboBox_3.currentIndex()
         data = self.uploadGlobalSettings()
@@ -654,6 +693,55 @@ class myWindow(QtWidgets.QMainWindow):
     def uploadDescription(self):
         data = self.uploadGlobalSettings()
         Thread(target = setDescription, args = (data['anime']['urls'],)).start()
+
+
+#### <<< Tab Manga Description >>> ####
+    def uploadDescriptionManga(self):
+        Thread(target = self.upDeskManga).start()
+        Thread(target = self.checkWorkSelenium).start()
+
+
+    def viewDescriptionManga(self):
+        index = self.ui.comboBox_4.currentIndex()
+        data = self.uploadGlobalSettings()
+
+        self.ui.label_6.setPixmap(QPixmap(f'{self.current_path}/description/{data["manga"]["images"][index]}'))
+        self.ui.textEdit_2.setHtml(data['manga']['description'][index])
+
+
+    def upDeskManga(self):
+        data = self.uploadGlobalSettings()
+        imgs = []
+        descs = []
+        option = webdriver.ChromeOptions()
+        option.add_argument('--headless')
+        driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
+        for i in data['manga']['urls']:
+            driver.get(i)
+            sleep(2)
+            if 'https://manga-chan.me' in i:
+                pass
+                img = driver.find_element_by_id('cover')
+                img = img.get_attribute('src')
+                desc = driver.find_element_by_id('description').text
+            else:
+                img = driver.find_elements_by_class_name('fotorama__img')
+                img = img[0].get_attribute('src')
+                desc = driver.find_element_by_class_name('manga-description').text
+            print(img)
+            image = img.split('/')
+            descs.append(desc)
+            r = get(img, stream=True)
+            if r.status_code == 200:
+                with open(f'{self.current_path}/description/{image[-1]}', 'wb') as f:
+                    r.raw.decode_content = True
+                    copyfileobj(r.raw, f)
+            image = loadImage(image[-1])
+            imgs.append(image)
+        self.setGlobalSettings(data, 'manga', 'images', imgs)
+        self.setGlobalSettings(data, 'manga', 'description', descs)
+        driver.quit()
+
 
 
 app = QtWidgets.QApplication([])

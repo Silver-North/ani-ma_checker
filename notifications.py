@@ -84,8 +84,8 @@ def loadImage(name):
     new_name = name.split('.')
     img = Image.open(f'{current_path}/description/{name}')
     resizing = img.resize((width, height), Image.ANTIALIAS)
-    resizing.save(f'{current_path}/description/{new_name[0]}.png')
-    return f'{new_name[0]}.png'
+    resizing.save(f'{current_path}/description/{name}')
+    return name
 
 
 def setDescription(urls):
