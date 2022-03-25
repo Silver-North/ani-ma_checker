@@ -15,6 +15,9 @@ option.add_experimental_option("prefs", prefs)
 
 def allParsing():
     global check_flag
+    option = webdriver.ChromeOptions()
+    option.add_argument('--headless')
+    option.add_experimental_option("prefs", prefs)
     driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
     url, numbers = listLinkOrNumbers()
     logs = []
@@ -83,6 +86,9 @@ def listLinkOrNumbers():
 
 def oneParsing(url, digit):
     global check_flag
+    option = webdriver.ChromeOptions()
+    option.add_argument('--headless')
+    option.add_experimental_option("prefs", prefs)
     driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
     urls, numbers = listLinkOrNumbers()
     log = ''

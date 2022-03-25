@@ -7,6 +7,7 @@ from json import dumps, load
 from pyttsx3 import init
 from shutil import copyfileobj
 from PIL import Image
+from time import sleep
 
 
 check = 0
@@ -15,7 +16,7 @@ tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
-def checkURL(url, series):
+def checkURL(url, series, fide=False):
     global check
     print(url)
     try:
@@ -47,13 +48,16 @@ def checkURL(url, series):
                 js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
             with open(f'{current_path}/notify.txt', 'a') as d:
                 d.write(f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n')
-        return names[0]
+        if fide == False:
+            return names[0]
     except Exception as e:
         with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
         data['anime']['log'] = f'Error: {e}'
         with open(f'{current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+    if fide:
+        return check
 
 
 def getDescription(url):
@@ -108,11 +112,13 @@ def setDescription(urls):
 
 def checking(urls, numbers):
     global check, flag
+    flag = True
     for i in enumerate(urls):
         if flag:
             series = numbers[i[0]] + 1
             checkURL(i[1], series)
-    flag = True
+        else:
+            break
     if check > 0:
         tts.say("Something new came out... check the natification log...")
         tts.runAndWait()
@@ -124,11 +130,13 @@ def checking(urls, numbers):
 def checkingWrite(urls, numbers):
     global flag
     names = []
+    flag = True
     for i in enumerate(urls):
         if flag:
             series = numbers[i[0]] + 1
             names.append(checkURL(i[1], series))
-    flag = True
+        else:
+            break
     print(True)
 
     with open(f'{current_path}/setting.json', 'r') as reads:
