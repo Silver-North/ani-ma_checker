@@ -9,7 +9,7 @@ from shutil import copyfileobj
 from PIL import Image
 from time import sleep
 
-
+check = 0
 tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
