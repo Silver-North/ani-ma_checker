@@ -10,8 +10,6 @@ from PIL import Image
 from time import sleep
 
 
-check = 0
-flag = True
 tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
@@ -75,7 +73,7 @@ def getDescription(url):
             with open(f'{current_path}/description/{img[-1]}', 'wb') as f:
                 r.raw.decode_content = True
                 copyfileobj(r.raw, f)
-        
+
         image = loadImage(img[-1])
         return image, desc[8].text
     except Exception as e:
@@ -89,62 +87,3 @@ def loadImage(name):
     resizing = img.resize((width, height), Image.ANTIALIAS)
     resizing.save(f'{current_path}/description/{name}')
     return name
-
-
-def setDescription(urls):
-    images = []
-    descs = []
-    for i in urls:
-        img, desc = getDescription(i)
-        images.append(img)
-        descs.append(desc)
-
-    with open(f'{current_path}/setting.json', 'r') as reads:
-        data = load(reads)
-
-    data['anime']['description'] = descs
-    data['anime']['images'] = images
-    
-    with open(f'{current_path}/setting.json', 'w') as js:
-        js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-
-
-def checking(urls, numbers):
-    global check, flag
-    flag = True
-    for i in enumerate(urls):
-        if flag:
-            series = numbers[i[0]] + 1
-            checkURL(i[1], series)
-        else:
-            break
-    if check > 0:
-        tts.say("Something new came out... check the natification log...")
-        tts.runAndWait()
-        system('notify-send "Вышло кое-что новенькое!!!"')
-    check = 0
-    print(True)
-
-
-def checkingWrite(urls, numbers):
-    global flag
-    names = []
-    flag = True
-    for i in enumerate(urls):
-        if flag:
-            series = numbers[i[0]] + 1
-            names.append(checkURL(i[1], series))
-        else:
-            break
-    print(True)
-
-    with open(f'{current_path}/setting.json', 'r') as reads:
-        data = load(reads)
-    data['anime']['name'] = names
-    with open(f'{current_path}/setting.json', 'w') as js:
-        js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-        
-
-def stopCheck():
-    global flag
-    flag = False
