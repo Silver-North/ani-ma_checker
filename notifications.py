@@ -17,6 +17,7 @@ current_path = f'{path.dirname(path.realpath(__file__))}'
 def checkURL(url, series, fide=False):
     global check
     print(url)
+    names = ''
     try:
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
@@ -46,16 +47,13 @@ def checkURL(url, series, fide=False):
                 js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
             with open(f'{current_path}/notify.txt', 'a') as d:
                 d.write(f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n')
-        if fide == False:
-            return names[0]
     except Exception as e:
         with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
         data['anime']['log'] = f'Error: {e}'
         with open(f'{current_path}/setting.json', 'w') as js:
             js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-    if fide:
-        return check
+    return names[0], check
 
 
 def getDescription(url):

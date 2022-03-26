@@ -26,13 +26,15 @@ from validators import url as check_url
 
 dead = True
 checker_tag = True
+update_list_anime = False 
 
 
 class ThreadProgress(QThread):
     _signal = pyqtSignal(int)
-    def __init__(self, flag=True):
+    def __init__(self, data, flag=True):
         super(ThreadProgress, self).__init__()
         self.flag = flag
+        self.data = data
         self.current_path = path.dirname(path.realpath(__file__))
         self.check = 0
 
@@ -41,40 +43,36 @@ class ThreadProgress(QThread):
         self.wait()
 
 
-    def uploadGlobalSettings(self):
-        with open(f'{self.current_path}/setting.json', 'r') as reads:
-            data = load(reads)
-        return data
-
-
     def run(self):
-        global dead, checker_tag
+        global dead, checker_tag, update_list_anime
         checker_tag = False
         dead = True
-        data = self.uploadGlobalSettings()
         name = []
-        for i in enumerate(data['anime']['urls']):
-            if not dead:
-                break
-            series = data['anime']['series'][i[0]] + 1
-            if self.flag:
-                self.check = checkURL(i[1], series, True)
-            else:
-                name.append(checkURL(i[1], series))
-            index = i[0] + 1
-            percent = int(index / len(data['anime']['urls']) * 100)
-            self._signal.emit(percent)
+        try:
+            for i in enumerate(self.data['anime']['urls']):
+                if not dead:
+                    raise Exception('Extra close Thread..')
+                series = self.data['anime']['series'][i[0]] + 1
+                names, self.check = checkURL(i[1], series)
+                if self.flag == False:
+                    name.append(names)
+                index = i[0] + 1
+                percent = int(index / len(self.data['anime']['urls']) * 100)
+                self._signal.emit(percent)
+            if not self.flag:
+                self.data['anime']['name'] = name
+                with open(f'{self.current_path}/setting.json', 'w') as js:
+                    js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+                update_list_anime = True
+        except Exception as e:
+            print('Error ==>\n', e)
+
         if self.check > 0:
+            self.check = 0
             tts = init()
             tts.say("Something new came out... check the natification log...")
             tts.runAndWait()
             system('notify-send "Вышло кое-что новенькое!!!"')
-        self.check = 0
-        if not self.flag:
-            data['anime']['name'] = name
-            with open(f'{self.current_path}/setting.json', 'w') as js:
-                js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-
         sleep(1)
         percent = 0
         self._signal.emit(percent)
@@ -123,7 +121,6 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.timeNumber()
         self.defaultIcon()
-        # self.downProgress()
 
         self.showed()
         self.showCombo()
@@ -407,7 +404,6 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def stopCheck(self):
-        self.thread_class.quit()
         self.f_flag = False
 
 
@@ -431,15 +427,16 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
         self.ui.toolButton_9.setToolTip(u"Checking..")
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-        Thread(target = self.clicker).start()
+        data = self.uploadGlobalSettings()
+        Thread(target = self.clicker, args=(data,)).start()
 
 
-    def clicker(self, check=True):
+    def clicker(self, data, check=True):
         self.flag = False
         if check:
-            self.thread_class = ThreadProgress(False)
+            self.thread_class = ThreadProgress(data, False)
         else:
-            self.thread_class = ThreadProgress()
+            self.thread_class = ThreadProgress(data)
         self.thread_class._signal.connect(self.progressCount)
         self.thread_class.start()
         self.thread_class.wait()
@@ -462,8 +459,9 @@ class myWindow(QtWidgets.QMainWindow):
         if self.ui.toolButton_12.isEnabled() == False:
             pass
         else:
+            data = self.uploadGlobalSettings()
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-            Thread(target = self.clicker, args = (False,)).start()
+            Thread(target = self.clicker, args = (data, False)).start()
         self.ui.toolButton_5.setEnabled(False)
         self.ui.toolButton_12.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
@@ -480,7 +478,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def timeNumber(self):
-        global checker_tag
+        global checker_tag, update_list_anime
         data = self.uploadGlobalSettings()
         self.timer.start(1000)
         if data['anime']['notify'] == 'unchecked':
@@ -495,6 +493,11 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.progressBar_2.setValue(self.percent_all_anime)
         else:
             self.percent_all_anime = 0
+        if update_list_anime:
+            self.ui.comboBox_3.clear()
+            self.ui.comboBox.clear()
+            self.showed()
+            update_list_anime = False
         self.iconTab()
         # self.downProgress()
 
@@ -725,9 +728,9 @@ class myWindow(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, 'anime', 'urls', url, True)
             self.setGlobalSettings(data, 'anime', 'series', series, True)
             self.ui.comboBox.addItem(url)
-        except:
+        except Exception as e:
             alert = QMessageBox()
-            alert.setText(f"URL does not exist on Internet")
+            alert.setText(f"URL Error ==>\n{e}")
             alert.exec_()
             self.ui.lineEdit.setText('')
 
@@ -736,10 +739,11 @@ class myWindow(QtWidgets.QMainWindow):
         reads = self.uploadGlobalSettings()
 
         for i in reads['anime']['name']:
+            self.ui.comboBox.addItem(i)
             self.ui.comboBox_3.addItem(i)
 
-        for i in reads['anime']['name']:
-            self.ui.comboBox.addItem(i)
+        self.ui.comboBox.setCurrentIndex(0)
+        self.ui.comboBox_3.setCurrentIndex(0)
 
         if path.exists(path.join(path.dirname(__file__), 'notify.txt')):
             if reads['anime']['notify'] == 'unchecked':
@@ -772,7 +776,7 @@ class myWindow(QtWidgets.QMainWindow):
         try:
             del(data['anime']['description'][index])
         except:
-            print('error name link!!!')
+            print('error Description link!!!')
         try:
             del(data['anime']['name'][index])
         except:
@@ -782,7 +786,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.comboBox.clear()
         self.ui.comboBox_3.clear()
         self.showed()
-        self.viewDescription()
 
 
     def stoped(self):
@@ -803,6 +806,14 @@ class myWindow(QtWidgets.QMainWindow):
         del(data['manga']['urls'][index])
         try:
             del(data['manga']['names'][index])
+        except:
+            pass
+        try:
+            del(data['manga']['images'][index])
+        except:
+            pass
+        try:
+            del(data['manga']['description'][index])
         except:
             pass
         try:
@@ -856,7 +867,8 @@ class myWindow(QtWidgets.QMainWindow):
     def currentUpdate(self):
         # self.times.start(3_600_000)
         self.flag = False
-        Thread(target = self.upUrls).start()
+        data = self.uploadGlobalSettings()
+        Thread(target = self.upUrls, args = (data,)).start()
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
         self.ui.toolButton_20.setEnabled(False)
         self.ui.toolButton_17.setEnabled(False)
@@ -865,7 +877,6 @@ class myWindow(QtWidgets.QMainWindow):
 
     def upUrls(self):
         global dead
-        data = self.uploadGlobalSettings()
         logs = []
         numbers_check = []
         msg = []
@@ -926,7 +937,8 @@ class myWindow(QtWidgets.QMainWindow):
 
     def updateClickManga(self):
         self.flag = False
-        Thread(target = self.setUpSelenium).start()
+        data = self.uploadGlobalSettings()
+        Thread(target = self.setUpSelenium, args = (data,)).start()
         self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
         self.ui.toolButton_20.setEnabled(False)
         self.ui.toolButton_17.setEnabled(False)
@@ -959,9 +971,8 @@ class myWindow(QtWidgets.QMainWindow):
 
 
 
-    def setUpSelenium(self):
+    def setUpSelenium(self, data):
         global dead
-        data = self.uploadGlobalSettings()
         names = []
         s = 0
         option = webdriver.ChromeOptions()
@@ -1035,12 +1046,11 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.setHtml(data['anime']['description'][index])
 
 
-    def setDescription(self):
+    def setDescription(self, data):
         global dead
         dead = True
         images = []
         descs = []
-        data = self.uploadGlobalSettings()
         try:
             for i in enumerate(data['anime']['urls']):
                 if dead == False:
@@ -1052,8 +1062,6 @@ class myWindow(QtWidgets.QMainWindow):
                 self.percent_desc_anime = int(index_i / len(data['anime']['urls']) * 100)
                 print(self.percent_desc_anime, index_i, len(data['anime']['urls']))
 
-        # data['anime']['description'] = descs
-        # data['anime']['images'] = images
             self.setGlobalSettings(data, 'anime', 'description', descs)
             self.setGlobalSettings(data, 'anime', 'images', images)
         except Exception as e:
@@ -1064,12 +1072,14 @@ class myWindow(QtWidgets.QMainWindow):
         
 
     def uploadDescription(self):
-        Thread(target = self.setDescription).start()
+        data = self.uploadGlobalSettings()
+        Thread(target = self.setDescription, args = (data,)).start()
 
 
 #### <<< Tab Manga Description >>> ####
     def uploadDescriptionManga(self):
-        Thread(target = self.upDeskManga).start()
+        data = self.uploadGlobalSettings()
+        Thread(target = self.upDeskManga, args = (data,)).start()
         Thread(target = self.checkWorkSelenium).start()
 
 
@@ -1081,8 +1091,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit_2.setHtml(data['manga']['description'][index])
 
 
-    def upDeskManga(self):
-        data = self.uploadGlobalSettings()
+    def upDeskManga(self, data):
         imgs = []
         descs = []
         s = 0
