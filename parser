@@ -17,7 +17,7 @@ from webbrowser import open as open_url
 from os import listdir, path, popen, system, rename
 from time import sleep, localtime, strftime
 from threading import Thread
-from notifications import checkURL, setDescription, loadImage
+from notifications import checkURL, getDescription, loadImage
 from json import dumps, load
 from pyttsx3 import init
 from datetime import date
@@ -97,6 +97,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.click = 0
         self.percent = 0
         self.percent_all_anime = 0
+        self.percent_all_manga = 0
+        self.percent_desc_manga = 0
+        self.percent_desc_anime = 0
         self.color = 0
         self.path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
         self.prefs = {'download.default_directory': self.path_down, "download.prompt_for_download": False}
@@ -104,9 +107,14 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
         
-        self.progress_check = QTimer()
-        self.progress_check.timeout.connect(self.downProgress)
-        
+        self.ui.progressBar.setStyleSheet('selection-background-color: #00e916; background-image: linear-gradient(160deg, #00e916 0%, #3dffe9 75%);')
+        self.ui.progressBar_2.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
+        self.ui.progressBar_3.setStyleSheet('selection-background-color: #FFE53B; background-image: linear-gradient(22deg, #FFE53B 0%, #FF2525 82%);')
+        self.ui.progressBar_4.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
+        self.ui.progressBar_5.setStyleSheet('selection-background-color: #FF3CAC; background-image: linear-gradient(219deg, #FF3CAC 4%, #784BA0 44%, #2B86C5 100%);')
+
+        self.ui.toolButton_24.setStyleSheet('border: none; background: transparent; color: gray;')
+
         self.current_path = path.dirname(path.realpath(__file__))
 
         self.tray = QSystemTrayIcon(self)
@@ -114,9 +122,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.tray.show()
 
         self.timeNumber()
-        self.downProgress()
-
         self.defaultIcon()
+        # self.downProgress()
+
         self.showed()
         self.showCombo()
         self.viewDescription()
@@ -137,7 +145,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
         self.update()
-
+        self.ui.tabWidget.setCurrentIndex(0)
 #### << Maiin-module >> ####
         self.ui.toolButton_3.clicked.connect(self.closed)
         self.ui.toolButton_11.clicked.connect(self.modeColorSheme)
@@ -417,6 +425,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_12.setEnabled(False)
         self.ui.toolButton_17.setEnabled(False)
         self.ui.toolButton_20.setEnabled(False)
+        self.ui.toolButton_22.setEnabled(False)
         self.ui.toolButton_23.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
@@ -440,6 +449,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_9.setEnabled(True)
         self.ui.toolButton_5.setEnabled(True)
         self.ui.toolButton_17.setEnabled(True)
+        self.ui.toolButton_22.setEnabled(True)
         self.ui.toolButton_20.setEnabled(True)
         self.ui.toolButton_23.setEnabled(True)
         self.ui.toolButton_4.setEnabled(True)
@@ -458,6 +468,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_12.setEnabled(False)
         self.ui.toolButton_9.setEnabled(False)
         self.ui.toolButton_17.setEnabled(False)
+        self.ui.toolButton_22.setEnabled(False)
         self.ui.toolButton_20.setEnabled(False)
         self.ui.toolButton_23.setEnabled(False)
         self.ui.toolButton_4.setEnabled(False)
@@ -477,27 +488,37 @@ class myWindow(QtWidgets.QMainWindow):
         elif data['anime']['notify'] == 'checked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         self.ui.progressBar.setValue(self.percent)
+        self.ui.progressBar_3.setValue(self.percent_all_manga)
+        self.ui.progressBar_4.setValue(self.percent_desc_anime)
+        self.ui.progressBar_5.setValue(self.percent_desc_manga)
         if checker_tag:
             self.ui.progressBar_2.setValue(self.percent_all_anime)
+        else:
+            self.percent_all_anime = 0
         self.iconTab()
-        self.downProgress()
+        # self.downProgress()
 
 
     def iconTab(self):
         index = self.ui.tabWidget.currentIndex()
+        self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nChecking site..')
         if self.flag:
             if index == 0:
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
                 self.tray.setToolTip('Anime checker')
+                self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nChecking site..')
             elif index == 1:
                 self.tray.setToolTip('Manga checker')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask.png'))
+                self.ui.toolButton_24.setToolTip('https://www.manga-chan.me\nhttps://www.readmanga.io\nhttps://www.mintmanga.live\nChecking site,,')
             elif index == 2:
                 self.tray.setToolTip('View Anime description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/view.png'))
+                self.ui.toolButton_24.setToolTip('About')
             elif index == 3:
                 self.tray.setToolTip('View Manga description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/view.png'))
+                self.ui.toolButton_24.setToolTip('About')
 
 
     def notifyCheck(self):
@@ -537,10 +558,6 @@ class myWindow(QtWidgets.QMainWindow):
     def changeSheme(self, ico, win, back, color):
         self.ui.toolButton_11.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
         self.setStyleSheet(win)
-        self.ui.label.setStyleSheet(color)
-        self.ui.label_2.setStyleSheet(color)
-        self.ui.label_3.setStyleSheet(color)
-        self.ui.label_4.setStyleSheet(color)
         self.ui.lineEdit.setStyleSheet(back)
         self.ui.textEdit.setStyleSheet(back)
         self.ui.textEdit_2.setStyleSheet(back)
@@ -554,6 +571,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lcdNumber.setStyleSheet(back)
         self.ui.lcdNumber_2.setStyleSheet(back)
         self.ui.lcdNumber_3.setStyleSheet(back)
+        if ico == 'lamp':
+            self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/dark-about.png'))
+        elif ico == 'dark':
+            self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/light-about.png'))
 
 
 # Set Icon for toolButton
@@ -616,6 +637,7 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.toolButton_17.setEnabled(False)
                 self.ui.toolButton_20.setEnabled(False)
                 self.ui.toolButton_23.setEnabled(False)
+                self.ui.toolButton_22.setEnabled(False)
                 self.ui.toolButton_4.setEnabled(False)
                 self.ui.toolButton_12.setEnabled(False)
                 self.ui.toolButton_9.setEnabled(False)
@@ -627,6 +649,7 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
                 self.ui.toolButton_17.setEnabled(True)
                 self.ui.toolButton_20.setEnabled(True)
+                self.ui.toolButton_22.setEnabled(True)
                 self.ui.toolButton_12.setEnabled(True)
                 self.ui.toolButton_5.setEnabled(True)
                 self.ui.toolButton_23.setEnabled(True)
@@ -758,8 +781,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.setGlobalSettings(data, '', '', '', False, True)
         self.ui.comboBox.clear()
         self.ui.comboBox_3.clear()
-        self.viewDescription()
         self.showed()
+        self.viewDescription()
 
 
     def stoped(self):
@@ -841,6 +864,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def upUrls(self):
+        global dead
         data = self.uploadGlobalSettings()
         logs = []
         numbers_check = []
@@ -849,48 +873,55 @@ class myWindow(QtWidgets.QMainWindow):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        for i in enumerate(data['manga']['urls']):
-            driver.get(i[1])
-            sleep(2)
-            if 'https://manga-chan.me' in i[1]:
-                print(i)
-                manga = driver.find_elements_by_class_name('manga2')
-                print(len(manga))
-                manga = manga[0].text
-                manga = manga.split(' Глава ')
-                manga = manga[1].split(' ')
-                manga = manga[0]
-                if '.' in manga:
-                    manga = float(manga)
+        try:
+            for i in enumerate(data['manga']['urls']):
+                if dead == False:
+                    break
+                index_i = i[0] + 1
+                self.percent_all_manga = int(index_i / len(data['manga']['urls']) * 100)
+                driver.get(i[1])
+                sleep(2)
+                if 'https://manga-chan.me' in i[1]:
+                    print(i)
+                    manga = driver.find_elements_by_class_name('manga2')
+                    print(len(manga))
+                    manga = manga[0].text
+                    manga = manga.split(' Глава ')
+                    manga = manga[1].split(' ')
+                    manga = manga[0]
+                    if '.' in manga:
+                        manga = float(manga)
+                    else:
+                        manga = int(manga)
                 else:
-                    manga = int(manga)
-            else:
-                print(i)
-                manga = driver.find_element_by_class_name('mt-3').text
-                manga = manga.split(' ')
-                if manga[-1].isdigit():
-                    manga = int(manga[-1])
-                elif manga[-2].isdigit():
-                    manga = int(manga[-2])
+                    print(i)
+                    manga = driver.find_element_by_class_name('mt-3').text
+                    manga = manga.split(' ')
+                    if manga[-1].isdigit():
+                        manga = int(manga[-1])
+                    elif manga[-2].isdigit():
+                        manga = int(manga[-2])
+                    else:
+                        try:
+                            manga = float(manga[-1])
+                        except:
+                            manga = float(manga[-2])
+
+                numbers_check.append(manga)
+
+                if data['manga']['numbers'][i[0]] < manga:
+                    logs.append(f'{data["manga"]["names"][i[0]]} > {manga}')
+                    msg.append(f'{data["manga"]["names"][i[0]]} > {manga}')
                 else:
-                    try:
-                        manga = float(manga[-1])
-                    except:
-                        manga = float(manga[-2])
-
-            numbers_check.append(manga)
-
-            if data['manga']['numbers'][i[0]] < manga:
-                logs.append(f'{data["manga"]["names"][i[0]]} > {manga}')
-                msg.append(f'{data["manga"]["names"][i[0]]} > {manga}')
-            else:
-                logs.append(f'{data["manga"]["names"][i[0]]} = {manga}')
-
-        if len(msg) > 0:
-            text = '\n'.join(msg)
-            system(f'notify-send "Вышло кое-что новенькое...\n{text}"')
-        self.setGlobalSettings(data, 'manga', 'logs', logs)
-        self.setGlobalSettings(data, 'manga', 'change_numbers', numbers_check)
+                    logs.append(f'{data["manga"]["names"][i[0]]} = {manga}')
+            dead = True
+            if len(msg) > 0:
+                text = '\n'.join(msg)
+                system(f'notify-send "Вышло кое-что новенькое...\n{text}"')
+            self.setGlobalSettings(data, 'manga', 'logs', logs)
+            self.setGlobalSettings(data, 'manga', 'change_numbers', numbers_check)
+        except Exception as e:
+            print('Error ==>\n', e)
 
 
     def updateClickManga(self):
@@ -907,18 +938,20 @@ class myWindow(QtWidgets.QMainWindow):
         while True:
             proc = popen('ps ax').read()
             if proc.find("chromedriver") == -1:
+                self.flag = True
                 self.ui.toolButton_23.setEnabled(True)
                 self.ui.toolButton_20.setEnabled(True)
                 self.ui.toolButton_17.setEnabled(True)
+                self.ui.toolButton_22.setEnabled(True)
                 self.ui.toolButton_4.setEnabled(True)
                 self.ui.toolButton_5.setEnabled(True)
                 self.ui.toolButton_9.setEnabled(True)
                 self.ui.toolButton_12.setEnabled(True)
-                self.flag = True
                 self.tray.setToolTip('Check..')
                 break
             else:
                 self.ui.toolButton_23.setEnabled(False)
+                self.ui.toolButton_22.setEnabled(False)
                 self.ui.toolButton_4.setEnabled(False)
                 self.ui.toolButton_5.setEnabled(False)
                 self.ui.toolButton_9.setEnabled(False)
@@ -927,27 +960,36 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def setUpSelenium(self):
+        global dead
         data = self.uploadGlobalSettings()
         names = []
+        s = 0
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        for i in data['manga']['urls']:
-            driver.get(i)
-            sleep(2)
-            if 'https://manga-chan.me' in i:
-                name = driver.find_element_by_class_name('title_top_a').text
-                name = name.split('(')
-                name = name[-1][:-1:]
-            else:
-                name = driver.find_element_by_class_name('name').text
-            print(name)
-            names.append(name)
-
-        self.setGlobalSettings(data, 'manga', 'names', names)
-        self.ui.comboBox_2.clear()
-        self.showCombo()
-        driver.quit()
+        try:
+            for i in data['manga']['urls']:
+                if dead == False:
+                    break
+                index_i = s + 1
+                self.percent_all_manga = int(index_i / len(data['manga']['urls']) * 100)
+                driver.get(i)
+                sleep(2)
+                if 'https://manga-chan.me' in i:
+                    name = driver.find_element_by_class_name('title_top_a').text
+                    name = name.split('(')
+                    name = name[-1][:-1:]
+                else:
+                    name = driver.find_element_by_class_name('name').text
+                print(name)
+                names.append(name)
+            self.setGlobalSettings(data, 'manga', 'names', names)
+            self.ui.comboBox_2.clear()
+            self.showCombo()
+            driver.quit()
+        except Exception as e:
+                print()
+        dead = True
 
 
     def editLineEdit(self):
@@ -993,9 +1035,36 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.setHtml(data['anime']['description'][index])
 
 
-    def uploadDescription(self):
+    def setDescription(self):
+        global dead
+        dead = True
+        images = []
+        descs = []
         data = self.uploadGlobalSettings()
-        Thread(target = setDescription, args = (data['anime']['urls'],)).start()
+        try:
+            for i in enumerate(data['anime']['urls']):
+                if dead == False:
+                    break
+                img, desc = getDescription(i[1])
+                images.append(img)
+                descs.append(desc)
+                index_i = i[0] + 1
+                self.percent_desc_anime = int(index_i / len(data['anime']['urls']) * 100)
+                print(self.percent_desc_anime, index_i, len(data['anime']['urls']))
+
+        # data['anime']['description'] = descs
+        # data['anime']['images'] = images
+            self.setGlobalSettings(data, 'anime', 'description', descs)
+            self.setGlobalSettings(data, 'anime', 'images', images)
+        except Exception as e:
+            print('Error ==>\n', e)
+        sleep(4)
+        self.percent_desc_anime = 0
+        dead = True
+        
+
+    def uploadDescription(self):
+        Thread(target = self.setDescription).start()
 
 
 #### <<< Tab Manga Description >>> ####
@@ -1016,33 +1085,40 @@ class myWindow(QtWidgets.QMainWindow):
         data = self.uploadGlobalSettings()
         imgs = []
         descs = []
+        s = 0
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        for i in data['manga']['urls']:
-            driver.get(i)
-            sleep(2)
-            if 'https://manga-chan.me' in i:
-                pass
-                img = driver.find_element_by_id('cover')
-                img = img.get_attribute('src')
-                desc = driver.find_element_by_id('description').text
-            else:
-                img = driver.find_elements_by_class_name('fotorama__img')
-                img = img[0].get_attribute('src')
-                desc = driver.find_element_by_class_name('manga-description').text
-            print(img)
-            image = img.split('/')
-            descs.append(desc)
-            r = get(img, stream=True)
-            if r.status_code == 200:
-                with open(f'{self.current_path}/description/{image[-1]}', 'wb') as f:
-                    r.raw.decode_content = True
-                    copyfileobj(r.raw, f)
-            image = loadImage(image[-1])
-            imgs.append(image)
-        self.setGlobalSettings(data, 'manga', 'images', imgs)
-        self.setGlobalSettings(data, 'manga', 'description', descs)
+        try:
+            for i in enumerate(data['manga']['urls']):
+                index_i = i[0] + 1
+                driver.get(i[1])
+                sleep(2)
+                if 'https://manga-chan.me' in i[1]:
+                    img = driver.find_element_by_id('cover')
+                    img = img.get_attribute('src')
+                    desc = driver.find_element_by_id('description').text
+                else:
+                    img = driver.find_elements_by_class_name('fotorama__img')
+                    img = img[0].get_attribute('src')
+                    desc = driver.find_element_by_class_name('manga-description').text
+                print(img)
+                image = img.split('/')
+                descs.append(desc)
+                r = get(img, stream=True)
+                if r.status_code == 200:
+                    with open(f'{self.current_path}/description/{image[-1]}', 'wb') as f:
+                        r.raw.decode_content = True
+                        copyfileobj(r.raw, f)
+                image = loadImage(image[-1])
+                imgs.append(image)
+                self.percent_desc_manga = int(index_i / len(data['manga']['urls']) * 100)
+            self.setGlobalSettings(data, 'manga', 'images', imgs)
+            self.setGlobalSettings(data, 'manga', 'description', descs)
+        except Exception as e:
+            print('Error ==>\n', e)
+        sleep(4)
+        self.percent_desc_manga = 0
         driver.quit()
 
 

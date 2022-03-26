@@ -85,7 +85,6 @@ def getDescription(url):
 def loadImage(name):
     width = 90
     height = 110
-    new_name = name.split('.')
     img = Image.open(f'{current_path}/description/{name}')
     resizing = img.resize((width, height), Image.ANTIALIAS)
     resizing.save(f'{current_path}/description/{name}')
