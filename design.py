@@ -20,13 +20,13 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.toolButton_3 = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton_3.setGeometry(QtCore.QRect(367, 10, 25, 25))
+        self.toolButton_3.setGeometry(QtCore.QRect(367, 4, 25, 25))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icons/close.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.toolButton_3.setIcon(icon)
         self.toolButton_3.setObjectName("toolButton_3")
         self.toolButton_11 = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton_11.setGeometry(QtCore.QRect(367, 40, 25, 25))
+        self.toolButton_11.setGeometry(QtCore.QRect(367, 34, 25, 25))
         self.toolButton_11.setObjectName("toolButton_11")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setGeometry(QtCore.QRect(0, 0, 361, 181))
@@ -233,20 +233,20 @@ class Ui_MainWindow(object):
         self.progressBar_5.setObjectName("progressBar_5")
         self.tabWidget.addTab(self.tab_4, "")
         self.toolButton_18 = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton_18.setGeometry(QtCore.QRect(367, 70, 25, 25))
+        self.toolButton_18.setGeometry(QtCore.QRect(367, 64, 25, 25))
         self.toolButton_18.setObjectName("toolButton_18")
         self.toolButton_24 = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton_24.setGeometry(QtCore.QRect(367, 150, 25, 25))
+        self.toolButton_24.setGeometry(QtCore.QRect(367, 152, 25, 25))
         self.toolButton_24.setIconSize(QtCore.QSize(24, 24))
         self.toolButton_24.setObjectName("toolButton_24")
         self.toolButton_6 = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton_6.setGeometry(QtCore.QRect(367, 100, 25, 25))
+        self.toolButton_6.setGeometry(QtCore.QRect(367, 94, 25, 25))
         self.toolButton_6.setIconSize(QtCore.QSize(36, 36))
         self.toolButton_6.setObjectName("toolButton_6")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -304,6 +304,7 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Sans Serif\'; font-size:7pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
+        self.textEdit.setPlaceholderText(_translate("MainWindow", "Description..."))
         self.toolButton_22.setToolTip(_translate("MainWindow", "Update Description"))
         self.toolButton_22.setText(_translate("MainWindow", "..."))
         self.textEdit_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -311,6 +312,7 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Sans Serif\'; font-size:7pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
+        self.textEdit_2.setPlaceholderText(_translate("MainWindow", "Description..."))
         self.label_6.setText(_translate("MainWindow", "IMG"))
         self.toolButton_23.setToolTip(_translate("MainWindow", "Update Description"))
         self.toolButton_23.setText(_translate("MainWindow", "..."))

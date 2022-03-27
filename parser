@@ -5,9 +5,9 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QSystemTrayIcon
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QTimer, QThread, pyqtSignal
+from QLed import QLed
 from design import Ui_MainWindow
 from sys import exit
-from socket import setdefaulttimeout
 from requests import get
 from selenium import webdriver
 from shutil import copyfileobj
@@ -25,8 +25,9 @@ from validators import url as check_url
 
 
 dead = True
+enable = True
 checker_tag = True
-update_list_anime = False 
+update_list_anime = False
 
 
 class ThreadProgress(QThread):
@@ -44,8 +45,9 @@ class ThreadProgress(QThread):
 
 
     def run(self):
-        global dead, checker_tag, update_list_anime
+        global dead, checker_tag, update_list_anime, enable
         checker_tag = False
+        enable = False
         dead = True
         name = []
         try:
@@ -54,19 +56,21 @@ class ThreadProgress(QThread):
                     raise Exception('Extra close Thread..')
                 series = self.data['anime']['series'][i[0]] + 1
                 names, self.check = checkURL(i[1], series)
+                if names == '':
+                    raise Exception('ERROR FOR URL_CHECK..')
                 if self.flag == False:
                     name.append(names)
                 index = i[0] + 1
                 percent = int(index / len(self.data['anime']['urls']) * 100)
                 self._signal.emit(percent)
             if not self.flag:
-                self.data['anime']['name'] = name
-                with open(f'{self.current_path}/setting.json', 'w') as js:
-                    js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+                if isinstance(self.data, dict):
+                    self.data['anime']['name'] = name
+                    with open(f'{self.current_path}/setting.json', 'w') as js:
+                        js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
                 update_list_anime = True
         except Exception as e:
             print('Error ==>\n', e)
-
         if self.check > 0:
             self.check = 0
             tts = init()
@@ -76,7 +80,8 @@ class ThreadProgress(QThread):
         sleep(1)
         percent = 0
         self._signal.emit(percent)
-        
+
+        enable = True
         checker_tag = True
         print(True)
 
@@ -104,14 +109,12 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
-        
+
         self.ui.progressBar.setStyleSheet('selection-background-color: #00e916; background-image: linear-gradient(160deg, #00e916 0%, #3dffe9 75%);')
         self.ui.progressBar_2.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
         self.ui.progressBar_3.setStyleSheet('selection-background-color: #FFE53B; background-image: linear-gradient(22deg, #FFE53B 0%, #FF2525 82%);')
         self.ui.progressBar_4.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
         self.ui.progressBar_5.setStyleSheet('selection-background-color: #FF3CAC; background-image: linear-gradient(219deg, #FF3CAC 4%, #784BA0 44%, #2B86C5 100%);')
-
-        self.ui.toolButton_24.setStyleSheet('border: none; background: transparent; color: gray;')
 
         self.current_path = path.dirname(path.realpath(__file__))
 
@@ -119,15 +122,20 @@ class myWindow(QtWidgets.QMainWindow):
         self.tray.activated.connect(self.triggerFocus)
         self.tray.show()
 
+        self.led = QLed(self, onColour=QLed.Green, shape=QLed.Circle)
+        self.led.setGeometry(374, 131, 12, 12)
+
         self.timeNumber()
         self.defaultIcon()
 
         self.showed()
+
         self.showCombo()
         self.viewDescription()
         self.updateNumber()
         self.upComboAnime()
         self.viewDescriptionManga()
+        
         self.ui.comboBox.activated[str].connect(self.upComboAnime)
         self.ui.comboBox_2.activated[str].connect(self.updateNumber)
         self.ui.comboBox_3.activated[str].connect(self.viewDescription)
@@ -137,7 +145,6 @@ class myWindow(QtWidgets.QMainWindow):
         if name == "Monday" or name == "Понедельник":
             with open(f'{self.current_path}/notify.txt', 'w') as clear:
                 clear.write('')
-        print(name)
 
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
@@ -201,11 +208,17 @@ class myWindow(QtWidgets.QMainWindow):
                     to_json[mode] = var
                 else:
                     to_json[tab][mode] = var
-        with open(f'{self.current_path}/setting.json', 'w') as js:
-            js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+        if isinstance(to_json, dict):
+            with open(f'{self.current_path}/setting.json', 'w') as js:
+                js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+        else:
+            print('Error setting Global.. no update file <setting.json>')
+            msg = QMessageBox()
+            msg.setText('Error setting Global.. no update file <setting.json>')
+            msg.exec_()
 
 
-    def allParsing(self):
+    def allParsing(self, data):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
@@ -230,6 +243,7 @@ class myWindow(QtWidgets.QMainWindow):
 
                     print(name_dir[0])
 
+                    series += data['anime']['ova'][i[0]]
                     if len(search_count_series) == series:
                         if len(search_count_series) > 6:
                             next.click()
@@ -239,7 +253,12 @@ class myWindow(QtWidgets.QMainWindow):
                                     next.click()
                                     if len(search_count_series) > 24:
                                         next.click()
-                        search_count_series[-1].click()
+                        if data['anime']['ova'][urls.index(url)] > 0:
+                            search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                            click_i = search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                        elif data['anime']['ova'][urls.index(url)] == 0:
+                            search_count_series[-1].click()
+                            click_i = search_count_series[-1].text
                         sleep(15)
                         frame = driver.find_elements_by_tag_name('iframe')
                         if len(frame) == 4:
@@ -253,7 +272,7 @@ class myWindow(QtWidgets.QMainWindow):
                         sleep(3)
                         print(100)
                         self.check_flag = False
-                        self.Download(down[2].get_attribute('href'), let[-1], url, name_dir[0], i[1], name, series, numbers)
+                        self.Download(down[2].get_attribute('href'), let[-1], url, name_dir[0], i[1], name, series, data, click_i)
                         logs.append(f'{i[0]} - {name_dir[0]} - New series {series}\n')
                     else:
                         logs.append(f'{i[0]} - {name_dir[0]} - No new < {series} > series\n')
@@ -264,7 +283,6 @@ class myWindow(QtWidgets.QMainWindow):
 
         driver.quit()
 
-        data = self.uploadGlobalSettings()
         data['anime']['logs'] = logs
         self.setGlobalSettings(data, 'anime', 'logs', logs)
         sleep(3)
@@ -273,31 +291,33 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def listLinkOrNumbers(self):
-        with open(f'{self.current_path}/setting.json', 'r') as reads:
-            data = load(reads)
+        data = self.uploadGlobalSettings()
         return data['anime']['urls'], data['anime']['series']
 
 
-    def oneParsing(self, url, digit):
+    def oneParsing(self, data, url, digit):
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        urls, numbers = self.listLinkOrNumbers()
+        urls, _ = self.listLinkOrNumbers()
         log = ''
         try:
+            self.percent_all_anime = 5
             series = digit + 1
             print(url)
             driver.get(url)
+            self.percent_all_anime = 15
             print(0)
             sleep(3)
             search_count_series = driver.find_elements_by_class_name('epizode')
             name = driver.find_element_by_class_name('shortstoryHead').text
             next = driver.find_element_by_class_name('next')
             name_dir = name.split(' /')
+            self.percent_all_anime = 35
 
             print(name_dir[0], len(search_count_series))
-
+            series += data['anime']['ova'][urls.index(url)]
             if len(search_count_series) == series:
                 if len(search_count_series) > 6:
                     next.click()
@@ -307,22 +327,30 @@ class myWindow(QtWidgets.QMainWindow):
                             next.click()
                             if len(search_count_series) > 24:
                                 next.click()
-                print(search_count_series[-1].text)
-                search_count_series[-1].click()
+                self.percent_all_anime = 40
+                if data['anime']['ova'][urls.index(url)] > 0:
+                    search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                    click_i = search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                elif data['anime']['ova'][urls.index(url)] == 0:
+                    search_count_series[-1].click()
+                    click_i = search_count_series[-1].text
                 sleep(15)
                 frame = driver.find_elements_by_tag_name('iframe')
                 if len(frame) == 4:
                     driver.switch_to.frame(frame[-2])
                 elif len(frame) == 3:
                     driver.switch_to.frame(frame[-1])
+                self.percent_all_anime = 55
                 sleep(3)
                 down = driver.find_elements_by_class_name('butt')
                 let = down[-2].get_attribute("href").split('?')
                 let = let[0].split('/')
+                self.percent_all_anime = 65
                 sleep(3)
                 print(down[2].get_attribute('href'))
                 self.check_flag = False
-                self.Download(down[2].get_attribute('href'), let[-1], urls, name_dir[0], url, name, series, numbers)
+                self.Download(down[2].get_attribute('href'), let[-1], urls, name_dir[0], url, name, series, data, click_i)
+                self.percent_all_anime = 97
                 log = f'{name_dir[0]} - New series {series}'
             else:
                 log = f'{name_dir[0]} - No new < {series} > series'
@@ -332,38 +360,36 @@ class myWindow(QtWidgets.QMainWindow):
             log = f"!!! << Error: {e} >> !!!"
 
         driver.quit()
-        data = self.uploadGlobalSettings()
         data['anime']['log'] = log
         self.setGlobalSettings(data, 'anime', 'log', log)
+        self.percent_all_anime = 100
+        sleep(4)
+        self.percent_all_anime = 0
 
 
-    def checkUpload(self, f, url, dir, link, name, series, numbers):
-        if path.exists(path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')):
-            curent_time = strftime("%H:%M", localtime())
-            system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
-            names_dir = '_'.join(dir.split())
-            old = path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')
-            new = path.join(f'{path.dirname(__file__)}/downloads', f'{names_dir}-{series}.mp4')
-
-            rename(old, new)
-
-            if not path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/'):
-                system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/downloads/"')
-
-            if path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}'):
-                pass
-            else:
-                system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/downloads/{names_dir}"')
-
-            system(f'mv "{self.path_down}/{names_dir}-{series}.mp4" "{self.path_down}/{names_dir}/"')
-
-            data = self.uploadGlobalSettings()
+    def checkUpload(self, f, url, dir, link, name, series, data, search):
+        curent_time = strftime("%H:%M", localtime())
+        system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
+        names_dir = '_'.join(dir.split())
+        if 'серия' in search:
             data['anime']['series'][url.index(link)] = series
-            self.setGlobalSettings(data, 'anime', 'series', data['anime']['series'])
-        else:
-            print('Wait!! Reconnect!!')
-            sleep(5)
-            self.checkUpload(f, url, dir, link, name, series, numbers)
+        elif 'ОВА' in search:
+            data['anime']['ova'][url.index(link)] += 1
+            series = f"ova-{data['anime']['ova'][url.index(link)]}"
+        new = path.join(f'{path.dirname(__file__)}/downloads', f'{names_dir}-{series}.mp4')
+        old = path.join(f'{path.dirname(__file__)}/downloads', f'_{f}')
+
+        rename(old, new)
+
+        if not path.isdir(f'{self.current_path}/downloads/'):
+            system(f'mkdir "{self.current_path}/downloads/"')
+
+        if not path.isdir(f'{self.current_path}/downloads/{names_dir}'):
+            system(f'mkdir "{self.current_path}/downloads/{names_dir}"')
+
+        system(f'mv "{self.path_down}/{names_dir}-{series}.mp4" "{self.path_down}/{names_dir}/"')
+        print(search)
+        self.setGlobalSettings(data, 'anime', 'series', data['anime']['series'])
 
 
     def handleProgress(self, blocknum, blocksize, totalsize):
@@ -377,7 +403,7 @@ class myWindow(QtWidgets.QMainWindow):
             QtWidgets.QApplication.processEvents()
 
 
-    def Download(self, down, f, urls, dir, link, name, series, numbers):
+    def Download(self, down, f, urls, dir, link, name, series, data, search):
         global dead
         dead = True
         save_loc = f'{self.current_path}/downloads/_{f}'
@@ -385,7 +411,7 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.progressBar.setToolTip(f'Download:\n{dir} -> {series}')
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
             url_request.urlretrieve(down, save_loc, self.handleProgress)
-            self.checkUpload(f, urls, dir, link, name, series, numbers)
+            self.checkUpload(f, urls, dir, link, name, series, data, search)
         except Exception as e:
             system(f'rm {self.current_path}/downloads/_{f}')
             dead = True
@@ -414,67 +440,56 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def updateClick(self):
-        print('Yes')
-        self.flag = False
-        self.ui.toolButton_5.setEnabled(False)
-        self.ui.toolButton_4.setEnabled(False)
-        self.ui.toolButton_12.setEnabled(False)
-        self.ui.toolButton_17.setEnabled(False)
-        self.ui.toolButton_20.setEnabled(False)
-        self.ui.toolButton_22.setEnabled(False)
-        self.ui.toolButton_23.setEnabled(False)
-        self.ui.toolButton_9.setEnabled(False)
-        self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/list.png'))
-        self.ui.toolButton_9.setToolTip(u"Checking..")
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-        data = self.uploadGlobalSettings()
-        Thread(target = self.clicker, args=(data,)).start()
+        global enable
+        if enable:
+            print('Yes')
+            self.flag = False
+            enable = False
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+            data = self.uploadGlobalSettings()
+            Thread(target = self.clicker, args=(data,)).start()
 
 
     def clicker(self, data, check=True):
+        global enable, dead
         self.flag = False
+        self.led.value = True
+        self.led.setToolTip('Working..')
+
         if check:
+            Thread(target = self.whileStartCheck, args = (self.ui.toolButton_9, 'circle')).start()
             self.thread_class = ThreadProgress(data, False)
         else:
+            Thread(target = self.whileStartCheck, args = (self.ui.toolButton_12, 'checking')).start()
             self.thread_class = ThreadProgress(data)
+
         self.thread_class._signal.connect(self.progressCount)
         self.thread_class.start()
         self.thread_class.wait()
 
         self.flag = True
-        self.ui.toolButton_12.setEnabled(True)
-        self.ui.toolButton_9.setEnabled(True)
-        self.ui.toolButton_5.setEnabled(True)
-        self.ui.toolButton_17.setEnabled(True)
-        self.ui.toolButton_22.setEnabled(True)
-        self.ui.toolButton_20.setEnabled(True)
-        self.ui.toolButton_23.setEnabled(True)
-        self.ui.toolButton_4.setEnabled(True)
-        self.defaultIcon()
+        dead = False
+        sleep(1)
+        enable = True
+        self.led.value = False
+        self.led.setToolTip('Not Working..')
+        dead = True
 
 
     def update(self):
-        print('Yes')
+        global enable
         self.timer_check.start(900_000)
-        if self.ui.toolButton_12.isEnabled() == False:
-            pass
-        else:
+        if enable:
+            print('Yes')
             data = self.uploadGlobalSettings()
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
             Thread(target = self.clicker, args = (data, False)).start()
-        self.ui.toolButton_5.setEnabled(False)
-        self.ui.toolButton_12.setEnabled(False)
-        self.ui.toolButton_9.setEnabled(False)
-        self.ui.toolButton_17.setEnabled(False)
-        self.ui.toolButton_22.setEnabled(False)
-        self.ui.toolButton_20.setEnabled(False)
-        self.ui.toolButton_23.setEnabled(False)
-        self.ui.toolButton_4.setEnabled(False)
 
 
     def upComboAnime(self):
         data = self.uploadGlobalSettings()
-        self.ui.lcdNumber.display(data['anime']['series'][self.ui.comboBox.currentIndex()])
+        num = float(f"{data['anime']['series'][self.ui.comboBox.currentIndex()]}.{data['anime']['ova'][self.ui.comboBox.currentIndex()]}")
+        self.ui.lcdNumber.display(num)
 
 
     def timeNumber(self):
@@ -499,7 +514,6 @@ class myWindow(QtWidgets.QMainWindow):
             self.showed()
             update_list_anime = False
         self.iconTab()
-        # self.downProgress()
 
 
     def iconTab(self):
@@ -508,7 +522,7 @@ class myWindow(QtWidgets.QMainWindow):
         if self.flag:
             if index == 0:
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
-                self.tray.setToolTip('Anime checker')
+                self.tray.setToolTip('AnimeVost checker')
                 self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nChecking site..')
             elif index == 1:
                 self.tray.setToolTip('Manga checker')
@@ -516,11 +530,11 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.toolButton_24.setToolTip('https://www.manga-chan.me\nhttps://www.readmanga.io\nhttps://www.mintmanga.live\nChecking site,,')
             elif index == 2:
                 self.tray.setToolTip('View Anime description')
-                self.tray.setIcon(QIcon(f'{self.current_path}/icons/view.png'))
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/a-desc.png'))
                 self.ui.toolButton_24.setToolTip('About')
             elif index == 3:
                 self.tray.setToolTip('View Manga description')
-                self.tray.setIcon(QIcon(f'{self.current_path}/icons/view.png'))
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/m-desc.png'))
                 self.ui.toolButton_24.setToolTip('About')
 
 
@@ -613,7 +627,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lcdNumber.setToolTip(u"Current Series")
 
 
-    def check(self):
+    def check_proc(self):
         proc = popen('ps ax').read()
         if proc.find("chromedriver") == -1:
             return False
@@ -621,45 +635,49 @@ class myWindow(QtWidgets.QMainWindow):
             return True
 
 
-    def whileStart(self):
+    def whileStart(self, flag_s = True):
+        global enable
+        current_spinner = 0
+        self.led.value = True
+        self.led.setToolTip('Working..')
+        if flag_s:
+            spinner = self.ui.toolButton_5
+            # self.ui.toolButton_5.setStyleSheet('border: none;')
+        else:
+            spinner = self.ui.toolButton_4
+            # self.ui.toolButton_4.setStyleSheet('border: none; background: transparent; color: gray;')
         while True:
-            if self.check():
+            if self.check_proc():
+
+                if current_spinner == 360:
+                    current_spinner = 0
+                    spinner.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+                else:
+                    spinner.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+                    current_spinner += 30
+        
                 filename = [f for f in listdir(f'{self.current_path}/downloads') if isfile(path.join(f'{self.current_path}/downloads', f))]
                 if len(filename) > 0:
                     for i in filename:
-                        if '.mp4.crdownload' in i or '.mp4' in i:
+                        if '.mp4' in i:
                             self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
                             self.tray.setToolTip('Downloading..')
                         else:
                             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
                             self.tray.setToolTip('Check..')
                 else:
-                    self.tray.setToolTip('Check..')
                     self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-                self.ui.toolButton_5.setEnabled(False)
-                self.ui.toolButton_17.setEnabled(False)
-                self.ui.toolButton_20.setEnabled(False)
-                self.ui.toolButton_23.setEnabled(False)
-                self.ui.toolButton_22.setEnabled(False)
-                self.ui.toolButton_4.setEnabled(False)
-                self.ui.toolButton_12.setEnabled(False)
-                self.ui.toolButton_9.setEnabled(False)
+                    self.tray.setToolTip('Check..')
             else:
                 self.defaultIcon()
+                enable = True
                 self.flag = True
+                self.led.value = False
+                self.led.setToolTip('Not Working..')
                 self.upComboAnime()
                 self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
                 self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
-                self.ui.toolButton_17.setEnabled(True)
-                self.ui.toolButton_20.setEnabled(True)
-                self.ui.toolButton_22.setEnabled(True)
-                self.ui.toolButton_12.setEnabled(True)
-                self.ui.toolButton_5.setEnabled(True)
-                self.ui.toolButton_23.setEnabled(True)
-                self.ui.toolButton_4.setEnabled(True)
-                self.ui.toolButton_9.setEnabled(True)
                 break
-            sleep(1)
 
 
     def loging(self):
@@ -686,31 +704,36 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def oneDown(self):
-        self.flag = False
-        data = self.uploadGlobalSettings()
-        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-        Thread(target = self.oneParsing, args = (data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
-        Thread(target = self.whileStart).start()
+        global enable
+        if enable:
+            enable = False
+            self.flag = False
+            data = self.uploadGlobalSettings()
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+            # print(self.ui.lcdNumber.value())
+            Thread(target = self.oneParsing, args = (data, data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
+            Thread(target = self.whileStart).start()
 
 
     def allDown(self):
-        self.flag = False
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/spinner.png'))
-        Thread(target = self.allParsing).start()
-        Thread(target = self.whileStart).start()
+        global enable
+        if enable:
+            enable = False
+            self.flag = False
+            data = self.uploadGlobalSettings()
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
+            Thread(target = self.allParsing, args = (data,)).start()
+            Thread(target = self.whileStart, args = (False, )).start()
 
 
     def triggerFocus(self, reason):
-        if reason == QSystemTrayIcon.Trigger:
+        if reason == QSystemTrayIcon.Trigger or reason == QSystemTrayIcon.MiddleClick:
             if self.click % 2 == 0:
                 self.setFocus()
                 self.show()
             else:
                 self.hide()
             self.click += 1
-        # elif reason == QSystemTrayIcon.MiddleClick:
 
 
     def closed(self):
@@ -727,12 +750,13 @@ class myWindow(QtWidgets.QMainWindow):
             data = self.uploadGlobalSettings()
             self.setGlobalSettings(data, 'anime', 'urls', url, True)
             self.setGlobalSettings(data, 'anime', 'series', series, True)
+            self.setGlobalSettings(data, 'anime', 'ova', 0, True)
             self.ui.comboBox.addItem(url)
-        except Exception as e:
-            alert = QMessageBox()
-            alert.setText(f"URL Error ==>\n{e}")
-            alert.exec_()
-            self.ui.lineEdit.setText('')
+            self.ui.lineEdit.setStyleSheet('background: rgb(98, 255, 59)')
+        except:
+            self.ui.lineEdit.setStyleSheet('background: rgb(236, 0, 0)')
+            self.ui.lineEdit.setText('  ERROR check URL..')
+        Thread(target = self.editLineEdit, args = (self.ui.lineEdit,)).start()
 
 
     def showed(self):
@@ -767,10 +791,11 @@ class myWindow(QtWidgets.QMainWindow):
 
         del(data['anime']['urls'][index])
         del(data['anime']['series'][index])
+        del(data['anime']['ova'][index])
 
         try:
-            del(data['anime']['images'][index])
             system(f'rm {self.current_path}/description/{data["anime"]["images"][index]}')
+            del(data['anime']['images'][index])
         except:
             pass
         try:
@@ -809,6 +834,7 @@ class myWindow(QtWidgets.QMainWindow):
         except:
             pass
         try:
+            system(f"rm {data['manga']['images'][index]}")
             del(data['manga']['images'][index])
         except:
             pass
@@ -821,8 +847,7 @@ class myWindow(QtWidgets.QMainWindow):
         except:
             pass
 
-        with open(f'{self.current_path}/setting.json', 'w') as w:
-            w.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+        self.setGlobalSettings(data, '', '', '', False, True)
         self.ui.comboBox.clear()
         self.showCombo()
 
@@ -858,21 +883,22 @@ class myWindow(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, 'manga', 'urls', url, True)
             self.setGlobalSettings(data, 'manga', 'numbers', number, True)
             self.ui.lineEdit_2.setText('')
+            self.ui.comboBox_2.addItem(url)
         else:
             self.ui.lineEdit_2.setStyleSheet('background: rgb(255, 0, 0)')
             self.ui.lineEdit_2.setText('Write correct url')
-            Thread(target = self.editLineEdit).start()
+            Thread(target = self.editLineEdit, args = (self.ui.lineEdit_2,)).start()
 
 
     def currentUpdate(self):
-        # self.times.start(3_600_000)
-        self.flag = False
-        data = self.uploadGlobalSettings()
-        Thread(target = self.upUrls, args = (data,)).start()
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
-        self.ui.toolButton_20.setEnabled(False)
-        self.ui.toolButton_17.setEnabled(False)
-        Thread(target = self.checkWorkSelenium).start()
+        global enable
+        if enable:
+            enable = False
+            self.flag = False
+            data = self.uploadGlobalSettings()
+            Thread(target = self.upUrls, args = (data,)).start()
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
+            Thread(target = self.checkWorkSelenium, args = (1,)).start()
 
 
     def upUrls(self, data):
@@ -936,39 +962,47 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def updateClickManga(self):
-        self.flag = False
-        data = self.uploadGlobalSettings()
-        Thread(target = self.setUpSelenium, args = (data,)).start()
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
-        self.ui.toolButton_20.setEnabled(False)
-        self.ui.toolButton_17.setEnabled(False)
-        Thread(target = self.checkWorkSelenium).start()
+        global enable
+        if enable:
+            enable = False
+            self.flag = False
+            data = self.uploadGlobalSettings()
+            Thread(target = self.setUpSelenium, args = (data,)).start()
+            self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
+            Thread(target = self.checkWorkSelenium, args = (0,)).start()
 
 
-    def checkWorkSelenium(self):
+    def checkWorkSelenium(self, flag_i):
+        current_spinner = 0
+        global enable
+        self.led.value = True
+        self.led.setToolTip('Working..')
         sleep(2)
+        if flag_i == 0:
+            spinner = self.ui.toolButton_20
+        elif flag_i == 1:
+            spinner = self.ui.toolButton_17
+        elif flag_i == 2:
+            spinner = self.ui.toolButton_23
         while True:
             proc = popen('ps ax').read()
             if proc.find("chromedriver") == -1:
                 self.flag = True
-                self.ui.toolButton_23.setEnabled(True)
-                self.ui.toolButton_20.setEnabled(True)
-                self.ui.toolButton_17.setEnabled(True)
-                self.ui.toolButton_22.setEnabled(True)
-                self.ui.toolButton_4.setEnabled(True)
-                self.ui.toolButton_5.setEnabled(True)
-                self.ui.toolButton_9.setEnabled(True)
-                self.ui.toolButton_12.setEnabled(True)
-                self.tray.setToolTip('Check..')
+                enable = True
+                self.ui.toolButton_17.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
+                self.ui.toolButton_23.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+                self.ui.toolButton_20.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+                self.led.value = False
+                self.led.setToolTip('Not Working..')
                 break
             else:
-                self.ui.toolButton_23.setEnabled(False)
-                self.ui.toolButton_22.setEnabled(False)
-                self.ui.toolButton_4.setEnabled(False)
-                self.ui.toolButton_5.setEnabled(False)
-                self.ui.toolButton_9.setEnabled(False)
-                self.ui.toolButton_12.setEnabled(False)
-
+                self.tray.setToolTip('Check..')
+                if current_spinner == 360:
+                    current_spinner = 0
+                    spinner.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+                else:
+                    spinner.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+                    current_spinner += 30
 
 
     def setUpSelenium(self, data):
@@ -999,14 +1033,14 @@ class myWindow(QtWidgets.QMainWindow):
             self.showCombo()
             driver.quit()
         except Exception as e:
-                print()
+                print('ERROR ===>\n', e)
         dead = True
 
 
-    def editLineEdit(self):
-        sleep(4)
-        self.ui.lineEdit_2.setText('')
-        self.ui.lineEdit_2.setStyleSheet('background: rgb(255, 255, 255)')
+    def editLineEdit(self, edit):
+        sleep(2.5)
+        edit.setText('')
+        edit.setStyleSheet('background: rgb(255, 255, 255)')
 
 
     def showCombo(self):
@@ -1019,10 +1053,13 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def updateNumber(self):
-        index = self.ui.comboBox_2.currentIndex()
         data = self.uploadGlobalSettings()
+        index = self.ui.comboBox_2.currentIndex()
         self.ui.lcdNumber_2.display(data['manga']['numbers'][index])
-        self.ui.lcdNumber_3.display(data['manga']['change_numbers'][index])
+        if len(data['manga']['change_numbers']) == 0:
+            self.ui.lcdNumber_3.display(index)
+        else:
+            self.ui.lcdNumber_3.display(data['manga']['change_numbers'][index])
         if data['manga']['change_numbers'][index] == data['manga']['numbers'][index]:
             self.ui.lcdNumber_3.setStyleSheet('background: rgb(50, 233, 37)')
             self.ui.toolButton_21.setEnabled(False)
@@ -1046,9 +1083,28 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.setHtml(data['anime']['description'][index])
 
 
-    def setDescription(self, data):
+    def whileStartCheck(self, but, default):
         global dead
+        current_spinner = 0
+        while True:
+            if dead == False:
+                break
+            if current_spinner == 360:
+                current_spinner = 0
+                but.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+            else:
+                but.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
+                current_spinner += 30
+            sleep(1)
+        but.setIcon(QIcon(f'{self.current_path}/icons/{default}.png'))
+
+
+    def setDescription(self, data):
+        global dead, enable
         dead = True
+        self.led.value = True
+        self.led.setToolTip('Working..')
+        Thread(target = self.whileStartCheck, args = (self.ui.toolButton_22, 'circle')).start()
         images = []
         descs = []
         try:
@@ -1066,21 +1122,32 @@ class myWindow(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, 'anime', 'images', images)
         except Exception as e:
             print('Error ==>\n', e)
+        self.ui.toolButton_22.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+        enable = True
+        dead = False
+        self.led.value = False
+        self.led.setToolTip('Not Working..')
         sleep(4)
-        self.percent_desc_anime = 0
         dead = True
-        
+        self.percent_desc_anime = 0
+
 
     def uploadDescription(self):
-        data = self.uploadGlobalSettings()
-        Thread(target = self.setDescription, args = (data,)).start()
+        global enable
+        if enable:
+            enable = False
+            data = self.uploadGlobalSettings()
+            Thread(target = self.setDescription, args = (data,)).start()
 
 
 #### <<< Tab Manga Description >>> ####
     def uploadDescriptionManga(self):
-        data = self.uploadGlobalSettings()
-        Thread(target = self.upDeskManga, args = (data,)).start()
-        Thread(target = self.checkWorkSelenium).start()
+        global enable
+        if enable:
+            enable = False
+            data = self.uploadGlobalSettings()
+            Thread(target = self.upDeskManga, args = (data,)).start()
+            Thread(target = self.checkWorkSelenium, args = (2,)).start()
 
 
     def viewDescriptionManga(self):
@@ -1094,7 +1161,6 @@ class myWindow(QtWidgets.QMainWindow):
     def upDeskManga(self, data):
         imgs = []
         descs = []
-        s = 0
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
@@ -1133,7 +1199,5 @@ class myWindow(QtWidgets.QMainWindow):
 
 app = QtWidgets.QApplication([])
 application = myWindow()
-# application.show()
-setdefaulttimeout(180)
 
 exit(app.exec())

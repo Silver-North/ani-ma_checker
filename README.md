@@ -20,7 +20,5 @@ Libraries are required to work:
 
 To install them use the pip command
 
-[ Sometimes malfunctions are possible with a non-perment Internet connection, up to formatting the configuration file (setting.json), there is a file to restore the configuration file (default.json) ]
-
 --- *** ---
 
