@@ -18,8 +18,6 @@ def checkURL(url, series, fide=False):
     global check
     print(url)
     names = ''
-    with open(f'{current_path}/setting.json', 'r') as reads:
-        data = load(reads)
     try:
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
@@ -42,13 +40,15 @@ def checkURL(url, series, fide=False):
             check += 1
             current_date = date.today()
             current_time = strftime("%H:%M", localtime())
-            if isinstance(data, dict):
-                data['anime']['notify'] = 'unchecked'
-                with open(f'{current_path}/setting.json', 'w') as js:
-                    js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+            # if isinstance(data, dict):
+                # data['anime']['notify'] = 'unchecked'
+                # with open(f'{current_path}/setting.json', 'w') as js:
+                    # js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
             with open(f'{current_path}/notify.txt', 'a') as d:
                 d.write(f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n')
     except Exception as e:
+        with open(f'{current_path}/setting.json', 'r') as reads:
+            data = load(reads)
         if isinstance(data, dict):
             data['anime']['log'] = f'Error: {e}'
             with open(f'{current_path}/setting.json', 'w') as js:
@@ -61,6 +61,10 @@ def getDescription(url):
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
         desc = soup.find_all('p')
+        if len(desc) == 10:
+            description = desc[7].text
+        elif len(desc) == 11:
+            description = desc[8].text
         img = soup.find_all('img', class_='imgRadius')
         image = f'https://www.animevost.org{img[0]["src"]}'
         img = img[0]['src'].split('/')
@@ -73,7 +77,7 @@ def getDescription(url):
                 copyfileobj(r.raw, f)
 
         image = loadImage(img[-1])
-        return image, desc[8].text
+        return image, description
     except Exception as e:
         print('error:\n', e)
 

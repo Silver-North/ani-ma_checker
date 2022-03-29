@@ -63,16 +63,20 @@ class ThreadProgress(QThread):
                 index = i[0] + 1
                 percent = int(index / len(self.data['anime']['urls']) * 100)
                 self._signal.emit(percent)
-            if not self.flag:
-                if isinstance(self.data, dict):
-                    self.data['anime']['name'] = name
-                    with open(f'{self.current_path}/setting.json', 'w') as js:
-                        js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
                 update_list_anime = True
+            self.data['anime']['name'] = name
+
+            if isinstance(self.data, dict) and self.flag == False:
+                with open(f'{self.current_path}/setting.json', 'w') as js:
+                    js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
         except Exception as e:
             print('Error ==>\n', e)
         if self.check > 0:
             self.check = 0
+            self.data['anime']['notify'] = 'unchecked'
+            if isinstance(self.data, dict):
+                with open(f'{self.current_path}/setting.json', 'w') as js:
+                    js.write(f"{dumps(self.data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
             tts = init()
             tts.say("Something new came out... check the natification log...")
             tts.runAndWait()
@@ -110,6 +114,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeNumber)
 
+        self.ui.toolButton_24.setStyleSheet('border: none;')
         self.ui.progressBar.setStyleSheet('selection-background-color: #00e916; background-image: linear-gradient(160deg, #00e916 0%, #3dffe9 75%);')
         self.ui.progressBar_2.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
         self.ui.progressBar_3.setStyleSheet('selection-background-color: #FFE53B; background-image: linear-gradient(22deg, #FFE53B 0%, #FF2525 82%);')
@@ -135,7 +140,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.updateNumber()
         self.upComboAnime()
         self.viewDescriptionManga()
-        
+
         self.ui.comboBox.activated[str].connect(self.upComboAnime)
         self.ui.comboBox_2.activated[str].connect(self.updateNumber)
         self.ui.comboBox_3.activated[str].connect(self.viewDescription)
@@ -189,8 +194,13 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def uploadGlobalSettings(self):
-        with open(f'{self.current_path}/setting.json', 'r') as reads:
-            data = load(reads)
+        try:
+            with open(f'{self.current_path}/setting.json', 'r') as reads:
+                data = load(reads)
+        except Exception as e:
+            print(f'Error upload setting.json..\n{e}')
+            with open(f'{self.current_path}/default.json', 'r') as reads:
+                data = load(reads)
         return data
 
 
@@ -211,6 +221,8 @@ class myWindow(QtWidgets.QMainWindow):
         if isinstance(to_json, dict):
             with open(f'{self.current_path}/setting.json', 'w') as js:
                 js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+            # with open(f'{self.current_path}/default.json', 'w') as js:
+                # js.write(f"{dumps(to_json, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
         else:
             print('Error setting Global.. no update file <setting.json>')
             msg = QMessageBox()
@@ -219,6 +231,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def allParsing(self, data):
+        global dead
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
@@ -254,19 +267,25 @@ class myWindow(QtWidgets.QMainWindow):
                                     if len(search_count_series) > 24:
                                         next.click()
                         if data['anime']['ova'][urls.index(url)] > 0:
-                            search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
-                            click_i = search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                            num = -(data['anime']['ova'][urls.index(url)]+1)
+                            search_count_series[num].click()
+                            click_i = search_count_series[num].click()
                         elif data['anime']['ova'][urls.index(url)] == 0:
                             search_count_series[-1].click()
                             click_i = search_count_series[-1].text
                         sleep(15)
-                        frame = driver.find_elements_by_tag_name('iframe')
-                        if len(frame) == 4:
-                            driver.switch_to.frame(frame[-2])
-                        elif len(frame) == 3:
-                            driver.switch_to.frame(frame[-1])
+                        iframe = driver.find_elements_by_tag_name('iframe')
+                        for item in range(len(iframe)):
+                            driver.switch_to.frame(iframe[item])
+                            sleep(1)
+                            down = driver.find_elements_by_class_name('butt')
+                            if len(down) != 4:
+                                sleep(1)
+                                driver.switch_to.default_content()
+                                continue
+                            else:
+                                break
                         sleep(3)
-                        down = driver.find_elements_by_class_name('butt')
                         let = down[-2].get_attribute("href").split('?')
                         let = let[0].split('/')
                         sleep(3)
@@ -282,12 +301,16 @@ class myWindow(QtWidgets.QMainWindow):
                     logs.append(f'{i[0]} - !!! << Error: {e} >> !!!\n')
 
         driver.quit()
-
         data['anime']['logs'] = logs
         self.setGlobalSettings(data, 'anime', 'logs', logs)
-        sleep(3)
+
+        sleep(2)
+        dead = False
+        sleep(0.5)
+
         self.ui.progressBar_2.setToolTip(f'Progress Checking..')
         self.percent_all_anime = 0
+        dead = True
 
 
     def listLinkOrNumbers(self):
@@ -296,6 +319,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def oneParsing(self, data, url, digit):
+        global dead
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
@@ -317,7 +341,9 @@ class myWindow(QtWidgets.QMainWindow):
             self.percent_all_anime = 35
 
             print(name_dir[0], len(search_count_series))
+
             series += data['anime']['ova'][urls.index(url)]
+            print(series)
             if len(search_count_series) == series:
                 if len(search_count_series) > 6:
                     next.click()
@@ -328,21 +354,37 @@ class myWindow(QtWidgets.QMainWindow):
                             if len(search_count_series) > 24:
                                 next.click()
                 self.percent_all_anime = 40
+
                 if data['anime']['ova'][urls.index(url)] > 0:
-                    search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
-                    click_i = search_count_series[-(data['anime']['ova'][urls.index(url)]+1)].click()
+                    num = -(data['anime']['ova'][urls.index(url)]+1)
+                    while True:
+                        click_i = search_count_series[num].text
+                        if click_i != '':
+                            break
+                    search_count_series[num].click()
                 elif data['anime']['ova'][urls.index(url)] == 0:
+                    # search_count_series[digit].click()
+                    while True:
+                        click_i = search_count_series[-1].text
+                        if click_i != '':
+                            break
                     search_count_series[-1].click()
-                    click_i = search_count_series[-1].text
+
+                print(click_i)
                 sleep(15)
-                frame = driver.find_elements_by_tag_name('iframe')
-                if len(frame) == 4:
-                    driver.switch_to.frame(frame[-2])
-                elif len(frame) == 3:
-                    driver.switch_to.frame(frame[-1])
+                iframe = driver.find_elements_by_tag_name('iframe')
+                for item in range(len(iframe)):
+                    driver.switch_to.frame(iframe[item])
+                    sleep(1)
+                    down = driver.find_elements_by_class_name('butt')
+                    if len(down) != 4:
+                        sleep(1)
+                        driver.switch_to.default_content()
+                        continue
+                    else:
+                        break
                 self.percent_all_anime = 55
                 sleep(3)
-                down = driver.find_elements_by_class_name('butt')
                 let = down[-2].get_attribute("href").split('?')
                 let = let[0].split('/')
                 self.percent_all_anime = 65
@@ -358,21 +400,28 @@ class myWindow(QtWidgets.QMainWindow):
         except Exception as e:
             driver.quit()
             log = f"!!! << Error: {e} >> !!!"
+            print(f"!!! << Error: {e} >> !!!")
 
         driver.quit()
         data['anime']['log'] = log
         self.setGlobalSettings(data, 'anime', 'log', log)
         self.percent_all_anime = 100
-        sleep(4)
+        if self.percent_all_anime == 100:
+            self.ui.progressBar_2.setFormat('Completed')
+        sleep(2)
+        dead = False
         self.percent_all_anime = 0
+        sleep(0.5)
+        dead = True
+        self.ui.progressBar_2.setFormat('%p%')
 
 
-    def checkUpload(self, f, url, dir, link, name, series, data, search):
+    def checkUpload(self, f, url, dirs, link, name, series, data, search='серия'):
         curent_time = strftime("%H:%M", localtime())
         system(f'notify-send "Вышла новая серия!{name}\n{curent_time}"')
-        names_dir = '_'.join(dir.split())
+        names_dir = '_'.join(dirs.split())
         if 'серия' in search:
-            data['anime']['series'][url.index(link)] = series
+            data['anime']['series'][url.index(link)] += 1
         elif 'ОВА' in search:
             data['anime']['ova'][url.index(link)] += 1
             series = f"ova-{data['anime']['ova'][url.index(link)]}"
@@ -396,33 +445,34 @@ class myWindow(QtWidgets.QMainWindow):
         global dead
         readed_data = blocknum * blocksize
         if totalsize > 0:
-            download_percentage = readed_data * 100 / totalsize
-            self.percent = int(download_percentage)
+            self.percent = int(readed_data * 100 / totalsize)
             if dead == False:
                 raise Exception("Sorry, no numbers below zero")
             QtWidgets.QApplication.processEvents()
 
 
-    def Download(self, down, f, urls, dir, link, name, series, data, search):
+    def Download(self, down, f, urls, dirs, link, name, series, data, search):
         global dead
         dead = True
         save_loc = f'{self.current_path}/downloads/_{f}'
         try:
-            self.ui.progressBar.setToolTip(f'Download:\n{dir} -> {series}')
-            self.tray.setIcon(QIcon(f'{self.current_path}/icons/dow.png'))
+            self.ui.progressBar.setToolTip(f'Download:\n{dirs} -> {data["anime"]["series"][urls.index(link)]+1}')
+            self.ui.progressBar.setFormat('Complete %p%')
             url_request.urlretrieve(down, save_loc, self.handleProgress)
-            self.checkUpload(f, urls, dir, link, name, series, data, search)
+            self.ui.progressBar.setFormat('Completed')
+            self.checkUpload(f, urls, dirs, link, name, series, data, search)
         except Exception as e:
             system(f'rm {self.current_path}/downloads/_{f}')
             dead = True
             print('Error: ==>\n', e)
-            self.ui.progressBar.setToolTip(f'Error download\n{dir} -> {series}')
+            self.ui.progressBar.setToolTip(f'Error download\n{dirs} -> {data["anime"]["series"][urls.index(link)]+1}')
 
 
     def extraClose(self):
         global dead
         dead = False
         system('killall chromedriver')
+        self.defaultIcon()
 
 
     def progressCount(self, percent):
@@ -488,7 +538,8 @@ class myWindow(QtWidgets.QMainWindow):
 
     def upComboAnime(self):
         data = self.uploadGlobalSettings()
-        num = float(f"{data['anime']['series'][self.ui.comboBox.currentIndex()]}.{data['anime']['ova'][self.ui.comboBox.currentIndex()]}")
+        index = self.ui.comboBox.currentIndex()
+        num = float(f"{data['anime']['series'][index]}.{data['anime']['ova'][index]}")
         self.ui.lcdNumber.display(num)
 
 
@@ -518,12 +569,12 @@ class myWindow(QtWidgets.QMainWindow):
 
     def iconTab(self):
         index = self.ui.tabWidget.currentIndex()
-        self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nChecking site..')
+        self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nhttps://v2.vost.pw/\nChecking site..')
         if self.flag:
             if index == 0:
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
                 self.tray.setToolTip('AnimeVost checker')
-                self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nChecking site..')
+                self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nhttps://v2.vost.pw/\nChecking site..')
             elif index == 1:
                 self.tray.setToolTip('Manga checker')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask.png'))
@@ -636,7 +687,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def whileStart(self, flag_s = True):
-        global enable
+        global enable, dead
         current_spinner = 0
         self.led.value = True
         self.led.setToolTip('Working..')
@@ -647,6 +698,8 @@ class myWindow(QtWidgets.QMainWindow):
             spinner = self.ui.toolButton_4
             # self.ui.toolButton_4.setStyleSheet('border: none; background: transparent; color: gray;')
         while True:
+            if dead == False:
+                break
             if self.check_proc():
 
                 if current_spinner == 360:
@@ -655,7 +708,7 @@ class myWindow(QtWidgets.QMainWindow):
                 else:
                     spinner.setIcon(QIcon(f'{self.current_path}/icons/spinner-{current_spinner}.png'))
                     current_spinner += 30
-        
+
                 filename = [f for f in listdir(f'{self.current_path}/downloads') if isfile(path.join(f'{self.current_path}/downloads', f))]
                 if len(filename) > 0:
                     for i in filename:
@@ -670,14 +723,16 @@ class myWindow(QtWidgets.QMainWindow):
                     self.tray.setToolTip('Check..')
             else:
                 self.defaultIcon()
-                enable = True
-                self.flag = True
-                self.led.value = False
-                self.led.setToolTip('Not Working..')
                 self.upComboAnime()
-                self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
-                self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
                 break
+
+        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
+        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
+        enable = True
+        dead = True
+        self.flag = True
+        self.led.setToolTip('Not Working..')
+        self.led.value = False
 
 
     def loging(self):
@@ -704,20 +759,21 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def oneDown(self):
-        global enable
+        global enable, dead
         if enable:
             enable = False
+            dead = True
             self.flag = False
             data = self.uploadGlobalSettings()
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-            # print(self.ui.lcdNumber.value())
             Thread(target = self.oneParsing, args = (data, data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
             Thread(target = self.whileStart).start()
 
 
     def allDown(self):
-        global enable
+        global enable, dead
         if enable:
+            dead = True
             enable = False
             self.flag = False
             data = self.uploadGlobalSettings()
@@ -762,9 +818,11 @@ class myWindow(QtWidgets.QMainWindow):
     def showed(self):
         reads = self.uploadGlobalSettings()
 
-        for i in reads['anime']['name']:
-            self.ui.comboBox.addItem(i)
-            self.ui.comboBox_3.addItem(i)
+        for i in enumerate(reads['anime']['name']):
+            self.ui.comboBox.addItem(i[1])
+            self.ui.comboBox_3.addItem(i[1])
+            if len(reads['anime']['images']) > i[0]:
+                self.ui.comboBox.setItemIcon(i[0], QIcon(f'{self.current_path}/description/{reads["anime"]["images"][i[0]]}'))
 
         self.ui.comboBox.setCurrentIndex(0)
         self.ui.comboBox_3.setCurrentIndex(0)
@@ -1110,7 +1168,7 @@ class myWindow(QtWidgets.QMainWindow):
         try:
             for i in enumerate(data['anime']['urls']):
                 if dead == False:
-                    break
+                    raise Exception('Error set description Anime')
                 img, desc = getDescription(i[1])
                 images.append(img)
                 descs.append(desc)
