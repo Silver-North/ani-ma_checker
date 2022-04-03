@@ -9,14 +9,14 @@ from shutil import copyfileobj
 from PIL import Image
 from time import sleep
 
-check = 0
+check = False
 tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
-def checkURL(url, series, fide=False):
+def checkURL(url, series, ova):
     global check
-    print(url)
+    print(series, ova, url)
     names = ''
     try:
         link = get(url)
@@ -26,26 +26,60 @@ def checkURL(url, series, fide=False):
         names = name.split(' /')
         mass = names[1].split('[')
         arr = []
-
+        
         if len(mass) == 2:
-            mass = name.split(' ')
-            arr = mass[-3].split('-')
+            if '-' not in mass[-1]:
+                arr = mass[-1][1]
+            else:
+                arr = mass[-1].split('-')
+            int_i = 0
         elif len(mass) == 3:
-            mass = name.split(' ')
-            arr = mass[-8].split('-')
+            if 'OVA' in mass[-1]:
+                int_i = mass[-1].split()
+                if ova == 1:
+                    int_i = int(int_i[1])
+                else:
+                    int_i = int(int_i[1].split('-')[1])
 
-        num = int(arr[-1])
+            if '-' not in mass[-2]:
+                arr = mass[-2][1]
+            else:
+                arr = mass[-2].split('-')
+        elif len(mass) == 4:
+            if 'OVA' in mass[-1]:
+                int_i = mass[-1].split()
+                if ova == 1:
+                    int_i = int(int_i[1])
+                else:
+                    int_i = int(int_i[1].split('-')[1])
+            if '-' not in mass[-3]:
+                arr = mass[-3][1]
+            else:
+                arr = mass[-3].split('-')
 
-        if num == series:
-            check += 1
-            current_date = date.today()
-            current_time = strftime("%H:%M", localtime())
-            # if isinstance(data, dict):
-                # data['anime']['notify'] = 'unchecked'
-                # with open(f'{current_path}/setting.json', 'w') as js:
-                    # js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+        string_num = arr[-1].split()
+        num = int(string_num[0])
+        
+        current_date = date.today()
+        current_time = strftime("%H:%M", localtime())
+
+        if num == series and ova == int_i:
+            check = True
+            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series} & new ova-{ova}\n'
+            print(0)
+        elif num == series and ova != int_i:
+            check = True
+            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n'
+            print(1)
+        elif ova == int_i and series != num:
+            check = True
+            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new ova-{ova}\n'
+            print(2)
+
+        if text != "":
             with open(f'{current_path}/notify.txt', 'a') as d:
-                d.write(f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n')
+                d.write(text)
+
     except Exception as e:
         with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
