@@ -26,7 +26,7 @@ def checkURL(url, series, ova):
         names = name.split(' /')
         mass = names[1].split('[')
         arr = []
-        
+
         if len(mass) == 2:
             if '-' not in mass[-1]:
                 arr = mass[-1][1]
@@ -40,11 +40,14 @@ def checkURL(url, series, ova):
                     int_i = int(int_i[1])
                 else:
                     int_i = int(int_i[1].split('-')[1])
-
-            if '-' not in mass[-2]:
-                arr = mass[-2][1]
             else:
+                int_i = 0
+
+            if '-' in mass[-2]:
                 arr = mass[-2].split('-')
+            else:
+                arr = mass[-2][:1:]
+            print(arr)
         elif len(mass) == 4:
             if 'OVA' in mass[-1]:
                 int_i = mass[-1].split()
@@ -52,17 +55,20 @@ def checkURL(url, series, ova):
                     int_i = int(int_i[1])
                 else:
                     int_i = int(int_i[1].split('-')[1])
-            if '-' not in mass[-3]:
-                arr = mass[-3][1]
             else:
+                int_i = 0
+
+            if '-' in mass[-3]:
                 arr = mass[-3].split('-')
+            else:
+                arr = mass[-3][:1:]
 
         string_num = arr[-1].split()
         num = int(string_num[0])
-        
+
         current_date = date.today()
         current_time = strftime("%H:%M", localtime())
-
+        print(num, int_i)
         if num == series and ova == int_i:
             check = True
             text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series} & new ova-{ova}\n'
@@ -81,6 +87,7 @@ def checkURL(url, series, ova):
                 d.write(text)
 
     except Exception as e:
+        print('error =========>\n', e)
         with open(f'{current_path}/setting.json', 'r') as reads:
             data = load(reads)
         if isinstance(data, dict):
@@ -89,6 +96,8 @@ def checkURL(url, series, ova):
                 js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
     return names[0], check
 
+
+checkURL('https://animevost.am/tip/tv/2785-otome-game-sekai-wa-mob-ni-kibishii-sekai-desu.html', 1, 1)
 
 def getDescription(url):
     try:
