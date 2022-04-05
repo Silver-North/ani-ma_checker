@@ -132,7 +132,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.tray.show()
 
         self.led = QLed(self, onColour=QLed.Green, shape=QLed.Circle)
-        self.led.setGeometry(374, 131, 12, 12)
+        self.led.setGeometry(371, 131, 12, 12)
 
         self.timeNumber()
         self.defaultIcon()

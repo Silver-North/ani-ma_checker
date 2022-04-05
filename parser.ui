@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>397</width>
+    <width>390</width>
     <height>178</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>397</width>
+    <width>390</width>
     <height>178</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>397</width>
+    <width>390</width>
     <height>178</height>
    </size>
   </property>
@@ -29,7 +29,7 @@
    <widget class="QToolButton" name="toolButton_3">
     <property name="geometry">
      <rect>
-      <x>367</x>
+      <x>364</x>
       <y>4</y>
       <width>25</width>
       <height>25</height>
@@ -49,7 +49,7 @@
    <widget class="QToolButton" name="toolButton_11">
     <property name="geometry">
      <rect>
-      <x>367</x>
+      <x>364</x>
       <y>34</y>
       <width>25</width>
       <height>25</height>
@@ -367,7 +367,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>7</pointsize>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="toolTip">
@@ -397,7 +397,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>7</pointsize>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="toolTip">
@@ -426,7 +426,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Current Tracker List</string>
+       <string>Current Tracker List
+Update every 18 minutes..</string>
       </property>
       <property name="currentText">
        <string/>
@@ -438,14 +439,14 @@
      <widget class="QToolButton" name="toolButton_33">
       <property name="geometry">
        <rect>
-        <x>241</x>
+        <x>242</x>
         <y>113</y>
         <width>25</width>
         <height>25</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Save urk from Track</string>
+       <string>Save url from Track</string>
       </property>
       <property name="text">
        <string>...</string>
@@ -458,7 +459,7 @@
      <widget class="QCheckBox" name="checkBox">
       <property name="geometry">
        <rect>
-        <x>225</x>
+        <x>226</x>
         <y>118</y>
         <width>14</width>
         <height>14</height>
@@ -1343,7 +1344,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QToolButton" name="toolButton_18">
     <property name="geometry">
      <rect>
-      <x>367</x>
+      <x>364</x>
       <y>64</y>
       <width>25</width>
       <height>25</height>
@@ -1359,7 +1360,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QToolButton" name="toolButton_24">
     <property name="geometry">
      <rect>
-      <x>367</x>
+      <x>364</x>
       <y>152</y>
       <width>25</width>
       <height>25</height>
@@ -1381,7 +1382,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QToolButton" name="toolButton_6">
     <property name="geometry">
      <rect>
-      <x>367</x>
+      <x>364</x>
       <y>94</y>
       <width>25</width>
       <height>25</height>
