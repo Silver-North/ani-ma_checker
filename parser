@@ -17,7 +17,7 @@ from webbrowser import open as open_url
 from os import listdir, path, popen, system, rename
 from time import sleep, localtime, strftime
 from threading import Thread
-from notifications import checkURL, getDescription, loadImage
+from notifications import checkURL, getDescription, loadImage, checkFixedOutput
 from json import dumps, load
 from pyttsx3 import init
 from datetime import date
@@ -157,8 +157,14 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
+       
+        self.timer_tracker = QTimer()
+        self.timer_tracker.timeout.connect(self.uploadTrackerAnime)
+        self.timer_tracker.start(1_080_000)
+       
         self.update()
         self.ui.tabWidget.setCurrentIndex(0)
+        self.comboTracker()
 #### << Maiin-module >> ####
         self.ui.toolButton_3.clicked.connect(self.closed)
         self.ui.toolButton_11.clicked.connect(self.modeColorSheme)
@@ -490,10 +496,30 @@ class myWindow(QtWidgets.QMainWindow):
         self.f_flag = False
 
 
-    def openURLAnime(self):
-        index = self.ui.comboBox.currentIndex()
+    def uploadTrackerAnime(self):
+        self.ui.comboBox_7.clear()
         data = self.uploadGlobalSettings()
-        open_url(data['anime']['urls'][index])
+        names, links = checkFixedOutput()
+        self.setGlobalSettings(data, 'anime', 'track-name', names)
+        self.setGlobalSettings(data, 'anime', 'track-link', links)
+        self.comboTracker()
+
+
+    def comboTracker(self):
+        data = self.uploadGlobalSettings()
+        if len(data['anime']['track-name']) > 0:
+            for i in data['anime']['track-name']:
+                self.ui.comboBox_7.addItem(i)
+
+
+    def openURLAnime(self):
+        data = self.uploadGlobalSettings()
+        if self.ui.checkBox.isChecked():
+            index = self.ui.comboBox_7.currentIndex()
+            open_url(data['anime']['track-link'][index])
+        else:
+            index = self.ui.comboBox.currentIndex()
+            open_url(data['anime']['urls'][index])
 
 
     def updateClick(self):
@@ -587,12 +613,20 @@ class myWindow(QtWidgets.QMainWindow):
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask.png'))
                 self.ui.toolButton_24.setToolTip('https://www.manga-chan.me\nhttps://www.readmanga.io\nhttps://www.mintmanga.live\nChecking site,,')
             elif index == 2:
+                self.tray.setToolTip('Manga checker')
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/ranobe.png'))
+                self.ui.toolButton_24.setToolTip('About')
+            elif index == 3:
                 self.tray.setToolTip('View Anime description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/a-desc.png'))
                 self.ui.toolButton_24.setToolTip('About')
-            elif index == 3:
+            elif index == 4:
                 self.tray.setToolTip('View Manga description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/m-desc.png'))
+                self.ui.toolButton_24.setToolTip('About')
+            elif index == 5:
+                self.tray.setToolTip('View Ranobe description')
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/r-desc.png'))
                 self.ui.toolButton_24.setToolTip('About')
 
 
@@ -634,21 +668,31 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_11.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
         self.setStyleSheet(win)
         self.ui.lineEdit.setStyleSheet(back)
+        self.ui.lineEdit_2.setStyleSheet(back)
+        self.ui.lineEdit_3.setStyleSheet(back)
         self.ui.textEdit.setStyleSheet(back)
         self.ui.textEdit_2.setStyleSheet(back)
-        self.ui.lineEdit_2.setStyleSheet(back)
+        self.ui.textEdit_3.setStyleSheet(back)
         self.ui.comboBox.setStyleSheet(back)
         self.ui.comboBox_2.setStyleSheet(back)
         self.ui.comboBox_3.setStyleSheet(back)
         self.ui.comboBox_4.setStyleSheet(back)
+        self.ui.comboBox_5.setStyleSheet(back)
+        self.ui.comboBox_6.setStyleSheet(back)
+        self.ui.comboBox_7.setStyleSheet(back)
         self.ui.spinBox.setStyleSheet(back)
         self.ui.doubleSpinBox.setStyleSheet(back)
+        self.ui.doubleSpinBox_2.setStyleSheet(back)
         self.ui.lcdNumber.setStyleSheet(back)
         self.ui.lcdNumber_2.setStyleSheet(back)
         self.ui.lcdNumber_3.setStyleSheet(back)
+        self.ui.lcdNumber_4.setStyleSheet(back)
+        self.ui.lcdNumber_5.setStyleSheet(back)
         if ico == 'lamp':
+            self.ui.checkBox.setStyleSheet('border-color: #0b76ef; background-color: #0b76ef;')
             self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/dark-about.png'))
         elif ico == 'dark':
+            self.ui.checkBox.setStyleSheet('border-color: rgb(122, 84, 84); background-color: rgb(122, 84, 84);')
             self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/light-about.png'))
 
 
@@ -663,8 +707,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_18.setIcon(QIcon(f'{self.current_path}/icons/hide.png'))
         self.ui.tabWidget.setTabIcon(0, QIcon(f'{self.current_path}/icons/animevost.png'))
         self.ui.tabWidget.setTabIcon(1, QIcon(f'{self.current_path}/icons/mask.png'))
-        self.ui.tabWidget.setTabIcon(2, QIcon(f'{self.current_path}/icons/a-desc.png'))
-        self.ui.tabWidget.setTabIcon(3, QIcon(f'{self.current_path}/icons/m-desc.png'))
+        self.ui.tabWidget.setTabIcon(2, QIcon(f'{self.current_path}/icons/ranobe.png'))
+        self.ui.tabWidget.setTabIcon(3, QIcon(f'{self.current_path}/icons/a-desc.png'))
+        self.ui.tabWidget.setTabIcon(4, QIcon(f'{self.current_path}/icons/m-desc.png'))
+        self.ui.tabWidget.setTabIcon(5, QIcon(f'{self.current_path}/icons/r-desc.png'))
         self.ui.toolButton.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_2.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_3.setIcon(QIcon(f'{self.current_path}/icons/close.png'))
@@ -836,7 +882,7 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.comboBox.addItem(i[1])
             self.ui.comboBox_3.addItem(i[1])
             if len(reads['anime']['images']) > i[0]:
-                self.ui.comboBox.setItemIcon(i[0], QIcon(f'{self.current_path}/description/{reads["anime"]["images"][i[0]]}'))
+                self.ui.comboBox.setItemIcon(i[0], QIcon(f'{self.current_path}/{reads["anime"]["images"][i[0]]}'))
 
         self.ui.comboBox.setCurrentIndex(0)
         self.ui.comboBox_3.setCurrentIndex(0)
@@ -1114,7 +1160,7 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox_3.currentIndex()
         data = self.uploadGlobalSettings()
 
-        self.ui.label_5.setPixmap(QPixmap(f'{self.current_path}/description/{data["anime"]["images"][index]}'))
+        self.ui.label_5.setPixmap(QPixmap(f'{self.current_path}/{data["anime"]["images"][index]}'))
         self.ui.textEdit.setHtml(data['anime']['description'][index])
 
 
@@ -1149,7 +1195,7 @@ class myWindow(QtWidgets.QMainWindow):
                     raise Exception('Error set description Anime')
                 img, desc = getDescription(i[1])
                 images.append(img)
-                descs.append(desc)
+                descs.append(f'description/{desc}')
                 index_i = i[0] + 1
                 self.percent_desc_anime = int(index_i / len(data['anime']['urls']) * 100)
                 print(self.percent_desc_anime, index_i, len(data['anime']['urls']))
@@ -1191,7 +1237,7 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox_4.currentIndex()
         data = self.uploadGlobalSettings()
 
-        self.ui.label_6.setPixmap(QPixmap(f'{self.current_path}/description/{data["manga"]["images"][index]}'))
+        self.ui.label_6.setPixmap(QPixmap(f'{self.current_path}/{data["manga"]["images"][index]}'))
         self.ui.textEdit_2.setHtml(data['manga']['description'][index])
 
 
@@ -1216,7 +1262,7 @@ class myWindow(QtWidgets.QMainWindow):
                     desc = driver.find_element_by_class_name('manga-description').text
                 print(img)
                 image = img.split('/')
-                descs.append(desc)
+                descs.append(f'description/{desc}')
                 r = get(img, stream=True)
                 if r.status_code == 200:
                     with open(f'{self.current_path}/description/{image[-1]}', 'wb') as f:

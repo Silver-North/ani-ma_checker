@@ -14,6 +14,24 @@ tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
+def checkFixedOutput():
+    try:
+        link = get('https://animevost.org')
+        soup = BeautifulSoup(link.text, 'html.parser')
+        raspisanie = soup.find_all('ul', class_='raspis_fixed')
+        links = raspisanie[0].find_all("a")
+        txt = raspisanie[0].text.split('\n')
+        del(txt[0])
+        del(txt[-1])
+        link = []
+        for i in enumerate(txt):
+            link.append(links[i[0]]["href"])
+
+        return txt, link
+    except Exception as e:
+        system(f'<<Error update tracker>>\n{e}')
+
+
 def checkURL(url, series, ova):
     global check
     print(series, ova, url)
@@ -96,8 +114,6 @@ def checkURL(url, series, ova):
                 js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
     return names[0], check
 
-
-checkURL('https://animevost.am/tip/tv/2785-otome-game-sekai-wa-mob-ni-kibishii-sekai-desu.html', 1, 1)
 
 def getDescription(url):
     try:
