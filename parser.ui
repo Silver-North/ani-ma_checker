@@ -75,7 +75,7 @@
      <string/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -483,8 +483,8 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_13">
       <property name="geometry">
        <rect>
-        <x>314</x>
-        <y>100</y>
+        <x>310</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -527,8 +527,8 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_17">
       <property name="geometry">
        <rect>
-        <x>267</x>
-        <y>100</y>
+        <x>263</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -552,7 +552,7 @@ Update every 18 minutes..</string>
      <widget class="QDoubleSpinBox" name="doubleSpinBox">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>242</x>
         <y>5</y>
         <width>81</width>
         <height>27</height>
@@ -586,8 +586,8 @@ Update every 18 minutes..</string>
      <widget class="QLCDNumber" name="lcdNumber_2">
       <property name="geometry">
        <rect>
-        <x>6</x>
-        <y>100</y>
+        <x>4</x>
+        <y>105</y>
         <width>101</width>
         <height>41</height>
        </rect>
@@ -605,7 +605,7 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_19">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>242</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -624,9 +624,9 @@ Update every 18 minutes..</string>
      <widget class="QComboBox" name="comboBox_2">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>4</x>
         <y>36</y>
-        <width>221</width>
+        <width>235</width>
         <height>26</height>
        </rect>
       </property>
@@ -634,8 +634,8 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_20">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>100</y>
+        <x>216</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -660,7 +660,7 @@ Update every 18 minutes..</string>
       <property name="geometry">
        <rect>
         <x>109</x>
-        <y>100</y>
+        <y>105</y>
         <width>101</width>
         <height>41</height>
        </rect>
@@ -678,7 +678,7 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_21">
       <property name="geometry">
        <rect>
-        <x>266</x>
+        <x>272</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -697,9 +697,9 @@ Update every 18 minutes..</string>
      <widget class="QLineEdit" name="lineEdit_2">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>4</x>
         <y>5</y>
-        <width>221</width>
+        <width>235</width>
         <height>26</height>
        </rect>
       </property>
@@ -735,11 +735,16 @@ Update every 18 minutes..</string>
      <widget class="QProgressBar" name="progressBar_3">
       <property name="geometry">
        <rect>
-        <x>6</x>
-        <y>70</y>
-        <width>345</width>
-        <height>23</height>
+        <x>4</x>
+        <y>66</y>
+        <width>347</width>
+        <height>35</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
       </property>
       <property name="toolTip">
        <string>Progress Checking..</string>
@@ -756,30 +761,11 @@ Update every 18 minutes..</string>
      <attribute name="toolTip">
       <string>Ranobe</string>
      </attribute>
-     <widget class="QLCDNumber" name="lcdNumber_5">
-      <property name="geometry">
-       <rect>
-        <x>109</x>
-        <y>100</y>
-        <width>101</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Current</string>
-      </property>
-      <property name="digitCount">
-       <number>8</number>
-      </property>
-      <property name="segmentStyle">
-       <enum>QLCDNumber::Flat</enum>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_27">
       <property name="geometry">
        <rect>
-        <x>314</x>
-        <y>100</y>
+        <x>310</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -803,14 +789,20 @@ Update every 18 minutes..</string>
      <widget class="QLCDNumber" name="lcdNumber_4">
       <property name="geometry">
        <rect>
-        <x>6</x>
-        <y>100</y>
-        <width>101</width>
+        <x>4</x>
+        <y>105</y>
+        <width>71</width>
         <height>41</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Readed</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
       </property>
       <property name="digitCount">
        <number>8</number>
@@ -822,8 +814,8 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_26">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>100</y>
+        <x>226</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -847,8 +839,8 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_31">
       <property name="geometry">
        <rect>
-        <x>267</x>
-        <y>100</y>
+        <x>268</x>
+        <y>105</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -897,7 +889,7 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_29">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>242</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -916,9 +908,9 @@ Update every 18 minutes..</string>
      <widget class="QLineEdit" name="lineEdit_3">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>4</x>
         <y>5</y>
-        <width>221</width>
+        <width>235</width>
         <height>26</height>
        </rect>
       </property>
@@ -929,9 +921,9 @@ Update every 18 minutes..</string>
      <widget class="QComboBox" name="comboBox_6">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>4</x>
         <y>36</y>
-        <width>221</width>
+        <width>235</width>
         <height>26</height>
        </rect>
       </property>
@@ -939,11 +931,16 @@ Update every 18 minutes..</string>
      <widget class="QProgressBar" name="progressBar_7">
       <property name="geometry">
        <rect>
-        <x>6</x>
-        <y>70</y>
-        <width>345</width>
-        <height>23</height>
+        <x>4</x>
+        <y>66</y>
+        <width>347</width>
+        <height>35</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
       </property>
       <property name="toolTip">
        <string>Progress Checking..</string>
@@ -955,7 +952,7 @@ Update every 18 minutes..</string>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>242</x>
         <y>5</y>
         <width>81</width>
         <height>27</height>
@@ -1011,7 +1008,7 @@ Update every 18 minutes..</string>
      <widget class="QToolButton" name="toolButton_30">
       <property name="geometry">
        <rect>
-        <x>266</x>
+        <x>272</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1027,6 +1024,56 @@ Update every 18 minutes..</string>
        <string>...</string>
       </property>
      </widget>
+     <widget class="QLCDNumber" name="lcdNumber_5">
+      <property name="geometry">
+       <rect>
+        <x>78</x>
+        <y>105</y>
+        <width>71</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Accessing</string>
+      </property>
+      <property name="digitCount">
+       <number>8</number>
+      </property>
+      <property name="segmentStyle">
+       <enum>QLCDNumber::Flat</enum>
+      </property>
+     </widget>
+     <widget class="QLCDNumber" name="lcdNumber_6">
+      <property name="geometry">
+       <rect>
+        <x>152</x>
+        <y>105</y>
+        <width>71</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Accessing</string>
+      </property>
+      <property name="midLineWidth">
+       <number>0</number>
+      </property>
+      <property name="smallDecimalPoint">
+       <bool>false</bool>
+      </property>
+      <property name="digitCount">
+       <number>8</number>
+      </property>
+      <property name="segmentStyle">
+       <enum>QLCDNumber::Flat</enum>
+      </property>
+      <property name="value" stdset="0">
+       <double>0.000000000000000</double>
+      </property>
+      <property name="intValue" stdset="0">
+       <number>0</number>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -1038,7 +1085,7 @@ Update every 18 minutes..</string>
      <widget class="QComboBox" name="comboBox_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>4</x>
         <y>2</y>
         <width>231</width>
         <height>26</height>
@@ -1048,7 +1095,7 @@ Update every 18 minutes..</string>
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>18</x>
+        <x>4</x>
         <y>31</y>
         <width>90</width>
         <height>110</height>
@@ -1067,9 +1114,9 @@ Update every 18 minutes..</string>
      <widget class="QTextEdit" name="textEdit">
       <property name="geometry">
        <rect>
-        <x>123</x>
+        <x>101</x>
         <y>30</y>
-        <width>231</width>
+        <width>253</width>
         <height>111</height>
        </rect>
       </property>
@@ -1117,10 +1164,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QProgressBar" name="progressBar_4">
       <property name="geometry">
        <rect>
-        <x>244</x>
+        <x>238</x>
         <y>2</y>
-        <width>81</width>
-        <height>23</height>
+        <width>89</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="value">
@@ -1138,9 +1185,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QTextEdit" name="textEdit_2">
       <property name="geometry">
        <rect>
-        <x>123</x>
+        <x>101</x>
         <y>30</y>
-        <width>231</width>
+        <width>253</width>
         <height>111</height>
        </rect>
       </property>
@@ -1172,7 +1219,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>18</x>
+        <x>4</x>
         <y>31</y>
         <width>90</width>
         <height>110</height>
@@ -1197,7 +1244,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="comboBox_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>4</x>
         <y>2</y>
         <width>231</width>
         <height>26</height>
@@ -1223,10 +1270,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QProgressBar" name="progressBar_5">
       <property name="geometry">
        <rect>
-        <x>244</x>
+        <x>238</x>
         <y>2</y>
-        <width>81</width>
-        <height>23</height>
+        <width>89</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="value">
@@ -1244,33 +1291,17 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="comboBox_5">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>4</x>
         <y>2</y>
-        <width>231</width>
+        <width>350</width>
         <height>26</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QToolButton" name="toolButton_25">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>2</y>
-        <width>25</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Update Description</string>
-      </property>
-      <property name="text">
-       <string>...</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>18</x>
+        <x>4</x>
         <y>31</y>
         <width>90</width>
         <height>110</height>
@@ -1295,9 +1326,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QTextEdit" name="textEdit_3">
       <property name="geometry">
        <rect>
-        <x>123</x>
+        <x>101</x>
         <y>30</y>
-        <width>231</width>
+        <width>253</width>
         <height>111</height>
        </rect>
       </property>
@@ -1324,19 +1355,6 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="placeholderText">
        <string>Description...</string>
-      </property>
-     </widget>
-     <widget class="QProgressBar" name="progressBar_6">
-      <property name="geometry">
-       <rect>
-        <x>244</x>
-        <y>2</y>
-        <width>81</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>0</number>
       </property>
      </widget>
     </widget>

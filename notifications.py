@@ -14,6 +14,115 @@ tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
+def parseRanobe(link):
+    try:
+        url = get(link)
+        soup = BeautifulSoup(url.text, "html.parser")
+        if 'tl.rulate.ru' in link:
+            name = soup.find('h1').text.split(' / ')[1]
+            description_start = soup.find('div', id="Info")
+            # access = soup.find_all('a', class_="btn btn-small btn-info")
+        
+            desi = description_start.find_all('div')[2]
+            img = f"https://tl.rulate.ru{desi.find('img')['src']}"
+
+            ran = 12
+            while True:
+                dess = description_start.find_all('div')[ran]
+                ran += 1
+                descriptions = dess.find_all('p')
+                if len(descriptions) == 0 or descriptions is None:
+                    continue
+                description = []
+                for i in descriptions:
+                    if len(i.text) > 1:
+                        description.append(i.text)
+                break
+            description = "\n".join(description)
+            
+            table = soup.find('table', class_="table table-condensed table-striped").find_all('tr')
+            toms = soup.find_all('tr', class_="volume_helper")
+
+            tr = []
+            tom = []
+            set_class = [] 
+            chapters = []
+
+            for i in table:
+                tr.append(i.get('class'))
+
+            if len(toms) == 0:
+                tom = 1
+                for i in tr:
+                    if isinstance(i, list) and 'chapter_row' in i:
+                        if " ".join(i) in set_class:
+                            continue
+                        else:
+                            set_class.append(" ".join(i))
+            elif len(toms) > 1:
+                for i in tr:
+                    if isinstance(i, list) and len(i) > 1:
+                        if " ".join(i) in set_class:
+                            continue
+                        else:
+                            set_class.append(" ".join(i))
+                for i in toms:
+                    if i is not None and len(i.text) > 1:
+                        tom.append(i.text.split()[1])
+            
+            for i in enumerate(set_class):
+                chapter = len(soup.find_all('tr', class_=i[1]))
+                if isinstance(tom, int):
+                    chapters.append(f'{tom}.{chapter}')
+                else:
+                    chapters.append(f'{tom[i[0]]}.{chapter}')
+            all = chapter = chapters[-1]
+            print(f'{name}\n{img}\n{description}\n{chapter}')
+
+        elif 'https://xn--80ac9aeh6f.xn--p1ai' in link:
+            name = soup.find('h1', class_="cursor-default md:cursor-pointer font-bold text-2xl md:text-3xl sm:leading-7 lg:leading-10 xl:leading-9 pt-1 text-black-0 dark:text-grayNormal-200 truncate").text
+            description = soup.find('div', class_="BookPage_desc__2rsZC").text
+            img = soup.find('img', class_="xs:rounded-md md:w-[180px] lg:w-[220px]")['src']
+            chapters = soup.find_all('a', class_="text-black-0 dark:text-grayNormal-200 hover:text-primary cursor-default md:cursor-pointer dark:hover:text-primary truncate text-sm md:text-base")
+            all = []
+            for i in chapters[0].text:
+                if i.isnumeric():
+                    all.append(i)
+
+            print(f'{name}\n{description}\n{img}\n{0}\n{"".join(all)}')
+            
+        elif 'ranobehub.org' in link:
+            name = soup.find('h1', class_="ui huge header").text
+            img = soup.find('img', class_="image")['data-src']
+            description = soup.find('div', class_="book-description__text").text
+            chapters = soup.find('div', class_="book-meta-value book-stats")
+            chapter = chapters.find('strong').text
+            print(f'{name}\n{img}\n{description[2:-2:]}\n{chapter}')
+
+        elif 'ruranobe.ru' in link:
+            name = soup.find('span', class_="headline__text").text
+            img = f'https://ruranobe.ru/{soup.find_all("img", class_="detail__image")[0]["src"]}'
+            description = soup.find('div', class_="read-more").text
+            chapters = soup.find('div', class_="detail__actions")
+            chapter = chapters.find('a').text
+            chapters = soup.find_all('a', class_="list__item")
+            for i in chapters:
+                tom = i.find('span', class_="list__item-number").text.split()[1].split(":")[0]
+                desc = i.find('span', class_="list__name").text
+                if chapter == desc[1:-1:]:
+                    print(tom)
+                    break
+            print(f'{name}\n{img}\n{description[1:-1:]}\n{tom}')
+        return name, img, description, chapter, all
+    except Exception as e:
+        system(f'notify-send "ERRor for parse Ranobe {link}\n{e}"')
+
+# parseRanobe('https://ruranobe.ru/r/mknr')
+# parseRanobe('https://ruranobe.ru/r/prince')
+# parseRanobe('https://tl.rulate.ru/book/43753')
+# parseRanobe('https://tl.rulate.ru/book/173')
+
+
 def checkFixedOutput():
     try:
         link = get('https://animevost.org')
@@ -29,7 +138,7 @@ def checkFixedOutput():
 
         return txt, link
     except Exception as e:
-        system(f'<<Error update tracker>>\n{e}')
+        system(f'notify-send "<<Error update tracker>>\n{e}"')
 
 
 def checkURL(url, series, ova):
@@ -89,20 +198,20 @@ def checkURL(url, series, ova):
         print(num, int_i)
         if num == series and ova == int_i:
             check = True
-            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series} & new ova-{ova}\n'
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series} & new ova-{ova}\n'
             print(0)
         elif num == series and ova != int_i:
             check = True
-            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n'
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n'
             print(1)
         elif ova == int_i and series != num:
             check = True
-            text = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new ova-{ova}\n'
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new ova-{ova}\n'
             print(2)
 
-        if text != "":
+        if txt != "":
             with open(f'{current_path}/notify.txt', 'a') as d:
-                d.write(text)
+                d.write(txt)
 
     except Exception as e:
         print('error =========>\n', e)

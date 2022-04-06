@@ -17,7 +17,7 @@ from webbrowser import open as open_url
 from os import listdir, path, popen, system, rename
 from time import sleep, localtime, strftime
 from threading import Thread
-from notifications import checkURL, getDescription, loadImage, checkFixedOutput
+from notifications import checkURL, getDescription, loadImage, checkFixedOutput, parseRanobe
 from json import dumps, load
 from pyttsx3 import init
 from datetime import date
@@ -76,7 +76,6 @@ class ThreadProgress(QThread):
             print('Error ==>\n', e)
             system(f'notify-send "Error checking anime\n{e}"')
         if self.check > 0:
-            self.check = 0
             self.data['anime']['notify'] = 'unchecked'
             if isinstance(self.data, dict):
                 with open(f'{self.current_path}/setting.json', 'w') as js:
@@ -86,6 +85,7 @@ class ThreadProgress(QThread):
             tts.runAndWait()
             system('notify-send "Вышло кое-что новенькое!!!"')
         sleep(1)
+        self.check = 0
         percent = 0
         self._signal.emit(percent)
 
@@ -111,6 +111,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.percent_all_manga = 0
         self.percent_desc_manga = 0
         self.percent_desc_anime = 0
+        self.ranobe_percent = 0
         self.color = 0
         self.path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
         self.prefs = {'download.default_directory': self.path_down, "download.prompt_for_download": False}
@@ -138,17 +139,22 @@ class myWindow(QtWidgets.QMainWindow):
         self.defaultIcon()
 
         self.showed()
+        self.viewRanobe()
 
         self.showCombo()
         self.viewDescription()
         self.updateNumber()
         self.upComboAnime()
         self.viewDescriptionManga()
+        self.upComboRanobe()
+        self.viewDescriptionRanobe()
 
         self.ui.comboBox.activated[str].connect(self.upComboAnime)
         self.ui.comboBox_2.activated[str].connect(self.updateNumber)
         self.ui.comboBox_3.activated[str].connect(self.viewDescription)
         self.ui.comboBox_4.activated[str].connect(self.viewDescriptionManga)
+        self.ui.comboBox_5.activated[str].connect(self.viewDescriptionRanobe)
+        self.ui.comboBox_6.activated[str].connect(self.upComboRanobe)
 
         name = date.today().strftime("%A")
         if name == "Monday" or name == "Понедельник":
@@ -193,6 +199,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_22.clicked.connect(self.uploadDescription)
 #### <<< View Manga-description module >> ####
         self.ui.toolButton_23.clicked.connect(self.uploadDescriptionManga)
+#### << Manga-module >> ####
+        self.ui.toolButton_32.clicked.connect(self.saveRanobeUrl)
+        self.ui.toolButton_26.clicked.connect(self.updateRanobeUrl)
+        
 
 
     def keyPressEvent(self, QKeyEvent):
@@ -588,6 +598,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.progressBar_3.setValue(self.percent_all_manga)
         self.ui.progressBar_4.setValue(self.percent_desc_anime)
         self.ui.progressBar_5.setValue(self.percent_desc_manga)
+        self.ui.progressBar_7.setValue( self.ranobe_percent)
         if checker_tag:
             self.ui.progressBar_2.setValue(self.percent_all_anime)
         else:
@@ -688,6 +699,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lcdNumber_3.setStyleSheet(back)
         self.ui.lcdNumber_4.setStyleSheet(back)
         self.ui.lcdNumber_5.setStyleSheet(back)
+        self.ui.lcdNumber_6.setStyleSheet(back)
         if ico == 'lamp':
             self.ui.checkBox.setStyleSheet('border-color: #0b76ef; background-color: #0b76ef;')
             self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/dark-about.png'))
@@ -701,6 +713,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
         self.ui.toolButton_22.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_23.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
+        self.ui.toolButton_26.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_14.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
         self.ui.toolButton_16.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
@@ -721,6 +734,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
         self.ui.toolButton_13.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_15.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
+        self.ui.toolButton_32.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
+        self.ui.toolButton_33.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_17.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
         self.ui.toolButton_19.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_20.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
@@ -1279,6 +1294,97 @@ class myWindow(QtWidgets.QMainWindow):
         sleep(4)
         self.percent_desc_manga = 0
         driver.quit()
+
+
+#### <<< Tab Manga Description >>> ####
+    def saveRanobeUrl(self):
+        url = self.ui.lineEdit_3.text()
+        chapter = self.ui.doubleSpinBox_2.value()
+        data = self.uploadGlobalSettings()
+        try:
+            get(url)
+            self.ui.comboBox_6.addItem(url)
+            self.ui.comboBox_5.addItem(url)
+            self.setGlobalSettings(data, 'ranobe', 'urls', url, True)
+            self.setGlobalSettings(data, 'ranobe', 'chapters', chapter, True)
+        except Exception as e:
+            system(f'notify-send "Error add new url <ranobe>\n{e}"')
+
+
+    def setRanobe(self):
+            data = self.uploadGlobalSettings()
+            names = []
+            images = []
+            descs = []
+            chapters = []
+            all_chapters = []
+        # try:
+            for i in enumerate(data['ranobe']['urls']):
+                print(i)
+                name, img, description, chapter, all = parseRanobe(i[1])
+                names.append(name)
+                image = img.split('/')[-1]
+                images.append(f'description/{image}')
+                r = get(img, stream=True)
+                if r.status_code == 200:
+                    with open(f'{self.current_path}/description/{image}', 'wb') as f:
+                        r.raw.decode_content = True
+                        copyfileobj(r.raw, f)
+
+                loadImage(image)
+                descs.append(description)
+                chapters.append(chapter)
+                all_chapters.append(all)
+                self.ranobe_percent = int((i[0] + 1) / len(data['ranobe']['urls']) * 100)
+            self.setGlobalSettings(data, 'ranobe', 'names', names)
+            self.setGlobalSettings(data, 'ranobe', 'images', images)
+            self.setGlobalSettings(data, 'ranobe', 'description', descs)
+            self.setGlobalSettings(data, 'ranobe', 'access-chapters', chapters)
+            self.setGlobalSettings(data, 'ranobe', 'future-chapters', all_chapters)
+            sleep(0.5)
+            self.ranobe_percent = 0
+            self.viewRanobe()
+        # except Exception as e:
+            # system(f'notify-send "Error for get data about <ranobe>\n{e}"')
+    
+
+    def viewRanobe(self):
+        self.ui.comboBox_5.clear()
+        self.ui.comboBox_6.clear()
+        data = self.uploadGlobalSettings()
+        if len(data['ranobe']['names']) > 0:
+            for i in data['ranobe']['names']:
+                self.ui.comboBox_6.addItem(i)
+                self.ui.comboBox_5.addItem(i)
+        else:
+            for i in data['ranobe']['urls']:
+                self.ui.comboBox_5.addItem(i)
+                self.ui.comboBox_6.addItem(i)
+
+
+    def upComboRanobe(self):
+        data = self.uploadGlobalSettings()
+        index = self.ui.comboBox_6.currentIndex()
+        self.ui.lcdNumber_4.display(data['ranobe']['chapters'][index])
+        if len(data['ranobe']['access-chapters']) > 0:
+            self.ui.lcdNumber_5.display(data['ranobe']['access-chapters'][index])
+            self.ui.lcdNumber_6.display(data['ranobe']['future-chapters'][index])
+        else:
+            self.ui.lcdNumber_5.display(0)
+            self.ui.lcdNumber_6.display(0)
+
+
+    def viewDescriptionRanobe(self):
+        index = self.ui.comboBox_5.currentIndex()
+        data = self.uploadGlobalSettings()
+
+        self.ui.label_7.setPixmap(QPixmap(f'{self.current_path}/{data["ranobe"]["images"][index]}'))
+        self.ui.textEdit_3.setHtml(data['ranobe']['description'][index])
+
+
+    def updateRanobeUrl(self):
+        Thread(target = self.setRanobe).start()
+        Thread(target = self.whileStartCheck, args = (self.ui.toolButton_26, 'circle')).start()
 
 
 app = QtWidgets.QApplication([])
