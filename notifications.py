@@ -3,14 +3,12 @@ from bs4 import BeautifulSoup
 from os import system, path
 from time import strftime, localtime
 from datetime import date
-from json import dumps, load
-from pyttsx3 import init
+from json import dumps
 from shutil import copyfileobj
 from PIL import Image
-from time import sleep
+
 
 check = False
-tts = init()
 current_path = f'{path.dirname(path.realpath(__file__))}'
 
 
@@ -21,8 +19,6 @@ def parseRanobe(link):
         if 'tl.rulate.ru' in link:
             name = soup.find('h1').text.split(' / ')[1]
             description_start = soup.find('div', id="Info")
-            # access = soup.find_all('a', class_="btn btn-small btn-info")
-        
             desi = description_start.find_all('div')[2]
             img = f"https://tl.rulate.ru{desi.find('img')['src']}"
 
@@ -117,11 +113,6 @@ def parseRanobe(link):
     except Exception as e:
         system(f'notify-send "ERRor for parse Ranobe {link}\n{e}"')
 
-# parseRanobe('https://ruranobe.ru/r/mknr')
-# parseRanobe('https://ruranobe.ru/r/prince')
-# parseRanobe('https://tl.rulate.ru/book/43753')
-# parseRanobe('https://tl.rulate.ru/book/173')
-
 
 def checkFixedOutput():
     try:
@@ -141,87 +132,97 @@ def checkFixedOutput():
         system(f'notify-send "<<Error update tracker>>\n{e}"')
 
 
-def checkURL(url, series, ova):
-    global check
-    print(series, ova, url)
-    names = ''
+def checkURL(data, url, series, ova):
+    check = False
+    name = ''
     try:
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
-        names = soup.find_all('div', class_='shortstoryHead')
-        name = names[0].text[22:-18:]
+        names = soup.find('div', class_='shortstoryHead')
+        name = names.text[22:-18:]
         names = name.split(' /')
+        name = names[0]
         mass = names[1].split('[')
         arr = []
 
         if len(mass) == 2:
             if '-' not in mass[-1]:
-                arr = mass[-1][1]
+                arr = int(mass[-1].split()[0])
+            elif 'Анонс' in mass[-1]:
+                arr = -1
             else:
-                arr = mass[-1].split('-')
+                art = mass[-1].split()[0]
+                arr = int(art.split('-')[1])
             int_i = 0
         elif len(mass) == 3:
             if 'OVA' in mass[-1]:
-                int_i = mass[-1].split()
+                inti = mass[-1].split()
                 if ova == 1:
-                    int_i = int(int_i[1])
+                    int_i = int(inti[1])
                 else:
-                    int_i = int(int_i[1].split('-')[1])
+                    int_i = int(inti[1].split('-')[1])
             else:
                 int_i = 0
-
             if '-' in mass[-2]:
-                arr = mass[-2].split('-')
+                art = mass[-2].split()[0]
+                arr = int(art.split('-')[1])
+            elif 'Анонс' in mass[-2]:
+                arr = -1
             else:
                 arr = mass[-2][:1:]
-            print(arr)
         elif len(mass) == 4:
             if 'OVA' in mass[-1]:
-                int_i = mass[-1].split()
+                inti = mass[-1].split()
                 if ova == 1:
-                    int_i = int(int_i[1])
+                    int_i = int(inti[1])
                 else:
-                    int_i = int(int_i[1].split('-')[1])
+                    int_i = int(inti[1].split('-')[1])
             else:
                 int_i = 0
 
             if '-' in mass[-3]:
-                arr = mass[-3].split('-')
+                art = mass[-2].split()[0]
+                arr = int(art.split('-')[1])
+            elif 'Анонс' in mass[-2]:
+                arr = -1
             else:
                 arr = mass[-3][:1:]
 
-        string_num = arr[-1].split()
-        num = int(string_num[0])
+        if isinstance(arr, int):
+            num = arr
+        else:
+            string_num = arr[-1].split()
+            num = int(string_num[0])
 
         current_date = date.today()
         current_time = strftime("%H:%M", localtime())
-        print(num, int_i)
+
         if num == series and ova == int_i:
-            check = True
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series} & new ova-{ova}\n'
-            print(0)
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series} & new ova-{ova}\n'
         elif num == series and ova != int_i:
-            check = True
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new series {series}\n'
-            print(1)
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series}\n'
         elif ova == int_i and series != num:
-            check = True
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {names[0]} - new ova-{ova}\n'
-            print(2)
+            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new ova-{ova}\n'
+        else:
+            txt = ''
 
         if txt != "":
-            with open(f'{current_path}/notify.txt', 'a') as d:
-                d.write(txt)
+            data['notify']['anime'].append(txt)
+            if isinstance(data, dict):
+                with open(f'{current_path}/setting.json', 'w') as js:
+                    js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+                with open(f'{current_path}/default.json', 'w') as js:
+                    js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+            else:
+                system('notify-send "Error for write notify <anime>"')
+            check = True
+            print([series, ova], url)
+        else:
+            print('No new', series, "series or no new", ova, 'ova')
 
     except Exception as e:
         print('error =========>\n', e)
-        with open(f'{current_path}/setting.json', 'r') as reads:
-            data = load(reads)
-        if isinstance(data, dict):
-            data['anime']['log'] = f'Error: {e}'
-            with open(f'{current_path}/setting.json', 'w') as js:
-                js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
-    return names[0], check
+    return name, check
 
 
 def getDescription(url):
