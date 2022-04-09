@@ -198,11 +198,11 @@ def checkURL(data, url, series, ova):
         current_time = strftime("%H:%M", localtime())
 
         if num == series and ova == int_i:
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series} & new ova-{ova}\n'
+            txt = f'[A][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series} & new ova-{ova}\n'
         elif num == series and ova != int_i:
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series}\n'
+            txt = f'[A][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series}\n'
         elif ova == int_i and series != num:
-            txt = f'[{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new ova-{ova}\n'
+            txt = f'[A]{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new ova-{ova}\n'
         else:
             txt = ''
 

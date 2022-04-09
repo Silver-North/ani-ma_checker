@@ -135,16 +135,13 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.movie = QMovie(f"{self.current_path}/icons/free.gif")
         self.small_movie = QMovie(f"{self.current_path}/icons/free-25.gif")
-        self.ui.label.setMovie(self.movie)
-        self.ui.label_2.setMovie(self.movie)
-        self.ui.label_3.setMovie(self.movie)
-        self.ui.label_4.setMovie(self.movie)
-        self.ui.label_8.setMovie(self.movie)
-        self.ui.label_9.setMovie(self.movie)
-        self.ui.label_10.setMovie(self.movie)
-        self.ui.label_11.setMovie(self.movie)
-        self.ui.label_12.setMovie(self.small_movie)
-        self.ui.label_13.setMovie(self.small_movie)
+        self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11, self.ui.label_12, self.ui.label_13]
+
+        for i in enumerate(self.labels_movie):
+            if i[0] in (8, 9):
+                i[1].setMovie(self.small_movie)
+            else:
+                i[1].setMovie(self.movie)
         
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.triggerFocus)
@@ -184,10 +181,6 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
-       
-        self.timer_tracker = QTimer()
-        self.timer_tracker.timeout.connect(self.uploadTrackerAnime)
-        self.timer_tracker.start(1_080_000)
        
         self.update()
         self.ui.tabWidget.setCurrentIndex(0)
@@ -287,7 +280,8 @@ class myWindow(QtWidgets.QMainWindow):
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        url, numbers = self.listLinkOrNumbers()
+        url, numbers = (data['anime']['urls'], data['anime']['series'])
+
         logs = []
         if len(url) > 0:
             for i in enumerate(url):
@@ -365,18 +359,13 @@ class myWindow(QtWidgets.QMainWindow):
         dead = True
 
 
-    def listLinkOrNumbers(self):
-        data = self.uploadGlobalSettings()
-        return data['anime']['urls'], data['anime']['series']
-
-
     def oneParsing(self, data, url, digit):
         global dead
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_experimental_option("prefs", self.prefs)
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        urls, _ = self.listLinkOrNumbers()
+        urls = data['anime']['urls']
         log = ''
         try:
             self.percent_all_anime = 5
@@ -549,18 +538,19 @@ class myWindow(QtWidgets.QMainWindow):
     def comboTracker(self):
         data = self.uploadGlobalSettings()
         if len(data['anime']['track-name']) > 0:
-            for i in data['anime']['track-name']:
-                self.ui.comboBox_7.addItem(i)
+            for i in enumerate(data['anime']['track-name']):
+                self.ui.comboBox_7.addItem(i[1])
+                self.ui.comboBox_7.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/animevost.png'))
 
 
     def updateClick(self):
         global enable
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_9.hide()
             print('Yes')
             self.flag = False
-            enable = False
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
             data = self.uploadGlobalSettings()
             Thread(target = self.clicker, args=(data,)).start()
@@ -590,7 +580,6 @@ class myWindow(QtWidgets.QMainWindow):
         dead = True
         self.ui.toolButton_12.show()
         self.ui.toolButton_9.show()
-        self.stopMovie()
         self.uploadTrackerAnime
 
 
@@ -598,6 +587,7 @@ class myWindow(QtWidgets.QMainWindow):
         global enable
         self.timer_check.start(900_000)
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_12.hide()
             print('Yes')
@@ -614,13 +604,15 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def timeNumber(self):
-        global checker_tag, update_list_anime
+        global checker_tag, update_list_anime, enable
         data = self.uploadGlobalSettings()
         self.timer.start(1000)
         if data['notify']['notify'] == 'unchecked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
         elif data['notify']['notify'] == 'checked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
+        if enable:
+            self.stopMovie()
         self.ui.progressBar.setValue(self.percent)
         self.ui.progressBar_3.setValue(self.percent_all_manga)
         self.ui.progressBar_4.setValue(self.percent_desc_anime)
@@ -828,7 +820,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.led.setToolTip('Not Working..')
         self.led.value = False
         spin.show()
-        self.stopMovie()
 
 
     def loging(self):
@@ -857,9 +848,9 @@ class myWindow(QtWidgets.QMainWindow):
     def oneDown(self):
         global enable, dead
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_5.hide()
-            enable = False
             dead = True
             self.flag = False
             data = self.uploadGlobalSettings()
@@ -871,10 +862,10 @@ class myWindow(QtWidgets.QMainWindow):
     def allDown(self):
         global enable, dead
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_4.hide()
             dead = True
-            enable = False
             self.flag = False
             data = self.uploadGlobalSettings()
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
@@ -1046,9 +1037,9 @@ class myWindow(QtWidgets.QMainWindow):
     def currentUpdate(self):
         global enable
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_17.hide()
-            enable = False
             self.flag = False
             data = self.uploadGlobalSettings()
             Thread(target = self.upUrls, args = (data,)).start()
@@ -1102,16 +1093,20 @@ class myWindow(QtWidgets.QMainWindow):
                 numbers_check.append(manga)
 
                 if data['manga']['numbers'][i[0]] < manga:
+                    current_date = date.today()
+                    current_time = strftime("%H:%M", localtime())
                     logs.append(f'{data["manga"]["names"][i[0]]} > {manga}')
-                    msg.append(f'{data["manga"]["names"][i[0]]} > {manga}')
+                    msg.append(f'[M][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {data["manga"]["names"][i[0]]} new chapter {manga}\n')
                 else:
                     logs.append(f'{data["manga"]["names"][i[0]]} = {manga}')
             dead = True
             if len(msg) > 0:
-                text = '\n'.join(msg)
-                system(f'notify-send "Вышло кое-что новенькое...\n{text}"')
-            self.setGlobalSettings(data, 'manga', 'logs', logs)
-            self.setGlobalSettings(data, 'manga', 'change_numbers', numbers_check)
+                data['notify']['manga'] += msg
+                data['notify']['notify'] = 'unchecked'
+                system('notify-send "Вышло кое-что новенькое.."')
+            data['manga']['logs'] = logs
+            data['manga']['change_numbers'] = numbers_check
+            self.setGlobalSettings(data, '', '', '', False, True)
         except Exception as e:
             print('Error ==>\n', e)
             system(f'notify-send "Error check manga\n{e}"')
@@ -1120,9 +1115,9 @@ class myWindow(QtWidgets.QMainWindow):
     def updateClickManga(self):
         global enable
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_20.hide()
-            enable = False
             self.flag = False
             data = self.uploadGlobalSettings()
             Thread(target = self.setUpSelenium, args = (data,)).start()
@@ -1268,23 +1263,22 @@ class myWindow(QtWidgets.QMainWindow):
             print('Error ==>\n', e)
             system(f'notify-send "Error check description anime\n{e}"')
 
-        enable = True
         dead = False
         self.led.value = False
         self.led.setToolTip('Not Working..')
         sleep(2)
         dead = True
+        enable = True
         self.percent_desc_anime = 0
         self.ui.toolButton_22.show()
-        self.stopMovie()
 
 
     def uploadDescription(self):
         global enable
         if enable:
+            enable = False
             self.startSmallMovie()
             self.ui.toolButton_22.hide()
-            enable = False
             data = self.uploadGlobalSettings()
             Thread(target = self.setDescription, args = (data,)).start()
 
@@ -1293,9 +1287,9 @@ class myWindow(QtWidgets.QMainWindow):
     def uploadDescriptionManga(self):
         global enable
         if enable:
+            enable = False
             self.startSmallMovie()
             self.ui.toolButton_23.hide()
-            enable = False
             data = self.uploadGlobalSettings()
             Thread(target = self.upDeskManga, args = (data,)).start()
             Thread(target = self.whileStart, args = (2,)).start()
@@ -1407,7 +1401,6 @@ class myWindow(QtWidgets.QMainWindow):
         except Exception as e:
             system(f'notify-send "Error for get data about <ranobe>\n{e}"')
         self.ui.toolButton_26.show()
-        self.stopMovie()
 
 
     def viewRanobe(self):
@@ -1447,9 +1440,9 @@ class myWindow(QtWidgets.QMainWindow):
     def updateRanobeUrl(self):
         global enable
         if enable:
+            enable = False
             self.startMovie()
             self.ui.toolButton_26.hide()
-            enable = False
             Thread(target = self.setRanobe).start()
 
 

@@ -75,7 +75,7 @@
      <string/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -115,6 +115,9 @@
         <width>85</width>
         <height>26</height>
        </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
       </property>
       <property name="digitCount">
        <number>7</number>
@@ -210,7 +213,7 @@
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>105</y>
+        <y>106</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -267,7 +270,7 @@
       <property name="geometry">
        <rect>
         <x>314</x>
-        <y>105</y>
+        <y>106</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -339,7 +342,7 @@
         <x>4</x>
         <y>58</y>
         <width>175</width>
-        <height>23</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
@@ -367,9 +370,9 @@
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>84</y>
+        <y>79</y>
         <width>175</width>
-        <height>23</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="font">
@@ -397,14 +400,13 @@
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>112</y>
+        <y>113</y>
         <width>219</width>
-        <height>27</height>
+        <height>25</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Current Tracker List
-Update every 18 minutes..</string>
+       <string>Current Tracker List</string>
       </property>
       <property name="currentText">
        <string/>
@@ -417,7 +419,7 @@ Update every 18 minutes..</string>
       <property name="geometry">
        <rect>
         <x>242</x>
-        <y>112</y>
+        <y>113</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -443,7 +445,7 @@ Update every 18 minutes..</string>
       <property name="geometry">
        <rect>
         <x>226</x>
-        <y>118</y>
+        <y>119</y>
         <width>14</width>
         <height>14</height>
        </rect>
@@ -519,6 +521,29 @@ Update every 18 minutes..</string>
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>-5</x>
+        <y>102</y>
+        <width>391</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="midLineWidth">
+       <number>0</number>
+      </property>
+     </widget>
+     <zorder>frame</zorder>
      <zorder>label</zorder>
      <zorder>toolButton_4</zorder>
      <zorder>label_4</zorder>
@@ -1584,7 +1609,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>364</x>
-      <y>106</y>
+      <y>100</y>
       <width>25</width>
       <height>25</height>
      </rect>
