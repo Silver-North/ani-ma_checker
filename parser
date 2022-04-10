@@ -20,7 +20,6 @@ from threading import Thread
 from notifications import checkURL, getDescription, loadImage, checkFixedOutput, parseRanobe
 from json import dumps, load
 from pyttsx3 import init
-from datetime import date
 from validators import url as check_url
 
 
@@ -170,14 +169,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.comboBox_4.activated[str].connect(self.viewDescriptionManga)
         self.ui.comboBox_5.activated[str].connect(self.viewDescriptionRanobe)
         self.ui.comboBox_6.activated[str].connect(self.upComboRanobe)
-
-        name = date.today().strftime("%A")
-        if name in ("Monday", "Понедельник"):
-            data = self.uploadGlobalSettings()
-            data['notify']['anime'] = []
-            data['notify']['manga'] = []
-            data['notify']['ranobe'] = []
-            self.setGlobalSettings(data, '', "", '', False, True)
 
         self.timer_check = QTimer()
         self.timer_check.timeout.connect(self.update)
@@ -502,6 +493,13 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.progressBar.setFormat('Complete %p%')
             url_request.urlretrieve(down, save_loc, self.handleProgress)
             self.ui.progressBar.setFormat('Completed')
+            while True:
+                for i in range(len(data['notify']['anime'])):
+                    if dirs in data['notify']['anime'][i]:
+                        del(data['notify']['anime'][i])
+                        break
+                else:
+                    break
             self.checkUpload(f, urls, dirs, link, name, series, data, search)
         except Exception as e:
             system(f'rm {self.current_path}/downloads/_{f}')
@@ -574,13 +572,13 @@ class myWindow(QtWidgets.QMainWindow):
         self.flag = True
         dead = False
         sleep(1)
-        enable = True
         self.led.value = False
         self.led.setToolTip('Not Working..')
         dead = True
+        self.uploadTrackerAnime()
         self.ui.toolButton_12.show()
         self.ui.toolButton_9.show()
-        self.uploadTrackerAnime
+        enable = True
 
 
     def update(self):
@@ -675,7 +673,7 @@ class myWindow(QtWidgets.QMainWindow):
                 str_.append(''.join(data['notify']['manga']))
             if len(data['notify']['ranobe']) > 0:
                 str_.append(''.join(data['notify']['ranobe']))
-            str = "".join(str_)
+            str = "\n".join(str_)
             alert.setGeometry(420, 95, 300, 100)
             alert.setText(str)
             data['notify']['notify'] = 'checked'
@@ -1003,6 +1001,13 @@ class myWindow(QtWidgets.QMainWindow):
             if '.00' in str(value) or '.0' in str(value):
                 value = int(value)
             data['manga']['numbers'][index] = value
+            while True:
+                for i in range(len(data['notify']['manga'])):
+                    if f'{self.ui.comboBox_2.currentText()} new chapter {value}' in data['notify']['manga'][i]:
+                        del(data['notify']['manga'][i])
+                        break
+                else:
+                    break
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.doubleSpinBox.setValue(0)
             self.updateNumber()
