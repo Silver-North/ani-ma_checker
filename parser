@@ -91,7 +91,6 @@ class ThreadProgress(QThread):
         percent = 0
         self._signal.emit(percent)
         del(self.check)
-        enable = True
         checker_tag = True
         print(True)
 
@@ -571,11 +570,11 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.flag = True
         dead = False
+        self.uploadTrackerAnime()
         sleep(1)
         self.led.value = False
         self.led.setToolTip('Not Working..')
         dead = True
-        self.uploadTrackerAnime()
         self.ui.toolButton_12.show()
         self.ui.toolButton_9.show()
         enable = True
@@ -688,7 +687,7 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.toolButton_11.setToolTip(u"Darkmode")
             self.setGlobalSettings(data, '', 'mode', 'darkmode')
         else:
-            self.changeSheme('lamp', 'background: rgb(255, 255, 255)', 'background: rgb(220, 220, 220)', 'color: rgb(0, 0, 0)')
+            self.changeSheme('lamp', 'background: rgb(250, 250, 250)', 'background: rgb(220, 220, 220)', 'color: rgb(0, 0, 0)')
             self.ui.toolButton_11.setToolTip(u"Lightmode")
             self.setGlobalSettings(data, '', 'mode', 'lightmode')
         self.color += 1
@@ -753,7 +752,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_13.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_15.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_32.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
-        self.ui.toolButton_33.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_17.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
         self.ui.toolButton_19.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_20.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
@@ -888,19 +886,28 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def saved(self):
-        url = self.ui.lineEdit.text()
+        data = self.uploadGlobalSettings()
         series = self.ui.spinBox.value()
         try:
-            get(url)
-            data = self.uploadGlobalSettings()
+            if self.ui.checkBox.isChecked():
+                url = data['anime']['track-link'][self.ui.comboBox_7.currentIndex()]
+                self.setGlobalSettings(data, 'anime', 'name', self.ui.comboBox_7.currentText().split(' / ')[0], True)
+                self.ui.comboBox.addItem(self.ui.comboBox_7.currentText().split(' / ')[0])
+                self.ui.comboBox.setItemIcon(len(data['anime']['name'])-1, QIcon(f'{self.current_path}/icons/animevost.png'))
+                self.ui.comboBox_3.addItem(self.ui.comboBox_7.currentText().split(' / ')[0])
+                self.ui.comboBox_3.setItemIcon(len(data['anime']['name'])-1, QIcon(f'{self.current_path}/icons/animevost.png'))
+            else:
+                url = self.ui.lineEdit.text()
+                get(url)
+                self.ui.comboBox.addItem(url)
             self.setGlobalSettings(data, 'anime', 'urls', url, True)
             self.setGlobalSettings(data, 'anime', 'series', series, True)
             self.setGlobalSettings(data, 'anime', 'images', 'icons/animevost.png', True)
             self.setGlobalSettings(data, 'anime', 'description', '', True)
             self.setGlobalSettings(data, 'anime', 'ova', 0, True)
-            self.ui.comboBox.addItem(url)
+
             self.ui.lineEdit.setStyleSheet('background: rgb(98, 255, 59)')
-        except:
+        except Exception as e:
             system(f'notify-send "Error add anime\n{e}"')
             self.ui.lineEdit.setStyleSheet('background: rgb(236, 0, 0)')
             self.ui.lineEdit.setText('  ERROR check URL..')
@@ -1166,7 +1173,12 @@ class myWindow(QtWidgets.QMainWindow):
     def editLineEdit(self, edit):
         sleep(2.5)
         edit.setText('')
-        edit.setStyleSheet('background: rgb(255, 255, 255)')
+        data = self.uploadGlobalSettings()
+        if data['mode'] == 'darkmode':
+            rgb = 'background: rgb(136, 136, 136)'
+        elif data['mode'] == 'lightmode':
+            rgb = 'background: rgb(220, 220, 220)'
+        edit.setStyleSheet(rgb)
 
 
     def showCombo(self):
