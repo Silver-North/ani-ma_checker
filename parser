@@ -21,6 +21,7 @@ from notifications import checkURL, getDescription, loadImage, checkFixedOutput,
 from json import dumps, load
 from pyttsx3 import init
 from validators import url as check_url
+from datetime import date
 
 
 dead = True
@@ -202,8 +203,12 @@ class myWindow(QtWidgets.QMainWindow):
 #### <<< View Manga-description module >> ####
         self.ui.toolButton_23.clicked.connect(self.uploadDescriptionManga)
 #### << Manga-module >> ####
-        self.ui.toolButton_32.clicked.connect(self.saveRanobeUrl)
         self.ui.toolButton_26.clicked.connect(self.updateRanobeUrl)
+        self.ui.toolButton_27.clicked.connect(self.logRanobe)
+        self.ui.toolButton_29.clicked.connect(self.delItemRanobe)
+        self.ui.toolButton_30.clicked.connect(self.updateItemRanobe)
+        self.ui.toolButton_31.clicked.connect(self.checkRanobeUrl)
+        self.ui.toolButton_32.clicked.connect(self.saveRanobeUrl)
         
 
     def keyPressEvent(self, QKeyEvent):
@@ -753,9 +758,13 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_15.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_32.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_17.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
+        self.ui.toolButton_31.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
         self.ui.toolButton_19.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_20.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_21.setIcon(QIcon(f'{self.current_path}/icons/edit.png'))
+        self.ui.toolButton_30.setIcon(QIcon(f'{self.current_path}/icons/edit.png'))
+        self.ui.toolButton_27.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
+        self.ui.toolButton_29.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_7.setToolTip(u"Log All parse URL")
         self.ui.toolButton_8.setToolTip(u"Log One parse URL")
         self.ui.toolButton_9.setToolTip(u"Update")
@@ -1372,19 +1381,54 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.comboBox_6.addItem(url)
             self.ui.comboBox_5.addItem(url)
             self.setGlobalSettings(data, 'ranobe', 'urls', url, True)
+            self.setGlobalSettings(data, 'ranobe', 'images', 'icons/ranobe.png', True)
+            self.setGlobalSettings(data, 'ranobe', 'description', '', True)
             self.setGlobalSettings(data, 'ranobe', 'chapters', chapter, True)
         except Exception as e:
             system(f'notify-send "Error add new url <ranobe>\n{e}"')
 
 
-    def setRanobe(self):
+    def delItemRanobe(self):
+        index = self.ui.comboBox_6.currentIndex()
+        data = self.uploadGlobalSettings()
+        alert = QMessageBox()
+        alert.setText('')
+        del(data['ranobe']['chapters'][index])
+        del(data['ranobe']['urls'][index])
+
+        if data['ranobe']['images'][index] != 'icons/ranobe.png':
+            system(f"rm {data['ranobe']['images'][index]}")
+        del(data['ranobe']['images'][index])
+        del(data['ranobe']['description'][index])
+
+        try:
+            del(data['ranobe']['names'][index])
+        except:
+            pass
+        try:
+            del(data['ranobe']['access-chapters'][index])
+        except:
+            pass
+        try:
+            del(data['ranobe']['future-chapters'][index])
+        except:
+            pass
+
+        self.setGlobalSettings(data, '', '', '', False, True)
+        self.viewRanobe()
+
+
+    def setRanobe(self, check):
         global enable, dead
+        dead = True
         data = self.uploadGlobalSettings()
         names = []
         images = []
         descs = []
         chapters = []
         all_chapters = []
+        msg = 0
+        self.ranobe_percent = 0
         try:
             for i in enumerate(data['ranobe']['urls']):
                 print(i)
@@ -1394,30 +1438,46 @@ class myWindow(QtWidgets.QMainWindow):
                 names.append(name)
                 image = img.split('/')[-1]
                 images.append(f'description/{image}')
-                r = get(img, stream=True)
-                if r.status_code == 200:
-                    with open(f'{self.current_path}/description/{image}', 'wb') as f:
-                        r.raw.decode_content = True
-                        copyfileobj(r.raw, f)
+                if data['ranobe']['chapters'][i[0]] < float(chapter):
+                    current_date = date.today()
+                    current_time = strftime("%H:%M", localtime())
+                    msg += 1
 
-                loadImage(image)
+                    self.setGlobalSettings(data, 'notify', 'ranobe', f'[R][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new chapter {chapter}\n', True)
+
+                if check == False:
+                    r = get(img, stream=True)
+                    if r.status_code == 200:
+                        with open(f'{self.current_path}/description/{image}', 'wb') as f:
+                            r.raw.decode_content = True
+                            copyfileobj(r.raw, f)
+
+                    loadImage(image)
                 descs.append(description)
                 chapters.append(chapter)
                 all_chapters.append(all)
                 self.ranobe_percent = int((i[0] + 1) / len(data['ranobe']['urls']) * 100)
-            self.setGlobalSettings(data, 'ranobe', 'names', names)
-            self.setGlobalSettings(data, 'ranobe', 'images', images)
-            self.setGlobalSettings(data, 'ranobe', 'description', descs)
+            if msg > 0:
+                system('notify-send "Вышло кое-что новенькое.."')
+                self.setGlobalSettings(data, 'notify', 'notify', 'unchecked')
+            if check == False:
+                self.setGlobalSettings(data, 'ranobe', 'names', names)
+                self.setGlobalSettings(data, 'ranobe', 'images', images)
+                self.setGlobalSettings(data, 'ranobe', 'description', descs)
             self.setGlobalSettings(data, 'ranobe', 'access-chapters', chapters)
             self.setGlobalSettings(data, 'ranobe', 'future-chapters', all_chapters)
             sleep(2.5)
             self.ranobe_percent = 0
             self.viewRanobe()
-            enable = True
             dead = True
+            self.setGlobalSettings(data, 'ranobe', 'log', '')
         except Exception as e:
+            log = f'Error ==>\n{e}' 
+            self.setGlobalSettings(data, 'ranobe', 'log', log)
             system(f'notify-send "Error for get data about <ranobe>\n{e}"')
         self.ui.toolButton_26.show()
+        self.ui.toolButton_31.show()
+        enable = True
 
 
     def viewRanobe(self):
@@ -1446,6 +1506,17 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.lcdNumber_6.display(0)
 
 
+    def logRanobe(self):
+        data = self.uploadGlobalSettings()
+        alert = QMessageBox()
+        alert.setGeometry(600, 95, 300, 100)
+        if data['ranobe']['log'] == '':
+            alert.setText('No Log..')
+        else:
+            alert.setText(data['ranobe']['log'])
+        alert.exec_()
+
+
     def viewDescriptionRanobe(self):
         index = self.ui.comboBox_5.currentIndex()
         data = self.uploadGlobalSettings()
@@ -1454,13 +1525,44 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit_3.setHtml(data['ranobe']['description'][index])
 
 
+    def updateItemRanobe(self):
+        data = self.uploadGlobalSettings()
+        value = self.ui.doubleSpinBox_2.value()
+        index = self.ui.comboBox_6.currentIndex()
+        if value != 0.0:
+            decimal = int(str(value).split('.')[1])
+            if decimal == 0:
+                value = int(value)
+            data['ranobe']['chapters'][index] = value
+            while True:
+                for i in range(len(data['notify']['ranobe'])):
+                    if f'{self.ui.comboBox_6.currentText()} - new chapter {value}' in data['notify']['ranobe'][i]:
+                        del(data['notify']['ranobe'][i])
+                        break
+                else:
+                    break
+            self.setGlobalSettings(data, '', '', '', False, True)
+            self.ui.doubleSpinBox_2.setValue(0)
+            # self.viewRanobe()
+            self.upComboRanobe()
+
+
     def updateRanobeUrl(self):
         global enable
         if enable:
             enable = False
             self.startMovie()
             self.ui.toolButton_26.hide()
-            Thread(target = self.setRanobe).start()
+            Thread(target = self.setRanobe, args = (False,)).start()
+
+
+    def checkRanobeUrl(self):
+        global enable
+        if enable:
+            enable = False
+            self.startMovie()
+            self.ui.toolButton_31.hide()
+            Thread(target = self.setRanobe, args = (True,)).start()
 
 
 app = QtWidgets.QApplication([])

@@ -75,7 +75,7 @@
      <string/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1054,7 +1054,7 @@
        <number>4</number>
       </property>
       <property name="maximum">
-       <double>9999.989999999999782</double>
+       <double>9999.999900000000707</double>
       </property>
       <property name="stepType">
        <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
