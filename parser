@@ -63,6 +63,12 @@ class ThreadProgress(QThread):
                 if names == '':
                     raise Exception('ERROR FOR URL_CHECK..')
                 if self.flag == False:
+                    if 'description/' in self.data['anime']['images'][i[0]]:
+                        pass
+                    else:
+                        img, desc = getDescription(i[1])
+                        self.data['anime']['images'][i[0]] = f'description/{img}'
+                        self.data['anime']['description'][i[0]] = desc
                     name.append(names)
                 index = i[0] + 1
                 percent = int(index / len(self.data['anime']['urls']) * 100)
@@ -112,7 +118,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.percent_all_anime = 0
         self.percent_all_manga = 0
         self.percent_desc_manga = 0
-        self.percent_desc_anime = 0
         self.ranobe_percent = 0
         self.color = 0
         self.path_down = f'{path.dirname(path.realpath(__file__))}/downloads'
@@ -127,14 +132,13 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.progressBar.setStyleSheet('selection-background-color: #00e916; background-image: linear-gradient(160deg, #00e916 0%, #3dffe9 75%);')
         self.ui.progressBar_2.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
         self.ui.progressBar_3.setStyleSheet('selection-background-color: #FFE53B; background-image: linear-gradient(22deg, #FFE53B 0%, #FF2525 82%);')
-        self.ui.progressBar_4.setStyleSheet('selection-background-color: #8BC6EC; background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);')
-        self.ui.progressBar_5.setStyleSheet('selection-background-color: #FF3CAC; background-image: linear-gradient(219deg, #FF3CAC 4%, #784BA0 44%, #2B86C5 100%);')
+        self.ui.progressBar_7.setStyleSheet('selection-background-color: #FF3CAC; background-image: linear-gradient(219deg, #FF3CAC 4%, #784BA0 44%, #2B86C5 100%);')
 
         self.current_path = path.dirname(path.realpath(__file__))
 
         self.movie = QMovie(f"{self.current_path}/icons/free.gif")
         self.small_movie = QMovie(f"{self.current_path}/icons/free-25.gif")
-        self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11, self.ui.label_12, self.ui.label_13]
+        self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11]
 
         for i in enumerate(self.labels_movie):
             if i[0] in (8, 9):
@@ -198,11 +202,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_19.clicked.connect(self.delItem)
         self.ui.toolButton_20.clicked.connect(self.updateClickManga)
         self.ui.toolButton_21.clicked.connect(self.checkUpdateItem)
-#### <<< View Anime-description module >> ####
-        self.ui.toolButton_22.clicked.connect(self.uploadDescription)
-#### <<< View Manga-description module >> ####
-        self.ui.toolButton_23.clicked.connect(self.uploadDescriptionManga)
-#### << Manga-module >> ####
+#### << Ranobe-module >> ####
         self.ui.toolButton_26.clicked.connect(self.updateRanobeUrl)
         self.ui.toolButton_27.clicked.connect(self.logRanobe)
         self.ui.toolButton_29.clicked.connect(self.delItemRanobe)
@@ -504,6 +504,9 @@ class myWindow(QtWidgets.QMainWindow):
                         break
                 else:
                     break
+            if len(data['notify']['anime']) == 0 and len(data['notify']['manga']) == 0 and len(data['notify']['ranobe']) == 0:
+                self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/empty.png'))
+                data['notify']['notify'] = 'empty'
             self.checkUpload(f, urls, dirs, link, name, series, data, search)
         except Exception as e:
             system(f'rm {self.current_path}/downloads/_{f}')
@@ -609,16 +612,17 @@ class myWindow(QtWidgets.QMainWindow):
         global checker_tag, update_list_anime, enable
         data = self.uploadGlobalSettings()
         self.timer.start(1000)
+            
         if data['notify']['notify'] == 'unchecked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
         elif data['notify']['notify'] == 'checked':
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notification.png'))
+        elif data['notify']['notify'] == 'empty':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         if enable:
             self.stopMovie()
         self.ui.progressBar.setValue(self.percent)
         self.ui.progressBar_3.setValue(self.percent_all_manga)
-        self.ui.progressBar_4.setValue(self.percent_desc_anime)
-        self.ui.progressBar_5.setValue(self.percent_desc_manga)
         self.ui.progressBar_7.setValue( self.ranobe_percent)
         if checker_tag:
             self.ui.progressBar_2.setValue(self.percent_all_anime)
@@ -667,6 +671,8 @@ class myWindow(QtWidgets.QMainWindow):
         data = self.uploadGlobalSettings()
 
         if len(data['notify']['anime']) == 0 and len(data['notify']['manga']) == 0 and len(data['notify']['ranobe']) == 0:
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/empty.png'))
+            data['notify']['notify'] = 'empty'
             alert.setGeometry(600, 95, 300, 100)
             alert.setText("No notifications..")
         else:
@@ -681,7 +687,7 @@ class myWindow(QtWidgets.QMainWindow):
             alert.setGeometry(420, 95, 300, 100)
             alert.setText(str)
             data['notify']['notify'] = 'checked'
-            self.setGlobalSettings(data, '', '', '', False, True)
+        self.setGlobalSettings(data, '', '', '', False, True)
         alert.exec_()
 
 
@@ -735,8 +741,6 @@ class myWindow(QtWidgets.QMainWindow):
 # Set Icon for toolButton
     def defaultIcon(self):
         self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
-        self.ui.toolButton_22.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
-        self.ui.toolButton_23.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_26.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
         self.ui.toolButton_18.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
@@ -787,8 +791,6 @@ class myWindow(QtWidgets.QMainWindow):
             spin = self.ui.toolButton_20
         elif flag_i == 1:
             spin = self.ui.toolButton_17
-        elif flag_i == 2:
-            spin = self.ui.toolButton_23
         elif flag_i == 3:
             spin = self.ui.toolButton_5
         elif flag_i == 4:
@@ -934,11 +936,13 @@ class myWindow(QtWidgets.QMainWindow):
 
         self.ui.comboBox.setCurrentIndex(0)
         self.ui.comboBox_3.setCurrentIndex(0)
-
-        if reads['notify']['notify'] == 'unchecked':
+        if len(reads['notify']['anime']) == 0 and len(reads['notify']['manga']) == 0 and len(reads['notify']['ranobe']) == 0:
+            self.setGlobalSettings(reads, 'notify', 'notify', 'empty')
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
+        elif reads['notify']['notify'] == 'unchecked':
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notify.png'))
         elif reads['notify']['notify'] == 'checked':
-            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
+            self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/notification.png'))
 
         if reads['mode'] == 'lightmode':
             self.changeSheme('lamp', 'background: rgb(255, 255, 255)', 'background: rgb(220, 220, 220)', 'color: rgb(0, 0, 0)')
@@ -954,6 +958,7 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox.currentIndex()
         data = self.uploadGlobalSettings()
         alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
         alert.setText('Are you sure you want to delete this entry?')
         alert.setGeometry(514, 107, 200, 200)
         alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
@@ -964,7 +969,7 @@ class myWindow(QtWidgets.QMainWindow):
             del(data['anime']['series'][index])
             del(data['anime']['ova'][index])
             if data['anime']['images'][index] != 'icons/animevost.png':
-                system(f'rm {self.current_path}/description/{data["anime"]["images"][index]}')
+                system(f'rm {self.current_path}/{data["anime"]["images"][index]}')
             del(data['anime']['images'][index])
             del(data['anime']['description'][index])
 
@@ -994,6 +999,7 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox_2.currentIndex()
         data = self.uploadGlobalSettings()
         alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
         alert.setText('Are you sure you want to delete this entry?')
         alert.setGeometry(514, 107, 200, 200)
         alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
@@ -1004,7 +1010,7 @@ class myWindow(QtWidgets.QMainWindow):
             del(data['manga']['urls'][index])
 
             if data['manga']['images'][index] != 'icons/mask.png':
-                system(f"rm {data['manga']['images'][index]}")
+                system(f"rm {self.current_path}/{data['manga']['images'][index]}")
             del(data['manga']['images'][index])
             del(data['manga']['description'][index])
 
@@ -1037,6 +1043,9 @@ class myWindow(QtWidgets.QMainWindow):
                         break
                 else:
                     break
+            if len(data['notify']['anime']) == 0 and len(data['notify']['manga']) == 0 and len(data['notify']['ranobe']) == 0:
+                self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/empty.png'))
+                data['notify']['notify'] = 'empty'
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.doubleSpinBox.setValue(0)
             self.updateNumber()
@@ -1160,36 +1169,56 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def setUpSelenium(self, data):
-        global dead
-        names = []
-        s = 0
+        global dead        
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        try:
-            for i in data['manga']['urls']:
+        self.percent_all_manga = 0
+        for i in enumerate(data['manga']['urls']):
+            try:
                 if dead == False:
                     break
-                index_i = s + 1
+                index_i = i[0] + 1
                 self.percent_all_manga = int(index_i / len(data['manga']['urls']) * 100)
-                driver.get(i)
+                driver.get(i[1])
                 sleep(2)
-                if 'https://manga-chan.me' in i:
+                if 'https://manga-chan.me' in i[1]:
                     name = driver.find_element_by_class_name('title_top_a').text
                     name = name.split('(')
                     name = name[-1][:-1:]
+                    img = driver.find_element_by_id('cover')
+                    img = img.get_attribute('src')
+                    desc = driver.find_element_by_id('description').text
                 else:
                     name = driver.find_element_by_class_name('name').text
+                    img = driver.find_elements_by_class_name('fotorama__img')
+                    img = img[0].get_attribute('src')
+                    desc = driver.find_element_by_class_name('manga-description').text
+
                 print(name)
-                names.append(name)
-            self.setGlobalSettings(data, 'manga', 'names', names)
-            self.ui.comboBox_2.clear()
-            self.showCombo()
-            driver.quit()
-        except Exception as e:
-            print('ERROR ===>\n', e)
-            system(f'notify-send "Error update manga\n{e}"')
+                if 'description/' in data['manga']['images'][i[0]]:
+                    pass
+                else:
+                    image = img.split('/')[-1]
+                    r = get(img, stream=True)
+                    if r.status_code == 200:
+                        with open(f'{self.current_path}/description/{image}', 'wb') as f:
+                            r.raw.decode_content = True
+                            copyfileobj(r.raw, f)
+                    loadImage(image)
+                    data['manga']['images'][i[0]] = f'description/{image}'
+                    data['manga']['description'][i[0]] = desc
+                data['manga']['names'][i[0]] = name
+            except Exception as e:
+                print('ERROR ===>\n', e)
+                system(f'notify-send "Error update manga\n{e}"')
+        self.setGlobalSettings(data, '', '', '', False, True)
+        self.ui.comboBox_2.clear()
+        self.showCombo()
+        driver.quit()
+        sleep(2)
         dead = True
+        self.percent_all_manga = 0
 
 
     def editLineEdit(self, edit):
@@ -1277,63 +1306,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.setHtml(data['anime']['description'][index])
 
 
-    def setDescription(self, data):
-        global dead, enable
-        dead = True
-        need = 0
-        self.led.value = True
-        self.led.setToolTip('Working..')
-        try:
-            for i in enumerate(data['anime']['urls']):
-                index_i = i[0] + 1
-                self.percent_desc_anime = int(index_i / len(data['anime']['urls']) * 100)
-                print(self.percent_desc_anime, index_i, len(data['anime']['urls']))
-                if dead == False:
-                    raise Exception('Error set description Anime')
-                if 'description/' in data['anime']['images'][i[0]]:
-                    need += 1
-                    continue
-                img, desc = getDescription(i[1])
-                data['anime']['images'][i[0]] = f'description/{img}'
-                data['anime']['description'][i[0]] = desc
-            if need > 0:
-                self.setGlobalSettings(data, '', '', "", False, True)
-        except Exception as e:
-            print('Error ==>\n', e)
-            system(f'notify-send "Error check description anime\n{e}"')
-
-        dead = False
-        self.led.value = False
-        self.led.setToolTip('Not Working..')
-        sleep(2)
-        dead = True
-        enable = True
-        self.percent_desc_anime = 0
-        self.ui.toolButton_22.show()
-
-
-    def uploadDescription(self):
-        global enable
-        if enable:
-            enable = False
-            self.startSmallMovie()
-            self.ui.toolButton_22.hide()
-            data = self.uploadGlobalSettings()
-            Thread(target = self.setDescription, args = (data,)).start()
-
-
 #### <<< Tab Manga Description >>> ####
-    def uploadDescriptionManga(self):
-        global enable
-        if enable:
-            enable = False
-            self.startSmallMovie()
-            self.ui.toolButton_23.hide()
-            data = self.uploadGlobalSettings()
-            Thread(target = self.upDeskManga, args = (data,)).start()
-            Thread(target = self.whileStart, args = (2,)).start()
-            
-
     def viewDescriptionManga(self):
         index = self.ui.comboBox_4.currentIndex()
         data = self.uploadGlobalSettings()
@@ -1342,49 +1315,16 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.textEdit_2.setHtml(data['manga']['description'][index])
 
 
-    def upDeskManga(self, data):
-        imgs = []
-        descs = []
-        option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        try:
-            for i in enumerate(data['manga']['urls']):
-                index_i = i[0] + 1
-                driver.get(i[1])
-                if 'description/' in data['manga']['images'][i[0]]:
-                    continue
-                sleep(2)
-                if 'https://manga-chan.me' in i[1]:
-                    img = driver.find_element_by_id('cover')
-                    img = img.get_attribute('src')
-                    desc = driver.find_element_by_id('description').text
-                else:
-                    img = driver.find_elements_by_class_name('fotorama__img')
-                    img = img[0].get_attribute('src')
-                    desc = driver.find_element_by_class_name('manga-description').text
-                print(img)
-                image = img.split('/')
-                descs.append(f'description/{desc}')
-                r = get(img, stream=True)
-                if r.status_code == 200:
-                    with open(f'{self.current_path}/description/{image[-1]}', 'wb') as f:
-                        r.raw.decode_content = True
-                        copyfileobj(r.raw, f)
-                image = loadImage(image[-1])
-                imgs.append(f'description/{image}')
-                self.percent_desc_manga = int(index_i / len(data['manga']['urls']) * 100)
-            self.setGlobalSettings(data, 'manga', 'images', imgs)
-            self.setGlobalSettings(data, 'manga', 'description', descs)
-        except Exception as e:
-            print('Error ==>\n', e)
-            system(f'notify-send "Error check description manga\n{e}"')
-        sleep(4)
-        self.percent_desc_manga = 0
-        driver.quit()
-
-
 #### <<< Tab Ranobe Description >>> ####
+    def viewDescriptionRanobe(self):
+        index = self.ui.comboBox_5.currentIndex()
+        data = self.uploadGlobalSettings()
+
+        self.ui.label_7.setPixmap(QPixmap(f'{self.current_path}/{data["ranobe"]["images"][index]}'))
+        self.ui.textEdit_3.setHtml(data['ranobe']['description'][index])
+
+
+#### <<< Tab Ranobe >>> ####
     def saveRanobeUrl(self):
         url = self.ui.lineEdit_3.text()
         chapter = self.ui.doubleSpinBox_2.value()
@@ -1405,6 +1345,7 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox_6.currentIndex()
         data = self.uploadGlobalSettings()
         alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
         alert.setText('Are you sure you want to delete this entry?')
         alert.setGeometry(514, 107, 200, 200)
         alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
@@ -1415,7 +1356,7 @@ class myWindow(QtWidgets.QMainWindow):
             del(data['ranobe']['urls'][index])
 
             if data['ranobe']['images'][index] != 'icons/ranobe.png':
-                system(f"rm {data['ranobe']['images'][index]}")
+                system(f"rm {self.current_path}/{data['ranobe']['images'][index]}")
             del(data['ranobe']['images'][index])
             del(data['ranobe']['description'][index])
 
@@ -1536,14 +1477,6 @@ class myWindow(QtWidgets.QMainWindow):
         alert.exec_()
 
 
-    def viewDescriptionRanobe(self):
-        index = self.ui.comboBox_5.currentIndex()
-        data = self.uploadGlobalSettings()
-
-        self.ui.label_7.setPixmap(QPixmap(f'{self.current_path}/{data["ranobe"]["images"][index]}'))
-        self.ui.textEdit_3.setHtml(data['ranobe']['description'][index])
-
-
     def updateItemRanobe(self):
         data = self.uploadGlobalSettings()
         value = self.ui.doubleSpinBox_2.value()
@@ -1560,9 +1493,11 @@ class myWindow(QtWidgets.QMainWindow):
                         break
                 else:
                     break
+            if len(data['notify']['anime']) == 0 and len(data['notify']['manga']) == 0 and len(data['notify']['ranobe']) == 0:
+                self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/empty.png'))
+                data['notify']['notify'] = 'empty'
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.doubleSpinBox_2.setValue(0)
-            # self.viewRanobe()
             self.upComboRanobe()
 
 
