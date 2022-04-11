@@ -953,24 +953,30 @@ class myWindow(QtWidgets.QMainWindow):
     def deleted(self):
         index = self.ui.comboBox.currentIndex()
         data = self.uploadGlobalSettings()
+        alert = QMessageBox()
+        alert.setText('Are you sure you want to delete this entry?')
+        alert.setGeometry(514, 107, 200, 200)
+        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        rezult = alert.exec()
 
-        del(data['anime']['urls'][index])
-        del(data['anime']['series'][index])
-        del(data['anime']['ova'][index])
-        if data['anime']['images'][index] != 'icons/animevost.png':
-            system(f'rm {self.current_path}/description/{data["anime"]["images"][index]}')
-        del(data['anime']['images'][index])
-        del(data['anime']['description'][index])
+        if rezult == QMessageBox.Ok:
+            del(data['anime']['urls'][index])
+            del(data['anime']['series'][index])
+            del(data['anime']['ova'][index])
+            if data['anime']['images'][index] != 'icons/animevost.png':
+                system(f'rm {self.current_path}/description/{data["anime"]["images"][index]}')
+            del(data['anime']['images'][index])
+            del(data['anime']['description'][index])
 
-        try:
-            del(data['anime']['name'][index])
-        except:
-            print('error name link!!!')
+            try:
+                del(data['anime']['name'][index])
+            except:
+                print('error name link!!!')
 
-        self.setGlobalSettings(data, '', '', '', False, True)
-        self.ui.comboBox.clear()
-        self.ui.comboBox_3.clear()
-        self.showed()
+            self.setGlobalSettings(data, '', '', '', False, True)
+            self.ui.comboBox.clear()
+            self.ui.comboBox_3.clear()
+            self.showed()
 
 
     def stoped(self):
@@ -987,26 +993,33 @@ class myWindow(QtWidgets.QMainWindow):
     def delItem(self):
         index = self.ui.comboBox_2.currentIndex()
         data = self.uploadGlobalSettings()
-        del(data['manga']['numbers'][index])
-        del(data['manga']['urls'][index])
+        alert = QMessageBox()
+        alert.setText('Are you sure you want to delete this entry?')
+        alert.setGeometry(514, 107, 200, 200)
+        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        rezult = alert.exec()
 
-        if data['manga']['images'][index] != 'icons/mask.png':
-            system(f"rm {data['manga']['images'][index]}")
-        del(data['manga']['images'][index])
-        del(data['manga']['description'][index])
+        if rezult == QMessageBox.Ok:
+            del(data['manga']['numbers'][index])
+            del(data['manga']['urls'][index])
 
-        try:
-            del(data['manga']['names'][index])
-        except:
-            pass
-        try:
-            del(data['manga']['change_numbers'][index])
-        except:
-            pass
+            if data['manga']['images'][index] != 'icons/mask.png':
+                system(f"rm {data['manga']['images'][index]}")
+            del(data['manga']['images'][index])
+            del(data['manga']['description'][index])
 
-        self.setGlobalSettings(data, '', '', '', False, True)
-        self.ui.comboBox.clear()
-        self.showCombo()
+            try:
+                del(data['manga']['names'][index])
+            except:
+                pass
+            try:
+                del(data['manga']['change_numbers'][index])
+            except:
+                pass
+
+            self.setGlobalSettings(data, '', '', '', False, True)
+            self.ui.comboBox.clear()
+            self.showCombo()
 
 
     def checkUpdateItem(self):
@@ -1392,30 +1405,35 @@ class myWindow(QtWidgets.QMainWindow):
         index = self.ui.comboBox_6.currentIndex()
         data = self.uploadGlobalSettings()
         alert = QMessageBox()
-        alert.setText('')
-        del(data['ranobe']['chapters'][index])
-        del(data['ranobe']['urls'][index])
+        alert.setText('Are you sure you want to delete this entry?')
+        alert.setGeometry(514, 107, 200, 200)
+        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        rezult = alert.exec()
 
-        if data['ranobe']['images'][index] != 'icons/ranobe.png':
-            system(f"rm {data['ranobe']['images'][index]}")
-        del(data['ranobe']['images'][index])
-        del(data['ranobe']['description'][index])
+        if rezult == QMessageBox.Ok:
+            del(data['ranobe']['chapters'][index])
+            del(data['ranobe']['urls'][index])
 
-        try:
-            del(data['ranobe']['names'][index])
-        except:
-            pass
-        try:
-            del(data['ranobe']['access-chapters'][index])
-        except:
-            pass
-        try:
-            del(data['ranobe']['future-chapters'][index])
-        except:
-            pass
+            if data['ranobe']['images'][index] != 'icons/ranobe.png':
+                system(f"rm {data['ranobe']['images'][index]}")
+            del(data['ranobe']['images'][index])
+            del(data['ranobe']['description'][index])
 
-        self.setGlobalSettings(data, '', '', '', False, True)
-        self.viewRanobe()
+            try:
+                del(data['ranobe']['names'][index])
+            except:
+                pass
+            try:
+                del(data['ranobe']['access-chapters'][index])
+            except:
+                pass
+            try:
+                del(data['ranobe']['future-chapters'][index])
+            except:
+                pass
+    
+            self.setGlobalSettings(data, '', '', '', False, True)
+            self.viewRanobe()
 
 
     def setRanobe(self, check):
@@ -1477,6 +1495,7 @@ class myWindow(QtWidgets.QMainWindow):
             system(f'notify-send "Error for get data about <ranobe>\n{e}"')
         self.ui.toolButton_26.show()
         self.ui.toolButton_31.show()
+        self.viewRanobe()
         enable = True
 
 
