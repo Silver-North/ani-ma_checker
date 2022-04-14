@@ -137,14 +137,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.current_path = path.dirname(path.realpath(__file__))
 
         self.movie = QMovie(f"{self.current_path}/icons/free.gif")
-        self.small_movie = QMovie(f"{self.current_path}/icons/free-25.gif")
         self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11]
 
         for i in enumerate(self.labels_movie):
-            if i[0] in (8, 9):
-                i[1].setMovie(self.small_movie)
-            else:
-                i[1].setMovie(self.movie)
+            i[1].setMovie(self.movie)
         
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.triggerFocus)
@@ -266,7 +262,6 @@ class myWindow(QtWidgets.QMainWindow):
 
     def stopMovie(self):
         self.movie.stop()
-        self.small_movie.stop()
 
 
     def allParsing(self, data):
@@ -911,6 +906,8 @@ class myWindow(QtWidgets.QMainWindow):
                 url = self.ui.lineEdit.text()
                 get(url)
                 self.ui.comboBox.addItem(url)
+                self.setGlobalSettings(data, 'anime', 'name', '', True)
+                self.ui.comboBox.setItemIcon(len(data['anime']['name'])-1, QIcon(f'{self.current_path}/icons/animevost.png'))
             self.setGlobalSettings(data, 'anime', 'urls', url, True)
             self.setGlobalSettings(data, 'anime', 'series', series, True)
             self.setGlobalSettings(data, 'anime', 'images', 'icons/animevost.png', True)
@@ -972,11 +969,7 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f'rm {self.current_path}/{data["anime"]["images"][index]}')
             del(data['anime']['images'][index])
             del(data['anime']['description'][index])
-
-            try:
-                del(data['anime']['name'][index])
-            except:
-                print('error name link!!!')
+            del(data['anime']['name'][index])
 
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.comboBox.clear()
@@ -1013,15 +1006,8 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f"rm {self.current_path}/{data['manga']['images'][index]}")
             del(data['manga']['images'][index])
             del(data['manga']['description'][index])
-
-            try:
-                del(data['manga']['names'][index])
-            except:
-                pass
-            try:
-                del(data['manga']['change_numbers'][index])
-            except:
-                pass
+            del(data['manga']['change_numbers'][index])
+            del(data['manga']['names'][index])
 
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.comboBox.clear()
@@ -1067,14 +1053,16 @@ class myWindow(QtWidgets.QMainWindow):
         if check_url(url):
             self.setGlobalSettings(data, 'manga', 'urls', url, True)
             self.setGlobalSettings(data, 'manga', 'numbers', number, True)
+            self.setGlobalSettings(data, 'manga', 'change_numbers', 0, True)
             self.setGlobalSettings(data, 'manga', 'images', 'icons/mask.png', True)
+            self.setGlobalSettings(data, 'manga', 'names', '', True)
             self.setGlobalSettings(data, 'manga', 'description', '', True)
-            self.ui.lineEdit_2.setText('')
             self.ui.comboBox_2.addItem(url)
+            self.ui.lineEdit_2.setStyleSheet('background: rgb(98, 255, 59)')
         else:
             self.ui.lineEdit_2.setStyleSheet('background: rgb(255, 0, 0)')
             self.ui.lineEdit_2.setText('Write correct url')
-            Thread(target = self.editLineEdit, args = (self.ui.lineEdit_2,)).start()
+        Thread(target = self.editLineEdit, args = (self.ui.lineEdit_2,)).start()
 
 
     def currentUpdate(self):
@@ -1192,7 +1180,9 @@ class myWindow(QtWidgets.QMainWindow):
                 else:
                     name = driver.find_element_by_class_name('name').text
                     img = driver.find_elements_by_class_name('fotorama__img')
+                    print(img)
                     img = img[0].get_attribute('src')
+                    print(img)
                     desc = driver.find_element_by_class_name('manga-description').text
 
                 print(name)
@@ -1200,6 +1190,7 @@ class myWindow(QtWidgets.QMainWindow):
                     pass
                 else:
                     image = img.split('/')[-1]
+                    print(image)
                     r = get(img, stream=True)
                     if r.status_code == 200:
                         with open(f'{self.current_path}/description/{image}', 'wb') as f:
@@ -1336,9 +1327,14 @@ class myWindow(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, 'ranobe', 'urls', url, True)
             self.setGlobalSettings(data, 'ranobe', 'images', 'icons/ranobe.png', True)
             self.setGlobalSettings(data, 'ranobe', 'description', '', True)
+            self.setGlobalSettings(data, 'ranobe', 'names', '', True)
             self.setGlobalSettings(data, 'ranobe', 'chapters', chapter, True)
+            self.setGlobalSettings(data, 'ranobe', 'future-chapters', 0, True)
+            self.setGlobalSettings(data, 'ranobe', 'access-chapters', 0, True)
+            self.ui.lineEdit_3.setStyleSheet('background: rgb(98, 255, 59)')
         except Exception as e:
             system(f'notify-send "Error add new url <ranobe>\n{e}"')
+        Thread(target = self.editLineEdit, args = (self.ui.lineEdit_3,)).start()
 
 
     def delItemRanobe(self):
@@ -1359,19 +1355,9 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f"rm {self.current_path}/{data['ranobe']['images'][index]}")
             del(data['ranobe']['images'][index])
             del(data['ranobe']['description'][index])
-
-            try:
-                del(data['ranobe']['names'][index])
-            except:
-                pass
-            try:
-                del(data['ranobe']['access-chapters'][index])
-            except:
-                pass
-            try:
-                del(data['ranobe']['future-chapters'][index])
-            except:
-                pass
+            del(data['ranobe']['names'][index])
+            del(data['ranobe']['access-chapters'][index])
+            del(data['ranobe']['future-chapters'][index])
     
             self.setGlobalSettings(data, '', '', '', False, True)
             self.viewRanobe()
