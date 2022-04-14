@@ -137,14 +137,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.current_path = path.dirname(path.realpath(__file__))
 
         self.movie = QMovie(f"{self.current_path}/icons/free.gif")
-        self.small_movie = QMovie(f"{self.current_path}/icons/free-25.gif")
         self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11]
 
         for i in enumerate(self.labels_movie):
-            if i[0] in (8, 9):
-                i[1].setMovie(self.small_movie)
-            else:
-                i[1].setMovie(self.movie)
+            i[1].setMovie(self.movie)
         
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.triggerFocus)
@@ -190,7 +186,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_4.clicked.connect(self.allDown)
         self.ui.toolButton_5.clicked.connect(self.oneDown)
         self.ui.toolButton_6.clicked.connect(self.stoped)
-        self.ui.toolButton_7.clicked.connect(self.loging)
         self.ui.toolButton_8.clicked.connect(self.logOne)
         self.ui.toolButton_9.clicked.connect(self.updateClick)
         self.ui.toolButton_10.clicked.connect(self.notifyCheck)
@@ -266,92 +261,6 @@ class myWindow(QtWidgets.QMainWindow):
 
     def stopMovie(self):
         self.movie.stop()
-        self.small_movie.stop()
-
-
-    def allParsing(self, data):
-        global dead
-        option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        option.add_experimental_option("prefs", self.prefs)
-        driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'), options=option)
-        url, numbers = (data['anime']['urls'], data['anime']['series'])
-
-        logs = []
-        if len(url) > 0:
-            for i in enumerate(url):
-                index_i = i[0] + 1
-                self.percent_all_anime = int(index_i / len(url) * 100)
-                self.ui.progressBar_2.setToolTip(f'check - {index_i}/{len(url)}..')
-                try:
-                    series = numbers[i[0]] + 1
-                    print(i)
-                    driver.get(i[1])
-                    print(0)
-                    sleep(3)
-                    search_count_series = driver.find_elements_by_class_name('epizode')
-                    name = driver.find_element_by_class_name('shortstoryHead').text
-                    next = driver.find_element_by_class_name('next')
-                    name_dir = name.split(' /')
-
-                    print(name_dir[0])
-
-                    series += data['anime']['ova'][i[0]]
-                    if len(search_count_series) == series:
-                        if len(search_count_series) > 6:
-                            next.click()
-                            if len(search_count_series) > 12:
-                                next.click()
-                                if len(search_count_series) > 18:
-                                    next.click()
-                                    if len(search_count_series) > 24:
-                                        next.click()
-                        if data['anime']['ova'][urls.index(url)] > 0:
-                            num = -(data['anime']['ova'][urls.index(url)]+1)
-                            search_count_series[num].click()
-                            click_i = search_count_series[num].click()
-                        elif data['anime']['ova'][urls.index(url)] == 0:
-                            search_count_series[-1].click()
-                            click_i = search_count_series[-1].text
-                        sleep(15)
-                        iframe = driver.find_elements_by_tag_name('iframe')
-                        for item in range(len(iframe)):
-                            driver.switch_to.frame(iframe[item])
-                            sleep(1)
-                            down = driver.find_elements_by_class_name('butt')
-                            if len(down) != 4:
-                                sleep(1)
-                                driver.switch_to.default_content()
-                                continue
-                            else:
-                                break
-                        sleep(3)
-                        let = down[-2].get_attribute("href").split('?')
-                        let = let[0].split('/')
-                        sleep(3)
-                        print(100)
-                        self.check_flag = False
-                        self.Download(down[2].get_attribute('href'), let[-1], url, name_dir[0], i[1], name, series, data, click_i)
-                        logs.append(f'{i[0]} - {name_dir[0]} - New series {series}\n')
-                    else:
-                        logs.append(f'{i[0]} - {name_dir[0]} - No new < {series} > series\n')
-                    driver.switch_to.default_content()
-                    sleep(5)
-                except Exception as e:
-                    system(f'notify-send "Error all-down\n{e}"')
-                    logs.append(f'{i[0]} - !!! << Error: {e} >> !!!\n')
-
-        driver.quit()
-        data['anime']['logs'] = logs
-        self.setGlobalSettings(data, 'anime', 'logs', logs)
-
-        sleep(2)
-        dead = False
-        sleep(0.5)
-
-        self.ui.progressBar_2.setToolTip(f'Progress Checking..')
-        self.percent_all_anime = 0
-        dead = True
 
 
     def oneParsing(self, data, url, digit):
@@ -380,16 +289,23 @@ class myWindow(QtWidgets.QMainWindow):
 
             series += data['anime']['ova'][urls.index(url)]
             print(series)
-            if len(search_count_series) == series:
-                if len(search_count_series) > 6:
+
+            def continueDownload(count = 0, repeat = False):
+                nonlocal search_count_series, series, name, next, name_dir, data
+                if series > 6:
                     next.click()
-                    if len(search_count_series) > 12:
+                    if series > 12:
                         next.click()
-                        if len(search_count_series) > 18:
+                        if series > 18:
                             next.click()
-                            if len(search_count_series) > 24:
+                            if series > 24:
                                 next.click()
                 self.percent_all_anime = 40
+
+                if count == 0:
+                    step = -1
+                else:
+                    step = series - 1
 
                 if data['anime']['ova'][urls.index(url)] > 0:
                     num = -(data['anime']['ova'][urls.index(url)]+1)
@@ -399,14 +315,12 @@ class myWindow(QtWidgets.QMainWindow):
                             break
                     search_count_series[num].click()
                 elif data['anime']['ova'][urls.index(url)] == 0:
-                    # search_count_series[digit].click()
                     while True:
-                        click_i = search_count_series[-1].text
+                        click_i = search_count_series[step].text
                         if click_i != '':
                             break
-                    search_count_series[-1].click()
+                    search_count_series[step].click()
 
-                print(click_i)
                 sleep(15)
                 iframe = driver.find_elements_by_tag_name('iframe')
                 for item in range(len(iframe)):
@@ -414,7 +328,7 @@ class myWindow(QtWidgets.QMainWindow):
                     sleep(1)
                     down = driver.find_elements_by_class_name('butt')
                     if len(down) != 4:
-                        sleep(1)
+                        sleep(0.3)
                         driver.switch_to.default_content()
                         continue
                     else:
@@ -430,9 +344,21 @@ class myWindow(QtWidgets.QMainWindow):
                 self.Download(down[2].get_attribute('href'), let[-1], urls, name_dir[0], url, name, series, data, click_i)
                 self.percent_all_anime = 97
                 log = f'{name_dir[0]} - New series {series}'
+                driver.switch_to.default_content()
+                if repeat:
+                    series += 1
+                    if len(search_count_series) - series > 0:
+                        continueDownload(len(search_count_series) - series, True)
+                    else:
+                        continueDownload(len(search_count_series) - series)
+        
+            if len(search_count_series) == series:
+                continueDownload()
+            elif len(search_count_series) > series:
+                continueDownload(len(search_count_series) - series, True)
             else:
                 log = f'{name_dir[0]} - No new < {series} > series'
-            driver.switch_to.default_content()
+
         except Exception as e:
             driver.quit()
             system(f'notify-send "Error one-down\n<< {e} >>"')
@@ -532,6 +458,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def uploadTrackerAnime(self):
+        global dead
         self.ui.comboBox_7.clear()
         data = self.uploadGlobalSettings()
         names, links = checkFixedOutput()
@@ -785,6 +712,7 @@ class myWindow(QtWidgets.QMainWindow):
 
     def whileStart(self, flag_i):
         global enable, dead
+        self.flag = False
         self.led.value = True
         self.led.setToolTip('Working..')
         if flag_i == 0:
@@ -795,7 +723,6 @@ class myWindow(QtWidgets.QMainWindow):
             spin = self.ui.toolButton_5
         elif flag_i == 4:
             spin = self.ui.toolButton_4
-            # self.ui.toolButton_4.setStyleSheet('border: none; background: transparent; color: gray;')
         while True:
             if dead == False:
                 break
@@ -814,7 +741,6 @@ class myWindow(QtWidgets.QMainWindow):
                         self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
                         self.tray.setToolTip('Check..')
             else:
-                self.flag = True
                 dead = False
                 sleep(0.5)
 
@@ -827,19 +753,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.led.setToolTip('Not Working..')
         self.led.value = False
         spin.show()
-
-
-    def loging(self):
-        alert = QMessageBox()
-        text = ''
-        data = self.uploadGlobalSettings()
-        if len(data['anime']['logs']) != 0:
-            for i in data['anime']['logs']:
-                text = f'{text}{i}'
-            alert.setText(text)
-        else:
-            alert.setText('No file exist...')
-        alert.exec_()
 
 
     def logOne(self):
@@ -857,27 +770,48 @@ class myWindow(QtWidgets.QMainWindow):
         if enable:
             enable = False
             self.startMovie()
-            self.ui.toolButton_5.hide()
             dead = True
-            self.flag = False
             data = self.uploadGlobalSettings()
-            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
             Thread(target = self.oneParsing, args = (data, data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
             Thread(target = self.whileStart, args = (3,)).start()
+
+
+    def checkDelOrDown(self, data, seti):
+        global enable
+        if len(seti) > 0:
+            for i in seti:
+                enable = False
+                self.flag = False
+                self.startMovie()
+                url = data['anime']['urls'][i]
+                series = data['anime']['series'][i]
+                thread_pars = Thread(target = self.oneParsing, args = (data, url, series))
+                thread_pars.start()
+                Thread(target = self.whileStart, args = (4, )).start()
+                thread_pars.join()
 
 
     def allDown(self):
         global enable, dead
         if enable:
             enable = False
-            self.startMovie()
-            self.ui.toolButton_4.hide()
             dead = True
-            self.flag = False
             data = self.uploadGlobalSettings()
-            self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
-            Thread(target = self.allParsing, args = (data,)).start()
-            Thread(target = self.whileStart, args = (4, )).start()
+            index = []
+            if len(data['notify']['anime']) > 0:
+                for el in enumerate(data['notify']['anime']):
+                    element = el[1].split(' > ')[1].split(' - ')[0]
+                    index.append(data['anime']['name'].index(element))
+            seti = set(index)
+            if len(seti) > 0:
+                Thread(target = self.checkDelOrDown, args = (data, seti)).start()
+            else:
+                enable = True
+                alert = QMessageBox()
+                alert.setIcon(QMessageBox.Information)
+                alert.setText('No data for update..')
+                alert.setGeometry(610, 85, 100, 100)
+                alert.exec()
 
 
     def triggerFocus(self, reason):
@@ -911,6 +845,8 @@ class myWindow(QtWidgets.QMainWindow):
                 url = self.ui.lineEdit.text()
                 get(url)
                 self.ui.comboBox.addItem(url)
+                self.setGlobalSettings(data, 'anime', 'name', '', True)
+                self.ui.comboBox.setItemIcon(len(data['anime']['name'])-1, QIcon(f'{self.current_path}/icons/animevost.png'))
             self.setGlobalSettings(data, 'anime', 'urls', url, True)
             self.setGlobalSettings(data, 'anime', 'series', series, True)
             self.setGlobalSettings(data, 'anime', 'images', 'icons/animevost.png', True)
@@ -972,11 +908,7 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f'rm {self.current_path}/{data["anime"]["images"][index]}')
             del(data['anime']['images'][index])
             del(data['anime']['description'][index])
-
-            try:
-                del(data['anime']['name'][index])
-            except:
-                print('error name link!!!')
+            del(data['anime']['name'][index])
 
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.comboBox.clear()
@@ -1013,15 +945,8 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f"rm {self.current_path}/{data['manga']['images'][index]}")
             del(data['manga']['images'][index])
             del(data['manga']['description'][index])
-
-            try:
-                del(data['manga']['names'][index])
-            except:
-                pass
-            try:
-                del(data['manga']['change_numbers'][index])
-            except:
-                pass
+            del(data['manga']['change_numbers'][index])
+            del(data['manga']['names'][index])
 
             self.setGlobalSettings(data, '', '', '', False, True)
             self.ui.comboBox.clear()
@@ -1067,14 +992,16 @@ class myWindow(QtWidgets.QMainWindow):
         if check_url(url):
             self.setGlobalSettings(data, 'manga', 'urls', url, True)
             self.setGlobalSettings(data, 'manga', 'numbers', number, True)
+            self.setGlobalSettings(data, 'manga', 'change_numbers', 0, True)
             self.setGlobalSettings(data, 'manga', 'images', 'icons/mask.png', True)
+            self.setGlobalSettings(data, 'manga', 'names', '', True)
             self.setGlobalSettings(data, 'manga', 'description', '', True)
-            self.ui.lineEdit_2.setText('')
             self.ui.comboBox_2.addItem(url)
+            self.ui.lineEdit_2.setStyleSheet('background: rgb(98, 255, 59)')
         else:
             self.ui.lineEdit_2.setStyleSheet('background: rgb(255, 0, 0)')
             self.ui.lineEdit_2.setText('Write correct url')
-            Thread(target = self.editLineEdit, args = (self.ui.lineEdit_2,)).start()
+        Thread(target = self.editLineEdit, args = (self.ui.lineEdit_2,)).start()
 
 
     def currentUpdate(self):
@@ -1192,7 +1119,9 @@ class myWindow(QtWidgets.QMainWindow):
                 else:
                     name = driver.find_element_by_class_name('name').text
                     img = driver.find_elements_by_class_name('fotorama__img')
+                    print(img)
                     img = img[0].get_attribute('src')
+                    print(img)
                     desc = driver.find_element_by_class_name('manga-description').text
 
                 print(name)
@@ -1200,6 +1129,7 @@ class myWindow(QtWidgets.QMainWindow):
                     pass
                 else:
                     image = img.split('/')[-1]
+                    print(image)
                     r = get(img, stream=True)
                     if r.status_code == 200:
                         with open(f'{self.current_path}/description/{image}', 'wb') as f:
@@ -1336,9 +1266,14 @@ class myWindow(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, 'ranobe', 'urls', url, True)
             self.setGlobalSettings(data, 'ranobe', 'images', 'icons/ranobe.png', True)
             self.setGlobalSettings(data, 'ranobe', 'description', '', True)
+            self.setGlobalSettings(data, 'ranobe', 'names', '', True)
             self.setGlobalSettings(data, 'ranobe', 'chapters', chapter, True)
+            self.setGlobalSettings(data, 'ranobe', 'future-chapters', 0, True)
+            self.setGlobalSettings(data, 'ranobe', 'access-chapters', 0, True)
+            self.ui.lineEdit_3.setStyleSheet('background: rgb(98, 255, 59)')
         except Exception as e:
             system(f'notify-send "Error add new url <ranobe>\n{e}"')
+        Thread(target = self.editLineEdit, args = (self.ui.lineEdit_3,)).start()
 
 
     def delItemRanobe(self):
@@ -1359,19 +1294,9 @@ class myWindow(QtWidgets.QMainWindow):
                 system(f"rm {self.current_path}/{data['ranobe']['images'][index]}")
             del(data['ranobe']['images'][index])
             del(data['ranobe']['description'][index])
-
-            try:
-                del(data['ranobe']['names'][index])
-            except:
-                pass
-            try:
-                del(data['ranobe']['access-chapters'][index])
-            except:
-                pass
-            try:
-                del(data['ranobe']['future-chapters'][index])
-            except:
-                pass
+            del(data['ranobe']['names'][index])
+            del(data['ranobe']['access-chapters'][index])
+            del(data['ranobe']['future-chapters'][index])
     
             self.setGlobalSettings(data, '', '', '', False, True)
             self.viewRanobe()
