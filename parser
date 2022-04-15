@@ -549,6 +549,12 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
         if enable:
             self.stopMovie()
+        if self.ui.checkBox_2.isChecked():
+            self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
+            self.ui.toolButton_5.setToolTip('Download All Elements')
+        else:
+            self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
+            self.ui.toolButton_5.setToolTip('Download Current Element')
         self.ui.progressBar.setValue(self.percent)
         self.ui.progressBar_3.setValue(self.percent_all_manga)
         self.ui.progressBar_7.setValue( self.ranobe_percent)
@@ -570,16 +576,16 @@ class myWindow(QtWidgets.QMainWindow):
         if self.flag:
             if index == 0:
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost.png'))
-                self.tray.setToolTip('AnimeVost checker')
+                self.tray.setToolTip('AnimeVost tracker')
                 self.ui.toolButton_24.setToolTip('https://www.animevost.org\nhttps://www.animevost.am\nhttps://v2.vost.pw/\nChecking site..')
             elif index == 1:
-                self.tray.setToolTip('Manga checker')
+                self.tray.setToolTip('Manga tracker')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask.png'))
                 self.ui.toolButton_24.setToolTip('https://www.manga-chan.me\nhttps://www.readmanga.io\nhttps://www.mintmanga.live\nChecking site,,')
             elif index == 2:
-                self.tray.setToolTip('Manga checker')
+                self.tray.setToolTip('Ranobe tracker')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/ranobe.png'))
-                self.ui.toolButton_24.setToolTip('About')
+                self.ui.toolButton_24.setToolTip('several site')
             elif index == 3:
                 self.tray.setToolTip('View Anime description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/a-desc.png'))
@@ -670,8 +676,9 @@ class myWindow(QtWidgets.QMainWindow):
 
 # Set Icon for toolButton
     def defaultIcon(self):
+        self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/checkbox-1.png'))
+        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/checkbox-2.png'))
         self.ui.toolButton_26.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
-        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
         self.ui.toolButton_18.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
         self.ui.tabWidget.setTabIcon(0, QIcon(f'{self.current_path}/icons/animevost.png'))
         self.ui.tabWidget.setTabIcon(1, QIcon(f'{self.current_path}/icons/mask.png'))
@@ -829,9 +836,17 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def closed(self):
-        self.extraClose()
-        self.stopCheck()
-        self.close()
+        alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
+        alert.setText('Do you really want to leave?')
+        alert.setGeometry(541, 107, 200, 200)
+        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        rezult = alert.exec()
+
+        if rezult == QMessageBox.Ok:
+            self.extraClose()
+            self.stopCheck()
+            self.close()
 
 
     def saved(self):
