@@ -23,14 +23,14 @@
             "https://animevost.am/tip/tv/2798-spy-x-family.html"
         ],
         "series": [
-            1,
-            1,
+            2,
+            0,
             2,
             2,
             2,
+            2,
             1,
-            1,
-            1,
+            2,
             2,
             2,
             2,
@@ -150,6 +150,8 @@
             "description/1649140404_1.jpg"
         ],
         "track-name": [
+            "Восхождение чародея / Mahoutsukai Reimeiki [1-2 из 12+] [3 серия - 22 апреля]",
+            "Городская дьяволица (второй сезон) / Machikado Mazoku: 2-choume [1-2 из 12+]",
             "Летнее время / Summer Time Render [1 из 12+] [2 серия - 21 апреля]",
             "Тусовщик Кунмин / Paripi Koumei [1-3 из 12+]",
             "Стать настоящей героиней! Непопулярная героиня и секретное задание / Heroine Tarumono! Kiraware Heroine to Naisho no Oshigoto [1-2 из 12+] [3 серия - 21 апреля]",
@@ -177,11 +179,11 @@
             "Боруто: Новое поколение Наруто / Boruto: Naruto Next Generations [1-244 из 500+] [245 серия - 17 апреля]",
             "Шэнму / Shenmue the Animation [1-10 из 13]",
             "Царство (четвёртый сезон) / Kingdom 4 [1 из 12+] [2 серия - 16 апреля]",
-            "Боевой континент / Douluo Dalu [1-203 из 300+]",
-            "Билд Дивайд: Белый код / Build Divide: Code White [1-2 из 12+]",
-            "Моя девушка не только милая / Kawaii dake ja Nai Shikimori-san [1 из 12+] [2 серия - 17 апреля]"
+            "Боевой континент / Douluo Dalu [1-203 из 300+]"
         ],
         "track-link": [
+            "https://animevost.org/tip/tv/2779-mahoutsukai-reimeiki.html",
+            "https://animevost.org/tip/tv/2777-machikado-mazoku-2-choume.html",
             "https://animevost.org/tip/tv/2807-summer-time-render.html",
             "https://animevost.org/tip/tv/2787-paripi-koumei.html",
             "https://animevost.org/tip/tv/2793-heroine-tarumono-kiraware-heroine-to-naisho-no-oshigoto.html",
@@ -209,9 +211,7 @@
             "https://animevost.org/tip/tv/1805-boruto-naruto-next-generations1112.html",
             "https://animevost.org/tip/tv/2768-shenmue-the-animation.html",
             "https://animevost.org/tip/tv/2801-kingdom-4.html",
-            "https://animevost.org/tip/tv/2539-douluo-dalu.html",
-            "https://animevost.org/tip/tv/2797-build-divide-code-white.html",
-            "https://animevost.org/tip/tv/2799-kawaii-dake-ja-nai-shikimori-san.html"
+            "https://animevost.org/tip/tv/2539-douluo-dalu.html"
         ]
     },
     "manga": {
@@ -502,12 +502,8 @@
     "notify": {
         "notify": "unchecked",
         "anime": [
-            "[A][14/4/2022 - 20:26] > У Коми проблемы с общением (второй сезон) - new series 2\n",
-            "[A][14/4/2022 - 20:41] > У Коми проблемы с общением (второй сезон) - new series 2\n",
-            "[A][14/4/2022 - 20:46] > Восхождение героя щита (второй сезон) - new series 2\n",
-            "[A][14/4/2022 - 20:46] > У Коми проблемы с общением (второй сезон) - new series 2\n",
-            "[A][14/4/2022 - 20:59] > Восхождение героя щита (второй сезон) - new series 2\n",
-            "[A][14/4/2022 - 21:08] > Восхождение героя щита (второй сезон) - new series 2\n"
+            "[A][15/4/2022 - 09:56] > Госпожа Кагуя: в любви как на войне (третий сезон) - new series 1\n",
+            "[A][15/4/2022 - 10:56] > Госпожа Кагуя: в любви как на войне (третий сезон) - new series 1\n"
         ],
         "manga": [],
         "ranobe": []

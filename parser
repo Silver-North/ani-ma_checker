@@ -22,6 +22,7 @@ from json import dumps, load
 from pyttsx3 import init
 from validators import url as check_url
 from datetime import date
+from random import randint
 
 
 dead = True
@@ -137,7 +138,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.current_path = path.dirname(path.realpath(__file__))
 
         self.movie = QMovie(f"{self.current_path}/icons/free.gif")
-        self.labels_movie = [self.ui.label, self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11]
+        self.labels_movie = [self.ui.label_2, self.ui.label_3, self.ui.label_4, self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11]
 
         for i in enumerate(self.labels_movie):
             i[1].setMovie(self.movie)
@@ -183,7 +184,6 @@ class myWindow(QtWidgets.QMainWindow):
 #### << Anime-module >> ####
         self.ui.toolButton.clicked.connect(self.saved)
         self.ui.toolButton_2.clicked.connect(self.deleted)
-        self.ui.toolButton_4.clicked.connect(self.allDown)
         self.ui.toolButton_5.clicked.connect(self.oneDown)
         self.ui.toolButton_6.clicked.connect(self.stoped)
         self.ui.toolButton_8.clicked.connect(self.logOne)
@@ -459,7 +459,6 @@ class myWindow(QtWidgets.QMainWindow):
 
     def uploadTrackerAnime(self):
         global dead
-        self.ui.comboBox_7.clear()
         data = self.uploadGlobalSettings()
         names, links = checkFixedOutput()
         self.setGlobalSettings(data, 'anime', 'track-name', names)
@@ -468,11 +467,13 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def comboTracker(self):
+        self.ui.comboBox_7.clear()
         data = self.uploadGlobalSettings()
         if len(data['anime']['track-name']) > 0:
             for i in enumerate(data['anime']['track-name']):
                 self.ui.comboBox_7.addItem(i[1])
                 self.ui.comboBox_7.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/animevost.png'))
+        self.ui.comboBox_7.setCurrentIndex(0)
 
 
     def updateClick(self):
@@ -659,15 +660,16 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lcdNumber_6.setStyleSheet(back)
         if ico == 'lamp':
             self.ui.checkBox.setStyleSheet('border-color: #0b76ef; background-color: #0b76ef;')
+            self.ui.checkBox_2.setStyleSheet('border-color: #0b76ef; background-color: #0b76ef;')
             self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/dark-about.png'))
         elif ico == 'dark':
             self.ui.checkBox.setStyleSheet('border-color: rgb(122, 84, 84); background-color: rgb(122, 84, 84);')
+            self.ui.checkBox_2.setStyleSheet('border-color: rgb(122, 84, 84); background-color: rgb(122, 84, 84);')
             self.ui.toolButton_24.setIcon(QIcon(f'{self.current_path}/icons/light-about.png'))
 
 
 # Set Icon for toolButton
     def defaultIcon(self):
-        self.ui.toolButton_4.setIcon(QIcon(f'{self.current_path}/icons/all-click.png'))
         self.ui.toolButton_26.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/click.png'))
         self.ui.toolButton_18.setIcon(QIcon(f'{self.current_path}/icons/web.png'))
@@ -681,7 +683,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_2.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_3.setIcon(QIcon(f'{self.current_path}/icons/close.png'))
         self.ui.toolButton_6.setIcon(QIcon(f'{self.current_path}/icons/lose.png'))
-        self.ui.toolButton_7.setIcon(QIcon(f'{self.current_path}/icons/log.png'))
         self.ui.toolButton_8.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_9.setIcon(QIcon(f'{self.current_path}/icons/circle.png'))
         self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/checking.png'))
@@ -696,7 +697,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_30.setIcon(QIcon(f'{self.current_path}/icons/edit.png'))
         self.ui.toolButton_27.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_29.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
-        self.ui.toolButton_7.setToolTip(u"Log All parse URL")
         self.ui.toolButton_8.setToolTip(u"Log One parse URL")
         self.ui.toolButton_9.setToolTip(u"Update")
         self.ui.lcdNumber.setToolTip(u"Current Series")
@@ -710,7 +710,7 @@ class myWindow(QtWidgets.QMainWindow):
             return True
 
 
-    def whileStart(self, flag_i):
+    def whileStart(self, flag_i, length = 0):
         global enable, dead
         self.flag = False
         self.led.value = True
@@ -721,13 +721,12 @@ class myWindow(QtWidgets.QMainWindow):
             spin = self.ui.toolButton_17
         elif flag_i == 3:
             spin = self.ui.toolButton_5
-        elif flag_i == 4:
-            spin = self.ui.toolButton_4
+        spin.hide()
         while True:
             if dead == False:
                 break
             if self.check_proc():
-                if flag_i in (3, 4):
+                if flag_i == 3:
                     filename = [f for f in listdir(f'{self.current_path}/downloads') if isfile(path.join(f'{self.current_path}/downloads', f))]
                     if len(filename) > 0:
                         for i in filename:
@@ -746,13 +745,13 @@ class myWindow(QtWidgets.QMainWindow):
 
                 self.defaultIcon()
                 break
-
-        enable = True
         dead = True
-        self.flag = True
-        self.led.setToolTip('Not Working..')
-        self.led.value = False
-        spin.show()
+        if length == 0:
+            enable = True
+            self.flag = True
+            self.led.setToolTip('Not Working..')
+            self.led.value = False
+            spin.show()
 
 
     def logOne(self):
@@ -772,46 +771,51 @@ class myWindow(QtWidgets.QMainWindow):
             self.startMovie()
             dead = True
             data = self.uploadGlobalSettings()
-            Thread(target = self.oneParsing, args = (data, data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
-            Thread(target = self.whileStart, args = (3,)).start()
+            self.ui.toolButton_5.hide()
+            index = []
+            if len(data['notify']['anime']) > 0:
+                for el in enumerate(data['notify']['anime']):
+                    element = el[1].split(' > ')[1].split(' - ')[0]
+                    index.append(data['anime']['name'].index(element))
+            seti = list(set(index))
+            
+            def alerts():
+                alert = QMessageBox()
+                alert.setIcon(QMessageBox.Information)
+                alert.setText('No data for update..')
+                alert.setGeometry(560, 75, 100, 100)
+                alert.exec()
+                self.ui.toolButton_5.show()
+
+            if self.ui.checkBox_2.isChecked():
+                if len(seti) > 0:
+                    Thread(target = self.checkDelOrDown, args = (data, seti)).start()
+                else:
+                    alerts()
+                    enable = True
+            else:
+                if len(seti) > 0:
+                    Thread(target = self.oneParsing, args = (data, data['anime']['urls'][self.ui.comboBox.currentIndex()], self.ui.lcdNumber.intValue()), daemon = True).start()
+                    Thread(target = self.whileStart, args = (3,)).start()
+                else:
+                    alerts()
+                    enable = True
 
 
     def checkDelOrDown(self, data, seti):
         global enable
         if len(seti) > 0:
             for i in seti:
-                enable = False
-                self.flag = False
-                self.startMovie()
                 url = data['anime']['urls'][i]
                 series = data['anime']['series'][i]
                 thread_pars = Thread(target = self.oneParsing, args = (data, url, series))
                 thread_pars.start()
-                Thread(target = self.whileStart, args = (4, )).start()
+                if i == seti[-1]:
+                    index = 0
+                else:
+                    index = randint(1, 13)
+                Thread(target = self.whileStart, args = (3, index)).start()
                 thread_pars.join()
-
-
-    def allDown(self):
-        global enable, dead
-        if enable:
-            enable = False
-            dead = True
-            data = self.uploadGlobalSettings()
-            index = []
-            if len(data['notify']['anime']) > 0:
-                for el in enumerate(data['notify']['anime']):
-                    element = el[1].split(' > ')[1].split(' - ')[0]
-                    index.append(data['anime']['name'].index(element))
-            seti = set(index)
-            if len(seti) > 0:
-                Thread(target = self.checkDelOrDown, args = (data, seti)).start()
-            else:
-                enable = True
-                alert = QMessageBox()
-                alert.setIcon(QMessageBox.Information)
-                alert.setText('No data for update..')
-                alert.setGeometry(610, 85, 100, 100)
-                alert.exec()
 
 
     def triggerFocus(self, reason):
