@@ -23,6 +23,7 @@ from pyttsx3 import init
 from validators import url as check_url
 from datetime import date
 from random import randint
+from alive_progress import alive_bar
 
 
 dead = True
@@ -53,28 +54,30 @@ class ThreadProgress(QThread):
         dead = True
         name = []
         try:
-            for i in enumerate(self.data['anime']['urls']):
-                if not dead:
-                    raise Exception('Extra close Thread..')
-                series = self.data['anime']['series'][i[0]] + 1
-                ova = self.data['anime']['ova'][i[0]] + 1
-                names, check_output = checkURL(self.data, i[1], series, ova)
-                if check_output:
-                    self.check += 1
-                if names == '':
-                    raise Exception('ERROR FOR URL_CHECK..')
-                if self.flag == False:
-                    if 'description/' in self.data['anime']['images'][i[0]]:
-                        pass
-                    else:
-                        img, desc = getDescription(i[1])
-                        self.data['anime']['images'][i[0]] = f'description/{img}'
-                        self.data['anime']['description'][i[0]] = desc
-                    name.append(names)
-                index = i[0] + 1
-                percent = int(index / len(self.data['anime']['urls']) * 100)
-                self._signal.emit(percent)
-                update_list_anime = True
+            with alive_bar(len(self.data['anime']['urls'])) as bar:
+                for i in enumerate(self.data['anime']['urls']):
+                    if not dead:
+                        raise Exception('Extra close Thread..')
+                    series = self.data['anime']['series'][i[0]] + 1
+                    ova = self.data['anime']['ova'][i[0]] + 1
+                    names, check_output = checkURL(self.data, i[1], series, ova)
+                    if check_output:
+                        self.check += 1
+                    if names == '':
+                        raise Exception('ERROR FOR URL_CHECK..')
+                    if self.flag == False:
+                        if 'description/' in self.data['anime']['images'][i[0]]:
+                            pass
+                        else:
+                            img, desc = getDescription(i[1])
+                            self.data['anime']['images'][i[0]] = f'description/{img}'
+                            self.data['anime']['description'][i[0]] = desc
+                        name.append(names)
+                    index = i[0] + 1
+                    percent = int(index / len(self.data['anime']['urls']) * 100)
+                    self._signal.emit(percent)
+                    update_list_anime = True
+                    bar()
 
             if isinstance(self.data, dict) and self.flag == False:
                 self.data['anime']['name'] = name
@@ -100,7 +103,6 @@ class ThreadProgress(QThread):
         self._signal.emit(percent)
         del(self.check)
         checker_tag = True
-        print(True)
 
 
 class myWindow(QtWidgets.QMainWindow):
@@ -482,7 +484,6 @@ class myWindow(QtWidgets.QMainWindow):
             enable = False
             self.startMovie()
             self.ui.toolButton_9.hide()
-            print('Yes')
             self.flag = False
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
             data = self.uploadGlobalSettings()
@@ -523,7 +524,6 @@ class myWindow(QtWidgets.QMainWindow):
             enable = False
             self.startMovie()
             self.ui.toolButton_12.hide()
-            print('Yes')
             data = self.uploadGlobalSettings()
             self.tray.setIcon(QIcon(f'{self.current_path}/icons/animevost-new.webp'))
             Thread(target = self.clicker, args = (data, False)).start()

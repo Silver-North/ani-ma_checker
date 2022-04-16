@@ -1,4 +1,4 @@
-This application needed to notify about the released series:
+# This application needed to notify about the released series:
   - <anime> of their download from the site:
 	  - https://www.animevost.org || https://www.animevost.am
     - tracker all released series, update every 18 minutes after start application
@@ -12,9 +12,8 @@ This application needed to notify about the released series:
 And it is possible to view the description of tracked ongoings
 
 
-```
-Libraries are required to work:
-```
+## Libraries are required to work:
+
   - pyqt5
   - json
   - selenium
@@ -22,14 +21,14 @@ Libraries are required to work:
   - pyttsx3
   - validators
   - PIL
+  - alive-progress
 
 
 To install them use the pip command
 
---- *** ---
-  [FUTURE] add ability to track <ranobe>
-	    create new tab: <ranobe> <description ranobe>
-  [FUTURE] add ability to track outgoing <anime>, <manga> on monitored sites
-	    create new tab: ongoings
-  [FUTURE] fix problems with animations
---- *** ---
+
+# Future:
+  - History
+  - export History or another list (Anime, Manga, Ranobe)
+  - new theme
+  - join all tabs descriptions in one tab

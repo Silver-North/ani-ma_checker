@@ -216,9 +216,6 @@ def checkURL(data, url, series, ova):
             else:
                 system('notify-send "Error for write notify <anime>"')
             check = True
-            print([series, ova], url)
-        else:
-            print('No new', series, "series or no new", ova, 'ova')
 
     except Exception as e:
         print('error =========>\n', e)
