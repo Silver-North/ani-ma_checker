@@ -42,7 +42,7 @@
             2,
             2,
             1,
-            1,
+            2,
             1
         ],
         "ova": [
@@ -88,27 +88,6 @@
             "Моя девушка не только милая",
             "Семья шпиона",
             "Власть книжного червя: Чтобы стать библиотекарем, все средства хороши (третий сезон)"
-        ],
-        "logs": [
-            "0 - !!! << Error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')) >> !!!\n",
-            "1 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff72d1f4310>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "2 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff72d1f51e0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "3 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff7576711e0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "4 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff72d393ee0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "5 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e79feb0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "6 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e7543a0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "7 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e7540a0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "8 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e754100>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "9 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e79fc10>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "10 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e79feb0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "11 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff72d393be0>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "12 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e5d9870>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "13 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff72d393c70>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "14 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e79de40>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "15 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e79e380>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "16 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e754100>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "17 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e5d9720>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n",
-            "18 - !!! << Error: HTTPConnectionPool(host='localhost', port=39529): Max retries exceeded with url: /session/58e4e6726fa4f91d731e9c7736f9384f/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff75e72ea70>: Failed to establish a new connection: [Errno 111] В соединении отказано')) >> !!!\n"
         ],
         "log": "",
         "description": [
@@ -156,6 +135,10 @@
             "description/1649702442_1.jpg"
         ],
         "track-name": [
+            "Семья шпиона / Spy x Family [1-2 из 12+] [3 серия - 23 апреля]",
+            "Ультрамариновые фанфары / Gunjou no Fanfare [1-3 из 12+]",
+            "Танцуй, танцуй, танцор / Dance Dance Danseur [1-2 из 12+]",
+            "Аой Асито / Ao Ashi [1-2 из 12+] [3 серия - 23 апреля]",
             "Непостижимая Ахарэн / Aharen-san wa Hakarenai [1-3 из 12+] [4 серия - 22 апреля]",
             "Жизнь девушки-карателя / Shokei Shoujo no Virgin Road [1-3 из 12+] [4 серия - 22 апреля]",
             "Наука влюблена, и мы докажем это (второй сезон) / Rikei ga Koi ni Ochita no de Shoumei shitemita. Heart [1-3 из 12+]",
@@ -181,13 +164,13 @@
             "Клуб Раймана / Ryman's Club [1-11 из 12]",
             "Власть книжного червя: Чтобы стать библиотекарем, все средства хороши (третий сезон) / Honzuki no Gekokujou: Shisho ni Naru Tame ni wa Shudan wo Erandeiraremasen 3rd Season [1 из 12+] [2 серия - 18 апреля]",
             "Путешествие к Бессмертию / FanRen Xiu Xian Chuan [1-45 из 47]",
-            "Тигр и кролик (второй сезон) / Tiger & Bunny 2 [1-13 из 25]",
-            "Воины Пограничья / Kyoukai Senki [1-14 из 25]",
-            "Похороны Короля Роз / Baraou no Souretsu [1-13 из 24]",
-            "Безупречный мир / Wanmei Shijie [1-53 из 78]",
-            "Стрелок с чёрной скалы: Падение / Black Rock Shooter: Dawn Fall [1-2 из 12+] [3 серия - 17 апреля]"
+            "Тигр и кролик (второй сезон) / Tiger & Bunny 2 [1-13 из 25]"
         ],
         "track-link": [
+            "https://animevost.org/tip/tv/2798-spy-x-family.html",
+            "https://animevost.org/tip/tv/2782-gunjou-no-fanfare.html",
+            "https://animevost.org/tip/tv/2796-dance-dance-danseur.html",
+            "https://animevost.org/tip/tv/2780-ao-ashi.html",
             "https://animevost.org/tip/tv/2771-aharen-san-wa-hakarenai.html",
             "https://animevost.org/tip/tv/2781-shokei-shoujo-no-virgin-road.html",
             "https://animevost.org/tip/tv/2783-rikei-ga-koi-ni-ochita-no-de-shoumei-shitemita-heart.html",
@@ -213,11 +196,7 @@
             "https://animevost.org/tip/tv/2766-rymans-club.html",
             "https://animevost.org/tip/tv/2804-honzuki-no-gekokujou-shisho-ni-naru-tame-ni-wa-shudan-wo-erandeiraremasen-3rd-season.html",
             "https://animevost.org/tip/tv/2491-fanren-xiu-xian-chuan.html",
-            "https://animevost.org/tip/ona/2805-tiger-bunny-2.html",
-            "https://animevost.org/tip/tv/2696-kyoukai-senki.html",
-            "https://animevost.org/tip/tv/2741-baraou-no-souretsu.html",
-            "https://animevost.org/tip/tv/2724-bezuprechnyy-mir-wanmei-shijie-1-31-iz-78.html",
-            "https://animevost.org/tip/tv/2773-black-rock-shooter-dawn-fall.html"
+            "https://animevost.org/tip/ona/2805-tiger-bunny-2.html"
         ]
     },
     "manga": {
@@ -306,7 +285,7 @@
             75,
             22,
             60,
-            14.1,
+            14.3,
             33,
             20.4,
             173,
@@ -322,9 +301,9 @@
             209,
             27,
             23.2,
-            324,
+            325,
             40,
-            114,
+            115,
             74,
             33.6,
             52
@@ -368,7 +347,7 @@
         "logs": [
             "Д.Грэй-мен = 243",
             "Герой? Я давно перестал им быть = 318",
-            "Убийца Гоблинов = 69",
+            "Убийца Гоблинов",
             "Парень в школе для девочек = 417",
             "Вторая жизнь в другом мире = 50",
             "Другой мир не может противостоять силе мгновенной смерти = 35",
@@ -378,7 +357,7 @@
             "Возвращение героя максимального уровня = 75",
             "В итоге офицер гильдии оказался легендарным убийцей = 22",
             "Сильнейший герой, обученный в тайном подземелье! = 60",
-            "Тебе нравлюсь я, а не моя дочь?! = 14.1",
+            "Тебе нравлюсь я, а не моя дочь?! > 14.3",
             "Меня призвали в другой мир во второй раз! = 33",
             "Гаремная жизнь хозяина проклятого меча = 20.4",
             "Вашей маме зять не нужен? = 173",
@@ -387,16 +366,16 @@
             "Ингошима = 98",
             "Сага о Винланде = 192",
             "Сказания о демонах и богах = 374",
-            "Ванпанчмен > 207",
+            "Ванпанчмен = 207",
             "Злодейка 99 уровня ~Я могу быть Скрытым Боссом, но я не Король Демонов~ = 12.2",
             "Гяру-учительница = 18",
             "Нисхождение демонического мастера = 127",
             "Удивительный доктор = 209",
             "Мечник, прозванный Магом Бесчисленных Мечей = 27",
             "29-летний холостяк перенёсся в другой мир, чтобы жить беззаботно… По крайней мере, он этого хотел. = 23.2",
-            "Моя жена — королева демонов = 324",
+            "Моя жена — королева демонов > 325",
             "Мир отомэ игр - это тяжелый мир для мобов = 40",
-            "Я единственный, кто вошёл в систему = 114",
+            "Я единственный, кто вошёл в систему > 115",
             "Эта фарфоровая кукла влюбилась = 74",
             "Власть книжного червя: часть первая = 33.6",
             "Буду назло качаться = 52"
@@ -514,9 +493,19 @@
         "log": ""
     },
     "notify": {
-        "notify": "empty",
+        "notify": "checked",
         "anime": [],
-        "manga": [],
+        "manga": [
+            "[M][16/4/2022 - 16:41] > Тебе нравлюсь я, а не моя дочь?! new chapter 14.3\n",
+            "[M][16/4/2022 - 16:45] > Моя жена — королева демонов new chapter 325\n",
+            "[M][16/4/2022 - 16:46] > Я единственный, кто вошёл в систему new chapter 115\n",
+            "[M][16/4/2022 - 19:00] Тебе нравлюсь я, а не моя дочь?! new chapter 14.3\n",
+            "[M][16/4/2022 - 19:05] Моя жена — королева демонов new chapter 325\n",
+            "[M][16/4/2022 - 19:05] Я единственный, кто вошёл в систему new chapter 115\n",
+            "[M][16/4/2022 - 20:17] >  Тебе нравлюсь я, а не моя дочь?! new chapter 14.3\n",
+            "[M][16/4/2022 - 20:25] >  Моя жена — королева демонов new chapter 325\n",
+            "[M][16/4/2022 - 20:26] >  Я единственный, кто вошёл в систему new chapter 115\n"
+        ],
         "ranobe": []
     },
     "history": {

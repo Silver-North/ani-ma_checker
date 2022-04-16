@@ -36,7 +36,8 @@ def parseRanobe(link):
                 break
             description = "\n".join(description)
             
-            table = soup.find('table', class_="table table-condensed table-striped").find_all('tr')
+            table = soup.find('table', 
+                class_="table table-condensed table-striped").find_all('tr')
             toms = soup.find_all('tr', class_="volume_helper")
 
             tr = []
@@ -76,10 +77,17 @@ def parseRanobe(link):
             print(f'{name}\n{img}\n{description}\n{chapter}')
 
         elif 'https://xn--80ac9aeh6f.xn--p1ai' in link:
-            name = soup.find('h1', class_="cursor-default md:cursor-pointer font-bold text-2xl md:text-3xl sm:leading-7 lg:leading-10 xl:leading-9 pt-1 text-black-0 dark:text-grayNormal-200 truncate").text
+            n_head = 'cursor-default md:cursor-pointer font-bold text-2xl'
+            n_body = ' md:text-3xl sm:leading-7 lg:leading-10 xl:leading-9 pt-1 '
+            n_footer = 'text-black-0 dark:text-grayNormal-200 truncate'
+            name = soup.find('h1', class_=f"{n_head}{n_body}{n_footer}").text
             description = soup.find('div', class_="BookPage_desc__2rsZC").text
-            img = soup.find('img', class_="xs:rounded-md md:w-[180px] lg:w-[220px]")['src']
-            chapters = soup.find_all('a', class_="text-black-0 dark:text-grayNormal-200 hover:text-primary cursor-default md:cursor-pointer dark:hover:text-primary truncate text-sm md:text-base")
+            img = soup.find('img',
+                class_="xs:rounded-md md:w-[180px] lg:w-[220px]")['src']
+            c_head = 'text-black-0 dark:text-grayNormal-200 hover:text-primary '
+            c_body = 'cursor-default md:cursor-pointer dark:hover:text-primary '
+            c_footer = 'truncate text-sm md:text-base'
+            chapters = soup.find_all('a', class_=f"{c_head}{c_body}{c_footer}")
             all = []
             for i in chapters[0].text:
                 if i.isnumeric():
@@ -97,13 +105,15 @@ def parseRanobe(link):
 
         elif 'ruranobe.ru' in link:
             name = soup.find('span', class_="headline__text").text
-            img = f'https://ruranobe.ru/{soup.find_all("img", class_="detail__image")[0]["src"]}'
+            url_p = 'https://ruranobe.ru/'
+            img = f'{url_p}{soup.find_all("img", class_="detail__image")[0]["src"]}'
             description = soup.find('div', class_="read-more").text
             chapters = soup.find('div', class_="detail__actions")
             chapter = chapters.find('a').text
             chapters = soup.find_all('a', class_="list__item")
             for i in chapters:
-                tom = i.find('span', class_="list__item-number").text.split()[1].split(":")[0]
+                tom = i.find('span', 
+                    class_="list__item-number").text.split()[1].split(":")[0]
                 desc = i.find('span', class_="list__name").text
                 if chapter == desc[1:-1:]:
                     print(tom)
@@ -194,15 +204,15 @@ def checkURL(data, url, series, ova):
             string_num = arr[-1].split()
             num = int(string_num[0])
 
-        current_date = date.today()
-        current_time = strftime("%H:%M", localtime())
-
+        c_d = date.today()
+        c_t = strftime("%H:%M", localtime())
+        note = f'[A][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}] > {name} -'
         if num == series and ova == int_i:
-            txt = f'[A][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series} & new ova-{ova}\n'
+            txt = f'{note} new series {series} & new ova-{ova}\n'
         elif num == series and ova != int_i:
-            txt = f'[A][{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new series {series}\n'
+            txt = f'{note} new series {series}\n'
         elif ova == int_i and series != num:
-            txt = f'[A]{current_date.day}/{current_date.month}/{current_date.year} - {current_time}] > {name} - new ova-{ova}\n'
+            txt = f'{note} - new ova-{ova}\n'
         else:
             txt = ''
 
@@ -210,9 +220,11 @@ def checkURL(data, url, series, ova):
             data['notify']['anime'].append(txt)
             if isinstance(data, dict):
                 with open(f'{current_path}/setting.json', 'w') as js:
-                    js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+                    js.write(dumps(data, sort_keys=False, indent=4,
+                                   ensure_ascii=False, separators=(',', ': ')))
                 with open(f'{current_path}/default.json', 'w') as js:
-                    js.write(f"{dumps(data, sort_keys=False, indent=4, ensure_ascii=False, separators=(',', ': '))}")
+                    js.write(dumps(data, sort_keys=False, indent=4,
+                                   ensure_ascii=False, separators=(',', ': ')))
             else:
                 system('notify-send "Error for write notify <anime>"')
             check = True
@@ -234,8 +246,8 @@ def getDescription(url):
         img = soup.find_all('img', class_='imgRadius')
         image = f'https://www.animevost.org{img[0]["src"]}'
         img = img[0]['src'].split('/')
-        if not path.isdir(f'/home/north/data/projects/Python/IsDev/Anime-parser/description/'):
-            system(f'mkdir "/home/north/data/projects/Python/IsDev/Anime-parser/description/"')
+        if not path.isdir(f'{current_path}/description/'):
+            system(f'mkdir "{current_path}/description/"')
         r = get(image, stream=True)
         if r.status_code == 200:
             with open(f'{current_path}/description/{img[-1]}', 'wb') as f:
