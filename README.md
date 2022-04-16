@@ -31,4 +31,3 @@ To install them use the pip command
   - History
   - export History or another list (Anime, Manga, Ranobe)
   - new theme
-  - join all tabs descriptions in one tab

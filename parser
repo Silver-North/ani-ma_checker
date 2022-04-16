@@ -159,18 +159,16 @@ class myWindow(QtWidgets.QMainWindow):
         self.viewRanobe()
 
         self.showCombo()
+        self.swithDescription()
         self.viewDescription()
         self.updateNumber()
         self.upComboAnime()
-        self.viewDescriptionManga()
         self.upComboRanobe()
-        self.viewDescriptionRanobe()
 
         self.ui.comboBox.activated[str].connect(self.upComboAnime)
         self.ui.comboBox_2.activated[str].connect(self.updateNumber)
         self.ui.comboBox_3.activated[str].connect(self.viewDescription)
-        self.ui.comboBox_4.activated[str].connect(self.viewDescriptionManga)
-        self.ui.comboBox_5.activated[str].connect(self.viewDescriptionRanobe)
+        self.ui.comboBox_4.activated[str].connect(self.swithDescription)
         self.ui.comboBox_6.activated[str].connect(self.upComboRanobe)
 
         self.timer_check = QTimer()
@@ -179,7 +177,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.update()
         self.ui.tabWidget.setCurrentIndex(0)
         self.comboTracker()
-#### << Maiin-module >> ####
+#### << Main-module >> ####
         self.ui.toolButton_3.clicked.connect(self.closed)
         self.ui.toolButton_11.clicked.connect(self.modeColorSheme)
         self.ui.toolButton_18.clicked.connect(self.openURL)
@@ -563,7 +561,6 @@ class myWindow(QtWidgets.QMainWindow):
         else:
             self.percent_all_anime = 0
         if update_list_anime:
-            self.ui.comboBox_3.clear()
             self.ui.comboBox.clear()
             self.showed()
             update_list_anime = False
@@ -587,16 +584,8 @@ class myWindow(QtWidgets.QMainWindow):
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/ranobe.png'))
                 self.ui.toolButton_24.setToolTip('several site')
             elif index == 3:
-                self.tray.setToolTip('View Anime description')
+                self.tray.setToolTip('View description')
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/a-desc.png'))
-                self.ui.toolButton_24.setToolTip('About')
-            elif index == 4:
-                self.tray.setToolTip('View Manga description')
-                self.tray.setIcon(QIcon(f'{self.current_path}/icons/m-desc.png'))
-                self.ui.toolButton_24.setToolTip('About')
-            elif index == 5:
-                self.tray.setToolTip('View Ranobe description')
-                self.tray.setIcon(QIcon(f'{self.current_path}/icons/r-desc.png'))
                 self.ui.toolButton_24.setToolTip('About')
 
 
@@ -646,13 +635,10 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.lineEdit_2.setStyleSheet(back)
         self.ui.lineEdit_3.setStyleSheet(back)
         self.ui.textEdit.setStyleSheet(back)
-        self.ui.textEdit_2.setStyleSheet(back)
-        self.ui.textEdit_3.setStyleSheet(back)
         self.ui.comboBox.setStyleSheet(back)
         self.ui.comboBox_2.setStyleSheet(back)
         self.ui.comboBox_3.setStyleSheet(back)
         self.ui.comboBox_4.setStyleSheet(back)
-        self.ui.comboBox_5.setStyleSheet(back)
         self.ui.comboBox_6.setStyleSheet(back)
         self.ui.comboBox_7.setStyleSheet(back)
         self.ui.spinBox.setStyleSheet(back)
@@ -684,8 +670,6 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setTabIcon(1, QIcon(f'{self.current_path}/icons/mask.png'))
         self.ui.tabWidget.setTabIcon(2, QIcon(f'{self.current_path}/icons/ranobe.png'))
         self.ui.tabWidget.setTabIcon(3, QIcon(f'{self.current_path}/icons/a-desc.png'))
-        self.ui.tabWidget.setTabIcon(4, QIcon(f'{self.current_path}/icons/m-desc.png'))
-        self.ui.tabWidget.setTabIcon(5, QIcon(f'{self.current_path}/icons/r-desc.png'))
         self.ui.toolButton.setIcon(QIcon(f'{self.current_path}/icons/diskette.png'))
         self.ui.toolButton_2.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
         self.ui.toolButton_3.setIcon(QIcon(f'{self.current_path}/icons/close.png'))
@@ -704,6 +688,9 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_30.setIcon(QIcon(f'{self.current_path}/icons/edit.png'))
         self.ui.toolButton_27.setIcon(QIcon(f'{self.current_path}/icons/log-one.png'))
         self.ui.toolButton_29.setIcon(QIcon(f'{self.current_path}/icons/trash.png'))
+        self.ui.comboBox_4.setItemIcon(0, QIcon(f'{self.current_path}/icons/animevost.png'))
+        self.ui.comboBox_4.setItemIcon(1, QIcon(f'{self.current_path}/icons/mask.png'))
+        self.ui.comboBox_4.setItemIcon(2, QIcon(f'{self.current_path}/icons/ranobe.png'))
         self.ui.toolButton_8.setToolTip(u"Log One parse URL")
         self.ui.toolButton_9.setToolTip(u"Update")
         self.ui.lcdNumber.setToolTip(u"Current Series")
@@ -882,15 +869,11 @@ class myWindow(QtWidgets.QMainWindow):
 
     def showed(self):
         reads = self.uploadGlobalSettings()
-
         for i in enumerate(reads['anime']['name']):
             self.ui.comboBox.addItem(i[1])
-            self.ui.comboBox_3.addItem(i[1])
             self.ui.comboBox.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/animevost.png'))
-            self.ui.comboBox_3.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/animevost.png'))
 
         self.ui.comboBox.setCurrentIndex(0)
-        self.ui.comboBox_3.setCurrentIndex(0)
         if len(reads['notify']['anime']) == 0 and len(reads['notify']['manga']) == 0 and len(reads['notify']['ranobe']) == 0:
             self.setGlobalSettings(reads, 'notify', 'notify', 'empty')
             self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/bell.png'))
@@ -1184,10 +1167,8 @@ class myWindow(QtWidgets.QMainWindow):
     def showCombo(self):
         data = self.uploadGlobalSettings()
         for i in enumerate(data['manga']['names']):
-            self.ui.comboBox_4.addItem(i[1])
             self.ui.comboBox_2.addItem(i[1])
             self.ui.comboBox_2.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/mask.png'))
-            self.ui.comboBox_4.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/mask.png'))
 
 
     def updateNumber(self):
@@ -1210,34 +1191,23 @@ class myWindow(QtWidgets.QMainWindow):
     def openURL(self):
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
+        child = 'urls'
         if tab == 0:
             mode = 'anime'
             if self.ui.checkBox.isChecked():
                 child = 'track-link'
                 index = self.ui.comboBox_7.currentIndex()
             else:
-                child = 'urls'
                 index = self.ui.comboBox.currentIndex()
         if tab == 1:
             mode = 'manga'
-            child = 'urls'
             index = self.ui.comboBox_2.currentIndex()
         if tab == 2:
             mode = 'ranobe'
-            child = 'urls'
             index = self.ui.comboBox_6.currentIndex()
         if tab == 3:
-            mode = 'anime'
-            child = 'urls'
+            mode = self.ui.comboBox_4.currentText()
             index = self.ui.comboBox_3.currentIndex()
-        if tab == 4:
-            mode = 'manga'
-            child = 'urls'
-            index = self.ui.comboBox_4.currentIndex()
-        if tab == 5:
-            mode = 'ranobe'
-            child = 'urls'
-            index = self.ui.comboBox_5.currentIndex()
         if len(data[mode]['urls']) > 0:
             open_url(data[mode][child][index])
         else:
@@ -1246,31 +1216,31 @@ class myWindow(QtWidgets.QMainWindow):
             alert.exec_()
 
 
-#### <<< Tab Anime Description >>> ####
+#### <<< Tab Description >>> ####
     def viewDescription(self):
+        data = self.uploadGlobalSettings()
+        name = self.ui.comboBox_4.currentText()
         index = self.ui.comboBox_3.currentIndex()
+        self.ui.label_5.setPixmap(QPixmap(f'{self.current_path}/{data[name]["images"][index]}'))
+        self.ui.textEdit.setHtml(data[name]['description'][index])
+
+
+    def swithDescription(self):
         data = self.uploadGlobalSettings()
-
-        self.ui.label_5.setPixmap(QPixmap(f'{self.current_path}/{data["anime"]["images"][index]}'))
-        self.ui.textEdit.setHtml(data['anime']['description'][index])
-
-
-#### <<< Tab Manga Description >>> ####
-    def viewDescriptionManga(self):
-        index = self.ui.comboBox_4.currentIndex()
-        data = self.uploadGlobalSettings()
-
-        self.ui.label_6.setPixmap(QPixmap(f'{self.current_path}/{data["manga"]["images"][index]}'))
-        self.ui.textEdit_2.setHtml(data['manga']['description'][index])
-
-
-#### <<< Tab Ranobe Description >>> ####
-    def viewDescriptionRanobe(self):
-        index = self.ui.comboBox_5.currentIndex()
-        data = self.uploadGlobalSettings()
-
-        self.ui.label_7.setPixmap(QPixmap(f'{self.current_path}/{data["ranobe"]["images"][index]}'))
-        self.ui.textEdit_3.setHtml(data['ranobe']['description'][index])
+        name = self.ui.comboBox_4.currentText()
+        self.ui.comboBox_3.clear()
+        child = 'names'
+        if name == 'anime':
+            ico = 'animevost.png'
+            child = 'name'
+        elif name == 'manga':
+            ico = 'mask.png'
+        elif name == 'ranobe':
+            ico = 'ranobe.png'
+        for i in enumerate(data[name][child]):
+            self.ui.comboBox_3.addItem(i[1])
+            self.ui.comboBox_3.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/{ico}'))
+        self.viewDescription()
 
 
 #### <<< Tab Ranobe >>> ####
@@ -1385,16 +1355,13 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def viewRanobe(self):
-        self.ui.comboBox_5.clear()
         self.ui.comboBox_6.clear()
         data = self.uploadGlobalSettings()
         if len(data['ranobe']['names']) > 0:
             for i in data['ranobe']['names']:
                 self.ui.comboBox_6.addItem(i)
-                self.ui.comboBox_5.addItem(i)
         else:
             for i in data['ranobe']['urls']:
-                self.ui.comboBox_5.addItem(i)
                 self.ui.comboBox_6.addItem(i)
 
 
