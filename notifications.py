@@ -208,9 +208,9 @@ def checkURL(data, url, series, ova):
         c_t = strftime("%H:%M", localtime())
         note = f'[A][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}] > {name} -'
         if num == series and ova == int_i:
-            txt = f'{note} new series {series} & new ova-{ova}\n'
+            txt = f'{note} - new series {series} & new ova-{ova}\n'
         elif num == series and ova != int_i:
-            txt = f'{note} new series {series}\n'
+            txt = f'{note} - new series {series}\n'
         elif ova == int_i and series != num:
             txt = f'{note} - new ova-{ova}\n'
         else:
