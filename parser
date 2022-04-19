@@ -283,7 +283,19 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def stoped(self):
-        self.extraClose()
+        global while_var
+        alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
+        alert.setGeometry(541, 107, 200, 200)
+        if while_var:
+            alert.setText('Do you really want to finished process?')
+            alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            rezult = alert.exec()
+            if rezult == QMessageBox.Ok:
+                self.extraClose()
+        else:
+            alert.setText('No active processes for ending!')
+            alert.exec_()
 
 
     def hidded(self):
@@ -294,8 +306,21 @@ class myWindow(QtWidgets.QMainWindow):
     def extraClose(self):
         global dead
         dead = False
-        system('killall chromedriver')
+        system('killall -s 9 chromedriver')
         self.defaultIcon()
+
+
+    def closed(self):
+        alert = QMessageBox()
+        alert.setIcon(QMessageBox.Information)
+        alert.setText('Do you really want to leave?')
+        alert.setGeometry(541, 107, 200, 200)
+        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        rezult = alert.exec()
+
+        if rezult == QMessageBox.Ok:
+            self.extraClose()
+            self.close()
 
 
     #### TODO ####
@@ -314,13 +339,6 @@ class myWindow(QtWidgets.QMainWindow):
         checkbox = False
         
         self.flag = False if while_var else True
-        
-        if self.check_proc() == False:
-            if tab_start == 0:
-                self.ui.toolButton_5.show()
-            if tab_start == 1:
-                self.ui.toolButton_17.show()
-                self.ui.toolButton_20.show()
         
         if self.ui.checkBox_2.isChecked():
             checkbox = True
@@ -393,6 +411,8 @@ class myWindow(QtWidgets.QMainWindow):
                         f'{self.current_path}/icons/animevost-new.webp'))
             if tab_start == 1:
                 self.tray.setIcon(QIcon(f'{self.current_path}/icons/mask-0.png'))
+            if tab_start == 2:
+                self.tray.setIcon(QIcon(f'{self.current_path}/icons/ranobe-0.png'))
 #<<<<!>>>>
             
 
@@ -588,19 +608,6 @@ class myWindow(QtWidgets.QMainWindow):
             self.click += 1
 
 
-    def closed(self):
-        alert = QMessageBox()
-        alert.setIcon(QMessageBox.Information)
-        alert.setText('Do you really want to leave?')
-        alert.setGeometry(541, 107, 200, 200)
-        alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        rezult = alert.exec()
-
-        if rezult == QMessageBox.Ok:
-            self.extraClose()
-            self.close()
-
-
     def openURL(self):
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
@@ -733,7 +740,7 @@ class myWindow(QtWidgets.QMainWindow):
                 tmp = f'{text} - new chapter {value}'
             else:
                 tmp = f'{text} - new series {value}'
-        temp = f'{text} - new ova-{value}'
+        temp = f'{text} - new ova'
         while True:
             for i in range(len(data['notify'][child])):
                 if tmp in data['notify'][child][i]:
@@ -815,7 +822,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 
 ####<<< Anime-module >>>####
-    def oneParsing(self, data, url, digit, index = 0):
+    def oneParsing(self, data, url, digit, index_value = 0):
         global dead, while_var, enable
         dead = True
         driver = webdriver.Chrome(path.join(path.dirname(__file__), 'chromedriver'),
@@ -832,10 +839,12 @@ class myWindow(QtWidgets.QMainWindow):
             next = driver.find_element(By.CLASS_NAME, 'next')
             name_dir = name.split(' /')
             self.percent_all_anime = 35
+            log = ''
             series += data['anime']['ova'][urls.index(url)]
 
             def continueDownload(count = 0, repeat = False):
-                nonlocal search_count_series, series, name, next, name_dir, data
+                nonlocal search_count_series, series, name, \
+                          next, name_dir, data, log
                 if series > 6:
                     next.click()
                     if series > 12:
@@ -900,8 +909,6 @@ class myWindow(QtWidgets.QMainWindow):
                 continueDownload()
             elif len(search_count_series) > series:
                 continueDownload(len(search_count_series) - series, True)
-            else:
-                log = f'{name_dir[0]} - No new < {series} > series'
 
         except Exception as e:
             system(f'notify-send "Error one-down\n<< {e} >>"')
@@ -909,20 +916,17 @@ class myWindow(QtWidgets.QMainWindow):
             print(f"!!! << Error: {e} >> !!!")
 
         driver.quit()
-        if index == 0:
-            while_var = False
-            enable = True
         data['anime']['log'] = log
         self.setGlobalSettings(data, 'anime', 'log', log)
         self.percent_all_anime = 100
-        if self.percent_all_anime == 100:
-            self.ui.progressBar_2.setFormat('Completed')
-        sleep(2)
-        dead = False
+        self.ui.progressBar_2.setFormat('Completed')
+        sleep(1.2)
         self.percent_all_anime = 0
-        sleep(0.5)
-        dead = True
         self.ui.progressBar_2.setFormat('%p%')
+        if index_value == 0:
+            while_var = False
+            enable = dead = True
+            self.ui.toolButton_5.show()
 
 
     def checkUpload(self, f, url, dirs, link, name, series, data, search='серия'):
@@ -974,7 +978,7 @@ class myWindow(QtWidgets.QMainWindow):
             url_request.urlretrieve(downs, save_loc, self.handleProgress)
             down = False
             self.ui.progressBar.setFormat('Completed')
-            self.checkNotify(data, 'anime', dirs, series)
+            self.checkNotify(data, 'anime', dirs, series, False)
             data['notify']['notify'] = 'empty' if self.emptyNotify(data) else \
                                        data['notify']['notify']
             self.checkUpload(f, urls, dirs, link, name, series, data, search)
@@ -1038,7 +1042,7 @@ class myWindow(QtWidgets.QMainWindow):
         while_var = dead = False
         self.uploadTrackerAnime()
         sleep(1)
-        dead = self.flag = True
+        dead = True
         tab_start = None
         self.ui.toolButton_12.show()
         self.ui.toolButton_9.show()
@@ -1229,6 +1233,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.setGlobalSettings(data, '', '', '', False, True)
         while_var = False
         enable = dead = True
+        self.ui.toolButton_17.show()
+        self.ui.toolButton_20.show()
         sleep(2)
         self.percent_all_manga = 0
 
@@ -1311,7 +1317,7 @@ class myWindow(QtWidgets.QMainWindow):
 
 #### <<< Tab Ranobe >>> ####
     def setRanobe(self, check):
-        global enable, dead
+        global enable, dead, while_var
         dead = True
         data = self.uploadGlobalSettings()
         names = []
@@ -1320,6 +1326,7 @@ class myWindow(QtWidgets.QMainWindow):
         chapters = []
         all_chapters = []
         msg = 0
+        length = len(data['ranobe']['urls'])
         self.ranobe_percent = 0
         try:
             for i in enumerate(data['ranobe']['urls']):
@@ -1346,13 +1353,12 @@ class myWindow(QtWidgets.QMainWindow):
                             'wb') as f:
                             r.raw.decode_content = True
                             copyfileobj(r.raw, f)
-
                     loadImage(image)
+
                 descs.append(description)
                 chapters.append(chapter)
                 all_chapters.append(all)
-                self.ranobe_percent = int(
-                    i[0] + 1) / len(data['ranobe']['urls'] * 100)
+                self.ranobe_percent = int((i[0] + 1) / length * 100)
             if msg > 0:
                 system('notify-send "Вышло кое-что новенькое.."')
                 self.setGlobalSettings(data, 'notify', 'notify', 'unchecked')
@@ -1375,6 +1381,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_31.show()
         self.viewRanobe()
         enable = True
+        while_var = False
 
 
     def viewRanobe(self):
@@ -1400,18 +1407,22 @@ class myWindow(QtWidgets.QMainWindow):
 
 
     def updateRanobeUrl(self):
-        global enable
+        global enable, while_var, tab_start 
         if enable:
             enable = False
+            while_var = True
+            tab_start = 2
             self.startMovie()
             self.ui.toolButton_26.hide()
             Thread(target = self.setRanobe, args = (False,)).start()
 
 
     def checkRanobeUrl(self):
-        global enable
+        global enable, while_var, tab_start 
         if enable:
             enable = False
+            while_var = True
+            tab_start = 2
             self.startMovie()
             self.ui.toolButton_31.hide()
             Thread(target = self.setRanobe, args = (True,)).start()
