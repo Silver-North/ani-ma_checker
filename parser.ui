@@ -138,9 +138,9 @@
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>29</y>
-        <width>219</width>
+        <width>221</width>
         <height>26</height>
        </rect>
       </property>
@@ -196,9 +196,9 @@
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>1</y>
-        <width>219</width>
+        <width>221</width>
         <height>26</height>
        </rect>
       </property>
@@ -211,7 +211,7 @@
        <rect>
         <x>226</x>
         <y>1</y>
-        <width>85</width>
+        <width>58</width>
         <height>27</height>
        </rect>
       </property>
@@ -222,7 +222,7 @@
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
       <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::PlusMinus</enum>
+       <enum>QAbstractSpinBox::NoButtons</enum>
       </property>
       <property name="maximum">
        <number>100000</number>
@@ -301,9 +301,9 @@
      <widget class="QProgressBar" name="progressBar">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>58</y>
-        <width>219</width>
+        <width>221</width>
         <height>20</height>
        </rect>
       </property>
@@ -331,9 +331,9 @@
      <widget class="QProgressBar" name="progressBar_2">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>79</y>
-        <width>219</width>
+        <width>221</width>
         <height>20</height>
        </rect>
       </property>
@@ -361,9 +361,9 @@
      <widget class="QComboBox" name="comboBox_7">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>113</y>
-        <width>219</width>
+        <width>221</width>
         <height>25</height>
        </rect>
       </property>
@@ -556,6 +556,56 @@
        </size>
       </property>
      </widget>
+     <widget class="QDial" name="dial_3">
+      <property name="geometry">
+       <rect>
+        <x>284</x>
+        <y>1</y>
+        <width>27</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>128</number>
+      </property>
+      <property name="pageStep">
+       <number>1</number>
+      </property>
+      <property name="wrapping">
+       <bool>true</bool>
+      </property>
+      <property name="notchTarget">
+       <double>8.699999999999999</double>
+      </property>
+      <property name="notchesVisible">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_14">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>106</y>
+        <width>41</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>MPV player</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+     </widget>
      <zorder>frame</zorder>
      <zorder>label_4</zorder>
      <zorder>label_2</zorder>
@@ -577,6 +627,8 @@
      <zorder>checkBox_2</zorder>
      <zorder>toolButton_4</zorder>
      <zorder>toolButton_7</zorder>
+     <zorder>dial_3</zorder>
+     <zorder>toolButton_14</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -588,7 +640,7 @@
      <widget class="QToolButton" name="toolButton_13">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -613,7 +665,7 @@
      <widget class="QToolButton" name="toolButton_15">
       <property name="geometry">
        <rect>
-        <x>326</x>
+        <x>330</x>
         <y>5</y>
         <width>25</width>
         <height>25</height>
@@ -632,7 +684,7 @@
      <widget class="QToolButton" name="toolButton_17">
       <property name="geometry">
        <rect>
-        <x>263</x>
+        <x>270</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -657,9 +709,9 @@
      <widget class="QDoubleSpinBox" name="doubleSpinBox">
       <property name="geometry">
        <rect>
-        <x>242</x>
+        <x>240</x>
         <y>5</y>
-        <width>81</width>
+        <width>88</width>
         <height>27</height>
        </rect>
       </property>
@@ -694,7 +746,7 @@
      <widget class="QLCDNumber" name="lcdNumber_2">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>105</y>
         <width>101</width>
         <height>41</height>
@@ -713,7 +765,7 @@
      <widget class="QToolButton" name="toolButton_19">
       <property name="geometry">
        <rect>
-        <x>242</x>
+        <x>240</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -732,7 +784,7 @@
      <widget class="QComboBox" name="comboBox_2">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>36</y>
         <width>235</width>
         <height>26</height>
@@ -742,7 +794,7 @@
      <widget class="QToolButton" name="toolButton_20">
       <property name="geometry">
        <rect>
-        <x>216</x>
+        <x>226</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -767,7 +819,7 @@
      <widget class="QLCDNumber" name="lcdNumber_3">
       <property name="geometry">
        <rect>
-        <x>109</x>
+        <x>107</x>
         <y>105</y>
         <width>101</width>
         <height>41</height>
@@ -786,7 +838,7 @@
      <widget class="QToolButton" name="toolButton_21">
       <property name="geometry">
        <rect>
-        <x>272</x>
+        <x>270</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -805,7 +857,7 @@
      <widget class="QLineEdit" name="lineEdit_2">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>5</y>
         <width>235</width>
         <height>26</height>
@@ -818,9 +870,9 @@
      <widget class="QProgressBar" name="progressBar_3">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>66</y>
-        <width>347</width>
+        <width>353</width>
         <height>35</height>
        </rect>
       </property>
@@ -839,7 +891,7 @@
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>216</x>
+        <x>226</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -855,7 +907,7 @@
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>263</x>
+        <x>270</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -893,7 +945,7 @@
      <widget class="QToolButton" name="toolButton_27">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -918,7 +970,7 @@
      <widget class="QLCDNumber" name="lcdNumber_4">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>105</y>
         <width>71</width>
         <height>41</height>
@@ -943,7 +995,7 @@
      <widget class="QToolButton" name="toolButton_26">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>230</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -968,7 +1020,7 @@
      <widget class="QToolButton" name="toolButton_31">
       <property name="geometry">
        <rect>
-        <x>268</x>
+        <x>272</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -993,7 +1045,7 @@
      <widget class="QToolButton" name="toolButton_29">
       <property name="geometry">
        <rect>
-        <x>242</x>
+        <x>240</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1012,7 +1064,7 @@
      <widget class="QLineEdit" name="lineEdit_3">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>5</y>
         <width>235</width>
         <height>26</height>
@@ -1025,7 +1077,7 @@
      <widget class="QComboBox" name="comboBox_6">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>36</y>
         <width>235</width>
         <height>26</height>
@@ -1035,9 +1087,9 @@
      <widget class="QProgressBar" name="progressBar_7">
       <property name="geometry">
        <rect>
-        <x>4</x>
+        <x>2</x>
         <y>66</y>
-        <width>347</width>
+        <width>353</width>
         <height>35</height>
        </rect>
       </property>
@@ -1056,9 +1108,9 @@
      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
       <property name="geometry">
        <rect>
-        <x>242</x>
+        <x>240</x>
         <y>5</y>
-        <width>81</width>
+        <width>88</width>
         <height>27</height>
        </rect>
       </property>
@@ -1096,7 +1148,7 @@
      <widget class="QToolButton" name="toolButton_32">
       <property name="geometry">
        <rect>
-        <x>326</x>
+        <x>330</x>
         <y>5</y>
         <width>25</width>
         <height>25</height>
@@ -1115,7 +1167,7 @@
      <widget class="QToolButton" name="toolButton_30">
       <property name="geometry">
        <rect>
-        <x>272</x>
+        <x>270</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1134,7 +1186,7 @@
      <widget class="QLCDNumber" name="lcdNumber_5">
       <property name="geometry">
        <rect>
-        <x>78</x>
+        <x>76</x>
         <y>105</y>
         <width>71</width>
         <height>41</height>
@@ -1153,7 +1205,7 @@
      <widget class="QLCDNumber" name="lcdNumber_6">
       <property name="geometry">
        <rect>
-        <x>152</x>
+        <x>150</x>
         <y>105</y>
         <width>71</width>
         <height>41</height>
@@ -1184,7 +1236,7 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>230</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1200,7 +1252,7 @@
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>268</x>
+        <x>272</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1434,8 +1486,8 @@ p, li { white-space: pre-wrap; }
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>150</y>
+     <x>268</x>
+     <y>155</y>
     </hint>
     <hint type="destinationlabel">
      <x>238</x>
@@ -1450,12 +1502,44 @@ p, li { white-space: pre-wrap; }
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>282</x>
-     <y>164</y>
+     <x>268</x>
+     <y>170</y>
     </hint>
     <hint type="destinationlabel">
      <x>235</x>
      <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dial_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>277</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>dial_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>54</y>
     </hint>
    </hints>
   </connection>

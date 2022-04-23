@@ -125,21 +125,15 @@ def parseRanobe(link):
 
 
 def checkFixedOutput():
-    try:
-        link = get('https://animevost.org')
-        soup = BeautifulSoup(link.text, 'html.parser')
-        raspisanie = soup.find_all('ul', class_='raspis_fixed')
-        links = raspisanie[0].find_all("a")
-        txt = raspisanie[0].text.split('\n')
-        del(txt[0])
-        del(txt[-1])
-        link = []
-        for i in enumerate(txt):
-            link.append(links[i[0]]["href"])
-
-        return txt, link
-    except Exception as e:
-        system(f'notify-send "<<Error update tracker>>\n{e}"')
+    link = get('https://animevost.org')
+    soup = BeautifulSoup(link.text, 'html.parser')
+    raspisanie = soup.find_all('ul', class_='raspis_fixed')
+    links = raspisanie[0].find_all("a")
+    txt = raspisanie[0].text.split('\n')[1:-1:]
+    link = []
+    for i in enumerate(txt):
+        link.append(links[i[0]]["href"])
+    return txt, link
 
 
 def checkURL(data, url, series, ova):
