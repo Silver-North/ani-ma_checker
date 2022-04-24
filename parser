@@ -822,8 +822,8 @@ class myWindow(QtWidgets.QMainWindow):
 
         False if path.isdir(f'{self.path_down}') else system(f'mkdir "{self.path_down}"') 
 
-        if not path.isdir(f'{self.path_down}{names_dir}'):
-            system(f'mkdir "{self.path_down}{names_dir}"')
+        if not path.isdir(f'{self.path_down}/{names_dir}'):
+            system(f'mkdir "{self.path_down}/{names_dir}"')
 
         system(f'mv "{self.path_down}/_{f}" \
                     "{self.path_down}/{names_dir}/{names_dir}-{series}.mp4"')
