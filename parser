@@ -591,12 +591,9 @@ class myWindow(QtWidgets.QMainWindow):
             data['notify']['notify'] = 'empty' if self.emptyNotify(data) else \
                                        data['notify']['notify']
             self.setGlobalSettings(data, '', '', '', False, True)
-            if child == 'manga':
-                self.ui.doubleSpinBox.setValue(0)
-                self.updateNumber()
-            else:
-                self.ui.doubleSpinBox_2.setValue(0)
-                self.upComboRanobe()
+            self.ui.doubleSpinBox.setValue(0) if child == 'manga' else \
+            self.ui.doubleSpinBox_2.setValue(0)
+            self.changed(tab)
 
 
     def checkNotify(self, data, child, text, value = None, check = True):
