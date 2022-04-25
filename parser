@@ -121,14 +121,14 @@ class myWindow(QtWidgets.QMainWindow):
         )
         bar = (self.ui.progressBar, self.ui.progressBar_2,
                self.ui.progressBar_3, self.ui.progressBar_7)
-        labels_movie = (self.ui.label_2, self.ui.label_3, self.ui.label_4,
-            self.ui.label_8, self.ui.label_9, self.ui.label_10, self.ui.label_11)
+        labels_movie = (self.ui.label_2, self.ui.label_3, self.ui.label_8,
+                        self.ui.label_9, self.ui.label_10, self.ui.label_11)
         gen = (self.ui.toolButton_2, self.ui.toolButton_19, self.ui.toolButton_29,
                self.ui.toolButton_8, self.ui.toolButton_13, self.ui.toolButton_27,
                self.ui.toolButton_21, self.ui.toolButton_30, self.ui.toolButton,
-               self.ui.toolButton_15, self.ui.toolButton_32)
-        up = (self.ui.toolButton_9, self.ui.toolButton_12, self.ui.toolButton_20,
-              self.ui.toolButton_17, self.ui.toolButton_26, self.ui.toolButton_31)
+               self.ui.toolButton_15, self.ui.toolButton_32, self.ui.toolButton_12)
+        up = (self.ui.toolButton_20, self.ui.toolButton_17,
+              self.ui.toolButton_26, self.ui.toolButton_31)
         self.comboboxes = (self.ui.comboBox, self.ui.comboBox_2,
                            self.ui.comboBox_6, self.ui.comboBox_7)
         self.dict_funcs = {
@@ -138,8 +138,10 @@ class myWindow(QtWidgets.QMainWindow):
                 4: self.wrapperUpdateList,
                 8: lambda e: self.ui.progressBar.setValue(e),
                 9: lambda e: self.ui.progressBar_3.setValue(e),
-                10: lambda e: self.ui.progressBar_7.setValue(e)
+                10: lambda e: self.ui.progressBar_7.setValue(e),
+                13: self.wrapperUpdate
         }
+        new_box = (*self.comboboxes[:-1:],self.ui.comboBox_3,self.ui.comboBox_4)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.everySecond)
@@ -163,8 +165,8 @@ class myWindow(QtWidgets.QMainWindow):
             i.setStyleSheet('border: none;')
         for i in enumerate(('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')):
             bar[i[0]].setStyleSheet(f'selection-background-color: {i[1]}')
-
-        for i in enumerate((*self.comboboxes[:-1:],self.ui.comboBox_3,self.ui.comboBox_4)):
+        
+        for i in enumerate(new_box):
             self.changed(i[0])
             i[1].activated[str].connect(partial(self.changed, i[0]))
         
@@ -184,11 +186,11 @@ class myWindow(QtWidgets.QMainWindow):
             i[1].clicked.connect(self.deleted) if i[0] in (0,1,2) else \
             i[1].clicked.connect(self.loged) if  i[0] in (3,4,5) else \
             i[1].clicked.connect(self.edited) if  i[0] in (6,7) else \
-            i[1].clicked.connect(self.saved)
+            i[1].clicked.connect(self.saved) if i[0] in (8,9,10) else \
+            i[1].clicked.connect(self.checkItems)
         for i, j in enumerate(up):
             flag = True if i % 2 == 1 else False
-            j.clicked.connect(partial(self.checkItems, flag)) if i in (0,1) else \
-            j.clicked.connect(partial(self.checkMangaUrl, flag)) if i in (2,3) else \
+            j.clicked.connect(partial(self.checkMangaUrl, flag)) if i in (0,1) else \
             j.clicked.connect(partial(self.checkRanobeUrl, flag))
         
 
@@ -287,17 +289,14 @@ class myWindow(QtWidgets.QMainWindow):
         global checker_tag, update_list_anime, enable, tab_start, down, while_var 
         data = self.uploadGlobalSettings()['notify']['notify']
         index = self.ui.tabWidget.currentIndex()
-        checkbox = False
-        
+        updates = False if self.ui.checkBox_3.isChecked() else True
+        checkbox = True if self.ui.checkBox_2.isChecked() else False   
         self.flag = False if while_var else True
-        
-        if self.ui.checkBox_2.isChecked():
-            checkbox = True
         
         return (data, enable, checkbox, checker_tag,
                 update_list_anime, index, tab_start, self.percent_all_anime,
                 self.percent, self.percent_all_manga, self.ranobe_percent,
-                while_var, down)
+                while_var, down, updates)
 
 
     def everySecond(self):
@@ -306,12 +305,12 @@ class myWindow(QtWidgets.QMainWindow):
 
     def timeNumber(self, data, enable, checkbox, checker_tag,
                    update_list, index, tabs, anime_percent, percent,
-                    percent_manga, ranobe_percent, var, down):
+                    percent_manga, ranobe_percent, var, down, up):
         global checklist
         
         inputs = (data, enable, checkbox, checker_tag,
                   update_list, index, tabs, anime_percent,
-                  percent, percent_manga, ranobe_percent, var, down)
+                  percent, percent_manga, ranobe_percent, var, down, up)
         if checklist != inputs:
             for i in range(len(inputs)):
                 if len(checklist) == 0 or checklist[i] != inputs[i]:
@@ -369,6 +368,13 @@ class myWindow(QtWidgets.QMainWindow):
         update_list_anime = False if update_list else True
 
 
+    def wrapperUpdate(self, checkbox):
+        ico = 'checking' if checkbox else 'circle'
+        tool = 'Tracking Elements' if checkbox else 'Update Elements'
+        self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
+        self.ui.toolButton_12.setToolTip(tool)
+
+
     def editLineEdit(self, edit):
         sleep(2.5)
         edit.setText('')
@@ -388,12 +394,9 @@ class myWindow(QtWidgets.QMainWindow):
             alert.setText("No notifications..")
         else:
             str_ = []
-            if len(data['notify']['anime']) > 0:
-                str_.append(''.join(data['notify']['anime']))
-            if len(data['notify']['manga']) > 0:
-                str_.append(''.join(data['notify']['manga']))
-            if len(data['notify']['ranobe']) > 0:
-                str_.append(''.join(data['notify']['ranobe']))
+            for i in data['notify'][1::]:
+                if len(data['notify'][i]) > 0:
+                    str_.append(''.join(data['notify'][i]))
             str = "\n".join(str_)
             alert.setGeometry(420, 95, 300, 100)
             alert.setText(str)
@@ -437,7 +440,8 @@ class myWindow(QtWidgets.QMainWindow):
             QIcon(f'{self.current_path}/icons/{ico}.png'), 
             QIcon(f'{self.current_path}/icons/{ico}-about.png')
         )
-        list_check = (self.ui.checkBox, self.ui.checkBox_2)
+        list_check = (self.ui.checkBox, self.ui.checkBox_2,
+                      self.ui.checkBox_3, self.ui.checkBox_4)
         for i in enumerate(list_back):
             i[1].setIcon(ls[0]) if i[0] == 19 else \
             i[1].setIcon(ls[1]) if i[0] == 20 else \
@@ -460,10 +464,10 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.comboBox_4.setItemIcon(i[0], QIcon(str))
         list_tool = (
             self.ui.toolButton_2, self.ui.toolButton_19, self.ui.toolButton_29,
-            self.ui.toolButton_9, self.ui.toolButton_26, self.ui.toolButton_20,
+            self.ui.toolButton_26, self.ui.toolButton_20,
             self.ui.toolButton_8, self.ui.toolButton_27, self.ui.toolButton_13,
             self.ui.toolButton, self.ui.toolButton_15, self.ui.toolButton_32,
-            self.ui.toolButton_17, self.ui.toolButton_12, self.ui.toolButton_31,
+            self.ui.toolButton_17, self.ui.toolButton_31,
             self.ui.toolButton_21, self.ui.toolButton_30, self.ui.toolButton_7,
             self.ui.toolButton_4, self.ui.toolButton_18, self.ui.toolButton_3,
             self.ui.toolButton_6, self.ui.toolButton_14
@@ -473,18 +477,18 @@ class myWindow(QtWidgets.QMainWindow):
         list_icon = [QIcon(f'{self.current_path}/icons/{i}.png') for i in lists]
         for i in enumerate(list_tool):
             i[1].setIcon(list_icon[0]) if i[0] in (0,1,2) else \
-            i[1].setIcon(list_icon[1]) if i[0] in (3,4,5) else \
-            i[1].setIcon(list_icon[2]) if i[0] in (6,7,8) else \
-            i[1].setIcon(list_icon[3]) if i[0] in (9,10,11) else \
-            i[1].setIcon(list_icon[4]) if i[0] in (12,13,14) else \
-            i[1].setIcon(list_icon[5]) if i[0] in (15,16) else \
-            i[1].setIcon(list_icon[6]) if i[0] == 17 else \
-            i[1].setIcon(list_icon[7]) if i[0] == 18 else \
-            i[1].setIcon(list_icon[8]) if i[0] == 19 else \
-            i[1].setIcon(list_icon[9]) if i[0] == 20 else \
-            i[1].setIcon(list_icon[10]) if i[0] == 21 else \
+            i[1].setIcon(list_icon[1]) if i[0] in (3,4) else \
+            i[1].setIcon(list_icon[2]) if i[0] in (5,6,7) else \
+            i[1].setIcon(list_icon[3]) if i[0] in (8,9,10) else \
+            i[1].setIcon(list_icon[4]) if i[0] in (11,12) else \
+            i[1].setIcon(list_icon[5]) if i[0] in (13,14) else \
+            i[1].setIcon(list_icon[6]) if i[0] == 15 else \
+            i[1].setIcon(list_icon[7]) if i[0] == 16 else \
+            i[1].setIcon(list_icon[8]) if i[0] == 17 else \
+            i[1].setIcon(list_icon[9]) if i[0] == 18 else \
+            i[1].setIcon(list_icon[10]) if i[0] == 19 else \
             i[1].setIcon(list_icon[11])
-            i[1].setToolTip('Exit') if i[0] == 20 else False
+            i[1].setToolTip('Exit') if i[0] == 18 else False
 
 
     def triggerFocus(self, reason):
@@ -596,29 +600,27 @@ class myWindow(QtWidgets.QMainWindow):
             self.changed(tab)
 
 
-    def checkNotify(self, data, child, text, value = None, check = True):
+    def checkNotify(self, data, ch, text, value = None, check = True):
         char = 'chapter' if check else 'series'
         tmp = f'{text} - new ' if value is None else \
               f'{text} - new {char} {value}'
-        temp = f'{text} - new ova' if child in 'anime' else 'NOT CHECK'
+        temp = f'{text} - new ova' if ch in 'anime' else 'NOT CHECK'
         while True:
-            for i in range(len(data['notify'][child])):
-                if tmp in data['notify'][child][i] or temp in data['notify'][child][i]:
-                    del(data['notify'][child][i])
+            for i in range(len(data['notify'][ch])):
+                if tmp in data['notify'][ch][i] or temp in data['notify'][ch][i]:
+                    del(data['notify'][ch][i])
                     break
             else:
                 break
 
 
-    def emptyNotify(self, data):
-        if (len(data['notify']['anime']) == 0 and
-            len(data['notify']['manga']) == 0 and
-            len(data['notify']['ranobe']) == 0):
+    def emptyNotify(self, data, flag = False):
+        note = [len(data['notify'][i]) for i in data['notify'] if i != 'notify']
+        if sum(note) == 0:
             self.ui.toolButton_10.setIcon(QIcon(
-                    f'{self.current_path}/icons/empty.png'))
-            return True
-        else:
-            return False
+                f'{self.current_path}/icons/bell.png'))
+            flag = True
+        return flag
 
 
     def saved(self):
@@ -639,7 +641,7 @@ class myWindow(QtWidgets.QMainWindow):
             edit = (self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3)
             track = self.ui.comboBox_7.currentIndex()
             url = data['anime']['track-link'][track] if tab == 0 \
-                  and self.comboboxes[-1].isChecked() else edit.text()
+                  and self.ui.checkBox.isChecked() else edit.text()
             title = self.ui.comboBox_7.currentText().split(' / ')[0] if tab == 0 \
                     and self.ui.checkBox.isChecked() else ''
             ico = f'icons/{mask}.png'
@@ -769,13 +771,12 @@ class myWindow(QtWidgets.QMainWindow):
                     else:
                         break
 
-                self.percent_all_anime = 55
-                sleep(3)
-                let = down[-2].get_attribute("href").split('?')[0].split('/')
+                down = down[3] if self.ui.checkBox_4.isChecked() else down[2]
+                let = down.get_attribute("href").split('?')[0].split('/')
                 self.percent_all_anime = 65
                 sleep(3)
 
-                self.Download(down[2].get_attribute('href'), let[-1], urls,
+                self.Download(down.get_attribute('href'), let[-1], urls,
                               name_dir[0], url, name, series, data, click_i)
                 
                 self.percent_all_anime = 97
@@ -817,7 +818,8 @@ class myWindow(QtWidgets.QMainWindow):
         series = f"ova-{ova}" if 'ОВА' in search else f'{series} серия'
         system(f'notify-send "Вышла {series}! {name}\n{curent_time}"')
 
-        False if path.isdir(f'{self.path_down}') else system(f'mkdir "{self.path_down}"') 
+        False if path.isdir(f'{self.path_down}') else \
+            system(f'mkdir "{self.path_down}"') 
 
         if not path.isdir(f'{self.path_down}/{names_dir}'):
             system(f'mkdir "{self.path_down}/{names_dir}"')
@@ -842,12 +844,11 @@ class myWindow(QtWidgets.QMainWindow):
         global dead, down
         dead = True
         save_loc = f'{self.current_path}/downloads/_{f}'
+        txt = f'Download:\n{dirs} -> {data["anime"]["series"][urls.index(link)]+1}'
         try:
-            self.ui.progressBar.setToolTip(
-                f'Download:\n{dirs} -> {data["anime"]["series"][urls.index(link)]+1}')
+            self.ui.progressBar.setToolTip(txt)
             self.ui.progressBar.setFormat('Complete %p%')
             url_request.urlretrieve(downs, save_loc, self.handleProgress)
-            down = False
             self.ui.progressBar.setFormat('Completed')
             self.checkNotify(data, 'anime', dirs, series, False)
             data['notify']['notify'] = 'empty' if self.emptyNotify(data) else \
@@ -857,10 +858,9 @@ class myWindow(QtWidgets.QMainWindow):
             system(f'rm {self.current_path}/downloads/_{f}')
             system(f'notify-send "Error download anime: {dirs}\n{e}"')
             dead = True
-            down = False
             print('Error: ==>\n', e)
-            self.ui.progressBar.setToolTip(
-                f'Error download\n{dirs} -> {data["anime"]["series"][urls.index(link)]+1}')
+            self.ui.progressBar.setToolTip(f'Error {txt}')
+        down = False
 
 
     def progressCount(self, percent):
@@ -879,13 +879,15 @@ class myWindow(QtWidgets.QMainWindow):
         self.showed(self.ui.comboBox_7, 3)
 
 
-    def checkItems(self, flag):
+    def checkItems(self, flags = False):
         global enable
         self.timer_check.start(900_000)
         if enable:
             enable = self.flag = False
             data = self.uploadGlobalSettings()
-            self.ui.toolButton_12.hide() if flag else self.ui.toolButton_9.hide()
+            self.ui.toolButton_12.hide()
+            flag = True if flags else False if self.ui.checkBox_3.isChecked() \
+                                 else True
             Thread(target = self.clicker, args = (data, not flag)).start()
 
 
