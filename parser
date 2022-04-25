@@ -464,16 +464,17 @@ class myWindow(QtWidgets.QMainWindow):
                 self.ui.comboBox_4.setItemIcon(i[0], QIcon(str))
         list_tool = (
             self.ui.toolButton_2, self.ui.toolButton_19, self.ui.toolButton_29,
-            self.ui.toolButton_26, self.ui.toolButton_20,
-            self.ui.toolButton_8, self.ui.toolButton_27, self.ui.toolButton_13,
-            self.ui.toolButton, self.ui.toolButton_15, self.ui.toolButton_32,
-            self.ui.toolButton_17, self.ui.toolButton_31,
-            self.ui.toolButton_21, self.ui.toolButton_30, self.ui.toolButton_7,
-            self.ui.toolButton_4, self.ui.toolButton_18, self.ui.toolButton_3,
-            self.ui.toolButton_6, self.ui.toolButton_14
+            self.ui.toolButton_26, self.ui.toolButton_20, self.ui.toolButton_8,
+            self.ui.toolButton_27, self.ui.toolButton_13,self.ui.toolButton,
+            self.ui.toolButton_15, self.ui.toolButton_32, self.ui.toolButton_17,
+            self.ui.toolButton_31, self.ui.toolButton_21, self.ui.toolButton_30,
+            self.ui.toolButton_7, self.ui.toolButton_4, self.ui.toolButton_18,
+            self.ui.toolButton_3, self.ui.toolButton_6, self.ui.toolButton_14,
+            self.ui.toolButton_16
         )
         lists = ('trash', 'circle', 'log-one', 'diskette', 'checking', 'edit',
-                 'checkbox-1', 'checkbox-2', 'web', 'close', 'lose', 'player')
+                 'checkbox-1', 'checkbox-2', 'web', 'close', 'lose', 'player',
+                 'checkbox-3')
         list_icon = [QIcon(f'{self.current_path}/icons/{i}.png') for i in lists]
         for i in enumerate(list_tool):
             i[1].setIcon(list_icon[0]) if i[0] in (0,1,2) else \
@@ -487,7 +488,8 @@ class myWindow(QtWidgets.QMainWindow):
             i[1].setIcon(list_icon[8]) if i[0] == 17 else \
             i[1].setIcon(list_icon[9]) if i[0] == 18 else \
             i[1].setIcon(list_icon[10]) if i[0] == 19 else \
-            i[1].setIcon(list_icon[11])
+            i[1].setIcon(list_icon[11]) if i[0] == 20 else \
+            i[1].setIcon(list_icon[12])
             i[1].setToolTip('Exit') if i[0] == 18 else False
 
 
