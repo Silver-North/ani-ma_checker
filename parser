@@ -24,6 +24,7 @@ from datetime import date
 from random import randint
 from alive_progress import alive_bar
 from functools import partial
+from xlwt import Workbook
 from notifications import (checkURL, getDescription, loadImage, 
                            checkFixedOutput, parseRanobe)
 
@@ -142,6 +143,10 @@ class myWindow(QtWidgets.QMainWindow):
                 13: self.wrapperUpdate
         }
         new_box = (*self.comboboxes[:-1:],self.ui.comboBox_3,self.ui.comboBox_4)
+        tuple_none = (self.ui.toolButton_24,self.ui.toolButton_10,
+                      self.ui.toolButton_11,self.ui.toolButton_25)
+
+        self.ui.dockWidget.hide()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.everySecond)
@@ -161,8 +166,8 @@ class myWindow(QtWidgets.QMainWindow):
         self.checkModeSheme()
 
         [self.showed(i[1], i[0]) for i in enumerate(self.comboboxes)]
-        for i in (self.ui.toolButton_24,self.ui.toolButton_10,self.ui.toolButton_11):
-            i.setStyleSheet('border: none;')
+        [i.setStyleSheet('border: none;') for i in tuple_none]
+        
         for i in enumerate(('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')):
             bar[i[0]].setStyleSheet(f'selection-background-color: {i[1]}')
         
@@ -174,6 +179,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer_check.timeout.connect(partial(self.checkItems, True))
         self.checkItems(True)
 
+        self.ui.pushButton.clicked.connect(self.startExport)
         self.ui.toolButton_3.clicked.connect(self.closed)
         self.ui.toolButton_5.clicked.connect(self.oneDown)
         self.ui.toolButton_6.clicked.connect(self.stoped)
@@ -182,6 +188,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.ui.toolButton_14.clicked.connect(self.openPlayer)
         self.ui.toolButton_18.clicked.connect(self.openURL)
         self.ui.toolButton_24.clicked.connect(self.aboutInfo)
+        self.ui.toolButton_25.clicked.connect(self.exportHistory)
         for i in enumerate(gen):
             i[1].clicked.connect(self.deleted) if i[0] in (0,1,2) else \
             i[1].clicked.connect(self.loged) if  i[0] in (3,4,5) else \
@@ -235,6 +242,32 @@ class myWindow(QtWidgets.QMainWindow):
                             ensure_ascii=False, separators=(',', ': ')))
         else:
             system(f'notify-send "Error, no update file <setting.json>"')
+
+
+    def exportHistory(self):
+        self.ui.dockWidget.setGeometry(555,75, 164,80)
+        self.ui.dockWidget.show()
+
+
+    def startExport(self):
+        mode = self.ui.comboBox_5.currentText()
+        format = self.ui.comboBox_8.currentText()
+        data = self.uploadGlobalSettings()['history']
+        saved = f'{self.current_path}/history.{format}'
+        if len(data[mode]) > 0:
+            if format in ('md', 'txt'):
+                with open(saved, 'w') as f:
+                    [f.write(f'{i}\n') for i in data[mode]]
+            elif format == 'json':
+                with open(saved, 'w') as f:
+                    f.write(dumps(data[mode], sort_keys=False, indent=4,
+                                   ensure_ascii=False, separators=(',', ': ')))
+            elif format == 'xlsx':
+                writing_book = Workbook()
+                writing = writing_book.add_sheet(f'export history {mode}')
+                [writing.write(i[0],0,i[1]) for i in enumerate(data[mode])]
+                writing_book.save(saved)
+        self.ui.dockWidget.close()
 
 
     def stoped(self):
@@ -430,11 +463,13 @@ class myWindow(QtWidgets.QMainWindow):
         list_back = (
             self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3,
             self.ui.textEdit, self.ui.comboBox, self.ui.comboBox_2,
-            self.ui.comboBox_3, self.ui.comboBox_4, self.ui.comboBox_6,
-            self.ui.comboBox_7, self.ui.spinBox, self.ui.doubleSpinBox,
-            self.ui.doubleSpinBox_2, self.ui.lcdNumber, self.ui.lcdNumber_2,
-            self.ui.lcdNumber_3, self.ui.lcdNumber_4, self.ui.lcdNumber_5,
-            self.ui.lcdNumber_6, self.ui.toolButton_11, self.ui.toolButton_24
+            self.ui.comboBox_3, self.ui.comboBox_4, self.ui.comboBox_5,
+            self.ui.comboBox_6, self.ui.comboBox_7, self.ui.comboBox_8,
+            self.ui.spinBox, self.ui.doubleSpinBox, self.ui.doubleSpinBox_2,
+            self.ui.lcdNumber, self.ui.lcdNumber_2, self.ui.lcdNumber_3,
+            self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
+            self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
+            self.ui.pushButton_2
         )
         ls = (
             QIcon(f'{self.current_path}/icons/{ico}.png'), 
@@ -443,13 +478,13 @@ class myWindow(QtWidgets.QMainWindow):
         list_check = (self.ui.checkBox, self.ui.checkBox_2,
                       self.ui.checkBox_3, self.ui.checkBox_4)
         for i in enumerate(list_back):
-            i[1].setIcon(ls[0]) if i[0] == 19 else \
-            i[1].setIcon(ls[1]) if i[0] == 20 else \
+            i[1].setIcon(ls[0]) if i[0] == 21 else \
+            i[1].setIcon(ls[1]) if i[0] == 22 else \
             i[1].setStyleSheet(back)
 
         tool = ('Lightmode', '#0b76ef') if ico in 'lamp' else \
                ('Darkmode', '#8B33B5')
-        list_back[-2].setToolTip(tool[0])
+        list_back[21].setToolTip(tool[0])
         for i in list_check:
             i.setStyleSheet(f'border-color: {tool[1]}; background-color: {tool[1]};')
 
@@ -470,11 +505,11 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.toolButton_31, self.ui.toolButton_21, self.ui.toolButton_30,
             self.ui.toolButton_7, self.ui.toolButton_4, self.ui.toolButton_18,
             self.ui.toolButton_3, self.ui.toolButton_6, self.ui.toolButton_14,
-            self.ui.toolButton_16
+            self.ui.toolButton_16, self.ui.toolButton_25
         )
         lists = ('trash', 'circle', 'log-one', 'diskette', 'checking', 'edit',
                  'checkbox-1', 'checkbox-2', 'web', 'close', 'lose', 'player',
-                 'checkbox-3')
+                 'checkbox-3', 'history')
         list_icon = [QIcon(f'{self.current_path}/icons/{i}.png') for i in lists]
         for i in enumerate(list_tool):
             i[1].setIcon(list_icon[0]) if i[0] in (0,1,2) else \
@@ -489,7 +524,8 @@ class myWindow(QtWidgets.QMainWindow):
             i[1].setIcon(list_icon[9]) if i[0] == 18 else \
             i[1].setIcon(list_icon[10]) if i[0] == 19 else \
             i[1].setIcon(list_icon[11]) if i[0] == 20 else \
-            i[1].setIcon(list_icon[12])
+            i[1].setIcon(list_icon[12]) if  i[0] == 21 else \
+            i[1].setIcon(list_icon[13])
             i[1].setToolTip('Exit') if i[0] == 18 else False
 
 
@@ -552,8 +588,12 @@ class myWindow(QtWidgets.QMainWindow):
             rezult = message('Are you sure you want to delete this entry?')
             if rezult == QMessageBox.Ok:
                 save_to_history = message('Save to history?')
+                dirs = "_".join(data[mode][throw][index].split())
                 if save_to_history == QMessageBox.Ok:
                     data['history'][mode].append(data[mode][throw][index])
+                    move = f'mv "{self.path_down}/{dirs}" "{self.path_down}/history/"'
+                rem = f'rm -r "{self.path_down}/{dirs}"'
+                system(move) if save_to_history == QMessageBox.Ok else system(rem) 
                 remove = f'rm {self.current_path}/{data[mode]["images"][index]}'
                 system(remove) if  data[mode]["images"][index] != icon else True
                 self.checkNotify(data, mode, data[mode][throw][index])
