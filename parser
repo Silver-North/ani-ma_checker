@@ -534,11 +534,13 @@ class myWindow(QtWidgets.QMainWindow):
             data = self.uploadGlobalSettings()
             tab = self.ui.tabWidget.currentIndex()
     
-            alert = QMessageBox()
-            alert.setIcon(QMessageBox.Information)
-            alert.setText('Are you sure you want to delete this entry?')
-            alert.setGeometry(514, 107, 200, 200)
-            alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            def message(text):
+                alert = QMessageBox()
+                alert.setIcon(QMessageBox.Information)
+                alert.setText(text)
+                alert.setGeometry(514, 107, 200, 200)
+                alert.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                return alert.exec()
 
             catch = 'log' if tab in (0,2) else 'logs'
             throw = 'names' if tab in (1,2) else 'name'
@@ -547,8 +549,11 @@ class myWindow(QtWidgets.QMainWindow):
             index = self.comboboxes[tab].currentIndex()
             icon = f'icons/{ico}.png'
 
-            rezult = alert.exec()
+            rezult = message('Are you sure you want to delete this entry?')
             if rezult == QMessageBox.Ok:
+                save_to_history = message('Save to history?')
+                if save_to_history == QMessageBox.Ok:
+                    data['history'][mode].append(data[mode][throw][index])
                 remove = f'rm {self.current_path}/{data[mode]["images"][index]}'
                 system(remove) if  data[mode]["images"][index] != icon else True
                 self.checkNotify(data, mode, data[mode][throw][index])
@@ -557,7 +562,7 @@ class myWindow(QtWidgets.QMainWindow):
                         continue
                     del(data[mode][i][index])
                 self.setGlobalSettings(data, '', '', '', False, True)
-    
+
                 if self.ui.comboBox_4.currentIndex() == tab:
                     self.ui.comboBox_3.clear()
                     self.ui.comboBox_4.setCurrentIndex(tab)
@@ -597,7 +602,7 @@ class myWindow(QtWidgets.QMainWindow):
             data['notify']['notify'] = 'empty' if self.emptyNotify(data) else \
                                        data['notify']['notify']
             self.setGlobalSettings(data, '', '', '', False, True)
-            self.ui.doubleSpinBox.setValue(0) if child == 'manga' else \
+            self.ui.doubleSpinBox.setValue(0) if child[0] == 'manga' else \
             self.ui.doubleSpinBox_2.setValue(0)
             self.changed(tab)
 
@@ -697,6 +702,7 @@ class myWindow(QtWidgets.QMainWindow):
         num = float(f"{data['anime']['series'][index]}.{data['anime']['ova'][index]}"
                     if tab == 0 else 0)
         current = data[mode][child][index] if tab in (1,2) else num
+        but = self.ui.toolButton_21 if tab == 1 else self.ui.toolButton_30
         if lcd_check is None:
             self.ui.label_5.setPixmap(QPixmap(
                 f'{self.current_path}/{data[mode]["images"][index]}'))
@@ -717,6 +723,9 @@ class myWindow(QtWidgets.QMainWindow):
                    data[mode][twin][index] else ('rgb(192, 16, 16)', True)
             [i.setStyleSheet(f'background: {back[0]}') for i in lcd_check \
                 if i != lcd_check[0]]
+            tup = (1,2) if tab == 1 else (3,4) if tab == 2 else False
+            False if tup == False else but.setEnabled(True) if \
+                lcd[tup[0]].value() < lcd[tup[1]].value() else but.setEnabled(False)
 
 
 ####<<< Anime-module >>>####
