@@ -427,9 +427,9 @@ class myWindow(QtWidgets.QMainWindow):
             alert.setText("No notifications..")
         else:
             str_ = []
-            for i in data['notify'][1::]:
-                if len(data['notify'][i]) > 0:
-                    str_.append(''.join(data['notify'][i]))
+            for i in data['notify']:
+                False if i == 'notify' else str_.append(''.join(data['notify'][i])) \
+                    if len(data['notify'][i]) > 0 else False
             str = "\n".join(str_)
             alert.setGeometry(420, 95, 300, 100)
             alert.setText(str)
