@@ -122,6 +122,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.option = webdriver.ChromeOptions()
         self.option.add_argument('--headless')
         self.option.add_experimental_option("prefs", self.prefs)
+        self.icon = f'{self.current_path}/icons'
         self.sheme = (('dark', 'background: #313131', 'background: #888888'),
                       ('lamp', 'background: #FFFFFF', 'background: #FFFFFF'))
         bar = (self.ui.progressBar, self.ui.progressBar_2,
@@ -155,7 +156,7 @@ class myWindow(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.everySecond)
         self.timer.start(1000)
 
-        self.movie = QMovie(f"{self.current_path}/icons/free.gif")
+        self.movie = QMovie(f"{self.icon}/free.gif")
         [i[1].setMovie(self.movie) for i in enumerate(labels_movie)]
         
         self.tray = QSystemTrayIcon(self)
@@ -363,13 +364,13 @@ class myWindow(QtWidgets.QMainWindow):
                                        if tab == 1 else 'ranobe-0.png'
         tool = 'Download file..' if down else pre
         self.tray.setToolTip(tool)
-        self.tray.setIcon(QIcon(f'{self.current_path}/icons/{ico}'))
+        self.tray.setIcon(QIcon(f'{self.icon}/{ico}'))
             
 
     def wrapperData(self, data):
-        ico = 'notify' if data in 'unchecked' else 'notification' \
-                       if data in 'checked' else 'bell'
-        self.ui.toolButton_10.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
+        ico = 'notification' if data in 'checked' else 'notify' \
+                       if data in 'unchecked' else 'bell'
+        self.ui.toolButton_10.setIcon(QIcon(f'{self.icon}/{ico}.png'))
 
 
     def wrapperEnable(self, enable):
@@ -382,7 +383,7 @@ class myWindow(QtWidgets.QMainWindow):
     def wrapperCheckbox(self, checkbox):
         ico = 'all-click' if checkbox else 'click'
         tool = 'Download All Elements' if checkbox else 'Download Current Element'
-        self.ui.toolButton_5.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
+        self.ui.toolButton_5.setIcon(QIcon(f'{self.icon}/{ico}.png'))
         self.ui.toolButton_5.setToolTip(tool)
     
 
@@ -394,7 +395,7 @@ class myWindow(QtWidgets.QMainWindow):
     def wrapperUpdate(self, checkbox):
         ico = 'checking' if checkbox else 'circle'
         tool = 'Tracking Elements' if checkbox else 'Update Elements'
-        self.ui.toolButton_12.setIcon(QIcon(f'{self.current_path}/icons/{ico}.png'))
+        self.ui.toolButton_12.setIcon(QIcon(f'{self.icon}/{ico}.png'))
         self.ui.toolButton_12.setToolTip(tool)
 #<<<<!>>>>
 
@@ -417,16 +418,11 @@ class myWindow(QtWidgets.QMainWindow):
             alert.setGeometry(600, 95, 300, 100)
             alert.setText("No notifications..")
         else:
-            str_ = []
-            for i in data['notify']:
-                False if i == 'notify' else str_.append(''.join(data['notify'][i])) \
-                    if len(data['notify'][i]) > 0 else False
-            str = "\n".join(str_)
             alert.setGeometry(420, 95, 300, 100)
-            alert.setText(str)
+            alert.setText("\n".join([''.join(data['notify'][i]) 
+                for i in data['notify'] if i not in 'notify']))
             data['notify']['notify'] = 'checked'
         self.setGlobalSettings(data, '', '', '', False, True)
-        self.checkModeSheme()
         alert.exec_()
 
 
@@ -445,8 +441,7 @@ class myWindow(QtWidgets.QMainWindow):
         data = reads['notify']['notify']
         ico = 'notify' if data in 'unchecked' else 'notification' \
                        if data in 'checked' else 'bell'
-        self.ui.toolButton_10.setIcon(
-                QIcon(f'{self.current_path}/icons/{ico}.png'))
+        self.ui.toolButton_10.setIcon(QIcon(f'{self.icon}/{ico}.png'))
 
 
     def changeSheme(self, ico, win, back):
@@ -459,10 +454,7 @@ class myWindow(QtWidgets.QMainWindow):
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
             self.ui.pushButton_2)
-        ls = (
-            QIcon(f'{self.current_path}/icons/{ico}.png'), 
-            QIcon(f'{self.current_path}/icons/{ico}-about.png')
-        )
+        ls = (QIcon(f'{self.icon}/{ico}.png'), QIcon(f'{self.icon}/{ico}-about.png'))
         list_check = (self.ui.checkBox, self.ui.checkBox_2,
                       self.ui.checkBox_3, self.ui.checkBox_4)
         for i in enumerate(list_back):
@@ -480,10 +472,9 @@ class myWindow(QtWidgets.QMainWindow):
     def defaultIcon(self):
         list_tab = ('animevost.png', 'mask.png', 'ranobe.png', 'a-desc.png')
         for i in enumerate(list_tab):
-            str = f'{self.current_path}/icons/{i[1]}'
-            self.ui.tabWidget.setTabIcon(i[0], QIcon(str))
+            self.ui.tabWidget.setTabIcon(i[0], QIcon(f'{self.icon}/{i[1]}'))
             if i[0] < 3:
-                self.ui.comboBox_4.setItemIcon(i[0], QIcon(str))
+                self.ui.comboBox_4.setItemIcon(i[0], QIcon(f'{self.icon}/{i[1]}'))
         list_tool = (
             self.ui.toolButton_2, self.ui.toolButton_19, self.ui.toolButton_29,
             self.ui.toolButton_26, self.ui.toolButton_20, self.ui.toolButton_8,
@@ -655,7 +646,7 @@ class myWindow(QtWidgets.QMainWindow):
         name = 'names' if tab in (1,2) else 'name'
         mode = 'anime' if tab == 0 else 'manga' if tab == 1 else 'ranobe'
         mask = 'animevost' if tab == 0 else 'mask' if tab == 1 else 'ranobe'
-        icon = QIcon(f'{self.current_path}/icons/{mask}.png')
+        icon = QIcon(f'{self.icon}/{mask}.png')
         catch = ('log', 'track-name', 'track-link') if tab == 0 else \
                  'logs' if tab == 1 else 'log'
         series = self.ui.spinBox.value() if tab == 0 else \
@@ -693,7 +684,7 @@ class myWindow(QtWidgets.QMainWindow):
         data = self.uploadGlobalSettings()[child][name]
         for i in enumerate(data):
             combo.addItem(i[1])
-            combo.setItemIcon(i[0], QIcon(f'{self.current_path}/icons/{ico}.png'))
+            combo.setItemIcon(i[0], QIcon(f'{self.icon}/{ico}.png'))
 
 
     def changed(self, tab):
@@ -725,8 +716,7 @@ class myWindow(QtWidgets.QMainWindow):
             ico = 'animevost' if index == 0 else 'mask' if index == 1 else 'ranobe'
             for i in enumerate(data[mode][name]):
                 self.ui.comboBox_3.addItem(i[1])
-                self.ui.comboBox_3.setItemIcon(i[0],
-                    QIcon(f'{self.current_path}/icons/{ico}.png'))
+                self.ui.comboBox_3.setItemIcon(i[0], QIcon(f'{self.icon}/{ico}.png'))
             self.changed(3)
         else:
             for i,v in enumerate(lcd_check):
