@@ -124,107 +124,73 @@ def parseRanobe(link):
         system(f'notify-send "ERRor for parse Ranobe {link}\n{e}"')
 
 
-def checkFixedOutput():
+def checkFixedOutput(dicts):
+    count = 0
     link = get('https://animevost.org')
     soup = BeautifulSoup(link.text, 'html.parser')
     raspisanie = soup.find_all('ul', class_='raspis_fixed')
     links = raspisanie[0].find_all("a")
-    txt = raspisanie[0].text.split('\n')[1:-1:]
-    link = []
-    for i in enumerate(txt):
-        link.append(links[i[0]]["href"])
+    txt = [i.split(' / ') for i in raspisanie[0].text.split('\n')[1:-1:]]
+    link = [links[i[0]]["href"] for i in enumerate(txt)]
+    for i,v in enumerate(link):
+        for j in dicts['anime']['urls']:
+            if v == j:
+                mass = txt[i][1].split('[')
+                check = numCheck(dicts, mass,
+                            dicts['anime']['ova'][dicts['anime']['urls'].index(v)]+1,
+                            dicts['anime']['series'][dicts['anime']['urls'].index(v)]+1,
+                                 txt[i][0])
+                count += 1 if check else 0
+    system('notify-send "Вышло кое-что новенькое!!!"') if count > 0 else False
+    txt = [' / '.join(i) for i in txt]
     return txt, link
 
 
-def checkURL(data, url, series, ova):
-    check = False
-    name = ''
+def numCheck(data, mass, ova, series, name, check=False):
+    inti = mass[-1].split()
+    ind = -1 if len(mass) == 2 else -2 if len(mass) == 3 else -2
+    if len(mass) == 2:
+        arr = int(mass[-1].split()[0]) if '-' not in mass[-1] else -1 if \
+              'Анонс' in mass[-1] else int(mass[-1].split()[0].split('-')[1])
+    else:
+        arr = int(mass[ind].split()[0].split('-')[1]) if '-' in mass[ind] else \
+              -1 if 'Анонс' in mass[ind] else mass[ind][:1:]
+    int_i = int(inti[1]) if ova == 1 and 'OVA' in mass[-1] else \
+            int(inti[1].split('-')[1]) if 'OVA' in mass[-1] else 0
+
+    num = arr if isinstance(arr, int) else int(arr[-1].split()[0])
+    c_d = date.today()
+    c_t = strftime("%H:%M", localtime())
+    note = f'[A][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}] > {name}'
+    txt = f'{note} - new series {num} & new ova-{int_i}\n' if num >= series and \
+          ova <= int_i else f'{note} - new series {num}\n' if num >= series and \
+          ova != int_i else f'{note} - new ova-{int_i}\n' if ova <= int_i and \
+          series != num else ""
+    if txt != "":
+        data['notify']['anime'].append(txt)
+        if isinstance(data, dict):
+            for i in ('setting', 'default'):
+                with open(f'{current_path}/{i}.json', 'w') as js:
+                    js.write(dumps(data, sort_keys=False, indent=4,
+                               ensure_ascii=False, separators=(',', ': ')))
+        else:
+            system('notify-send "Error for write notify <anime>"')
+        check = True
+    return check
+
+
+
+def checkURL(data, url, series, ova, check=False):
     try:
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
-        names = soup.find('div', class_='shortstoryHead')
-        name = names.text[22:-18:]
-        names = name.split(' /')
+        names = soup.find('div', class_='shortstoryHead').text[22:-18:].split(' / ')
         name = names[0]
         mass = names[1].split('[')
-        arr = []
-
-        if len(mass) == 2:
-            if '-' not in mass[-1]:
-                arr = int(mass[-1].split()[0])
-            elif 'Анонс' in mass[-1]:
-                arr = -1
-            else:
-                art = mass[-1].split()[0]
-                arr = int(art.split('-')[1])
-            int_i = 0
-        elif len(mass) == 3:
-            if 'OVA' in mass[-1]:
-                inti = mass[-1].split()
-                if ova == 1:
-                    int_i = int(inti[1])
-                else:
-                    int_i = int(inti[1].split('-')[1])
-            else:
-                int_i = 0
-            if '-' in mass[-2]:
-                art = mass[-2].split()[0]
-                arr = int(art.split('-')[1])
-            elif 'Анонс' in mass[-2]:
-                arr = -1
-            else:
-                arr = mass[-2][:1:]
-        elif len(mass) == 4:
-            if 'OVA' in mass[-1]:
-                inti = mass[-1].split()
-                if ova == 1:
-                    int_i = int(inti[1])
-                else:
-                    int_i = int(inti[1].split('-')[1])
-            else:
-                int_i = 0
-
-            if '-' in mass[-3]:
-                art = mass[-2].split()[0]
-                arr = int(art.split('-')[1])
-            elif 'Анонс' in mass[-2]:
-                arr = -1
-            else:
-                arr = mass[-3][:1:]
-
-        if isinstance(arr, int):
-            num = arr
-        else:
-            string_num = arr[-1].split()
-            num = int(string_num[0])
-
-        c_d = date.today()
-        c_t = strftime("%H:%M", localtime())
-        note = f'[A][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}] > {name}'
-        if num == series and ova == int_i:
-            txt = f'{note} - new series {series} & new ova-{ova}\n'
-        elif num == series and ova != int_i:
-            txt = f'{note} - new series {series}\n'
-        elif ova == int_i and series != num:
-            txt = f'{note} - new ova-{ova}\n'
-        else:
-            txt = ''
-
-        if txt != "":
-            data['notify']['anime'].append(txt)
-            if isinstance(data, dict):
-                with open(f'{current_path}/setting.json', 'w') as js:
-                    js.write(dumps(data, sort_keys=False, indent=4,
-                                   ensure_ascii=False, separators=(',', ': ')))
-                with open(f'{current_path}/default.json', 'w') as js:
-                    js.write(dumps(data, sort_keys=False, indent=4,
-                                   ensure_ascii=False, separators=(',', ': ')))
-            else:
-                system('notify-send "Error for write notify <anime>"')
-            check = True
-
+        check = numCheck(data, mass, ova, series, name)
     except Exception as e:
-        print('error =========>\n', e)
+        name = ''
+        print(f'notify-send "error ===>\n{e}"')
     return name, check
 
 
@@ -233,13 +199,10 @@ def getDescription(url):
         link = get(url)
         soup = BeautifulSoup(link.text, 'html.parser')
         desc = soup.find_all('p')
-        if len(desc) == 10:
-            description = desc[7].text
-        elif len(desc) == 11:
-            description = desc[8].text
-        img = soup.find_all('img', class_='imgRadius')
-        image = f'https://www.animevost.org{img[0]["src"]}'
-        img = img[0]['src'].split('/')
+        description = desc[7].text if len(desc) == 10 else desc[8].text
+        img = soup.find_all('img', class_='imgRadius')[0]["src"]
+        image = f'https://www.animevost.org{img}'
+        img = img.split('/')
         if not path.isdir(f'{current_path}/description/'):
             system(f'mkdir "{current_path}/description/"')
         r = get(image, stream=True)
