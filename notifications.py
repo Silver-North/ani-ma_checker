@@ -124,8 +124,7 @@ def parseRanobe(link):
         system(f'notify-send "ERRor for parse Ranobe {link}\n{e}"')
 
 
-def checkFixedOutput(dicts):
-    count = 0
+def checkFixedOutput(dicts, count=0):
     link = get('https://animevost.org')
     soup = BeautifulSoup(link.text, 'html.parser')
     raspisanie = soup.find_all('ul', class_='raspis_fixed')
@@ -141,6 +140,14 @@ def checkFixedOutput(dicts):
                             dicts['anime']['series'][dicts['anime']['urls'].index(v)]+1,
                                  txt[i][0])
                 count += 1 if check else 0
+    dicts['notify']['notify'] = 'unchecked' if count > 0 else dicts['notify']['notify']
+    if isinstance(dicts, dict):
+        for i in ('setting', 'default'):
+            with open(f'{current_path}/{i}.json', 'w') as js:
+                js.write(dumps(dicts, sort_keys=False, indent=4,
+                           ensure_ascii=False, separators=(',', ': ')))
+    else:
+        system('notify-send "Error for write notify <anime>"')
     system('notify-send "Вышло кое-что новенькое!!!"') if count > 0 else False
     txt = [' / '.join(i) for i in txt]
     return txt, link

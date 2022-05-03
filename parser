@@ -368,8 +368,8 @@ class myWindow(QtWidgets.QMainWindow):
             
 
     def wrapperData(self, data):
-        ico = 'notification' if data in 'checked' else 'notify' \
-                       if data in 'unchecked' else 'bell'
+        ico = 'notification' if data == 'checked' else 'notify' \
+                       if data == 'unchecked' else 'bell'
         self.ui.toolButton_10.setIcon(QIcon(f'{self.icon}/{ico}.png'))
 
 
@@ -900,7 +900,7 @@ class myWindow(QtWidgets.QMainWindow):
         tab_start = 0
         data = self.uploadGlobalSettings()
         try:
-            names, links = checkFixedOutput(data)
+            names, links = checkFixedOutput(data, 0)
             self.setGlobalSettings(data, 'anime', 'track-name', names)
             self.setGlobalSettings(data, 'anime', 'track-link', links)
         except Exception as e:
