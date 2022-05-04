@@ -509,6 +509,7 @@ class Ui_MainWindow(object):
         self.toolButton_16.clicked.connect(self.checkBox_3.toggle) # type: ignore
         self.toolButton_9.clicked.connect(self.checkBox_4.toggle) # type: ignore
         self.pushButton_2.clicked.connect(self.dockWidget.close) # type: ignore
+        self.toolButton_25.clicked.connect(self.dockWidget.show) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

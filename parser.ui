@@ -1795,8 +1795,24 @@ p, li { white-space: pre-wrap; }
      <y>96</y>
     </hint>
     <hint type="destinationlabel">
-     <x>207</x>
-     <y>113</y>
+     <x>209</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_25</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>81</y>
     </hint>
    </hints>
   </connection>

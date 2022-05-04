@@ -5,11 +5,22 @@ from time import strftime, localtime
 from datetime import date
 from json import dumps
 from shutil import copyfileobj
+from pyttsx3 import init
 from PIL import Image
 
 
 check = False
 current_path = f'{path.dirname(path.realpath(__file__))}'
+
+
+def checkVoice(data, check):
+    if check > 0:
+        data['notify']['notify'] = 'unchecked'
+        system('notify-send "Вышло кое-что новенькое!!!"')
+        tts = init()
+        tts.say("Something new came out... check the natification log...")
+        tts.runAndWait()
+    return data['notify']['notify']
 
 
 def parseRanobe(link):
@@ -138,9 +149,9 @@ def checkFixedOutput(dicts, count=0):
                 check = numCheck(dicts, mass,
                             dicts['anime']['ova'][dicts['anime']['urls'].index(v)]+1,
                             dicts['anime']['series'][dicts['anime']['urls'].index(v)]+1,
-                                 txt[i][0])
+                            txt[i][0])
                 count += 1 if check else 0
-    dicts['notify']['notify'] = 'unchecked' if count > 0 else dicts['notify']['notify']
+    dicts['notify']['notify'] = checkVoice(dicts, count)
     if isinstance(dicts, dict):
         for i in ('setting', 'default'):
             with open(f'{current_path}/{i}.json', 'w') as js:
@@ -148,7 +159,6 @@ def checkFixedOutput(dicts, count=0):
                            ensure_ascii=False, separators=(',', ': ')))
     else:
         system('notify-send "Error for write notify <anime>"')
-    system('notify-send "Вышло кое-что новенькое!!!"') if count > 0 else False
     txt = [' / '.join(i) for i in txt]
     return txt, link
 
