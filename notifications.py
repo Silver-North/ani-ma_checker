@@ -153,10 +153,9 @@ def checkFixedOutput(dicts, count=0):
                 count += 1 if check else 0
     dicts['notify']['notify'] = checkVoice(dicts, count)
     if isinstance(dicts, dict):
-        for i in ('setting', 'default'):
-            with open(f'{current_path}/{i}.json', 'w') as js:
-                js.write(dumps(dicts, sort_keys=False, indent=4,
-                           ensure_ascii=False, separators=(',', ': ')))
+        with open(f'{current_path}/setting.json', 'w') as js:
+            js.write(dumps(dicts, sort_keys=False, indent=4,
+                       ensure_ascii=False, separators=(',', ': ')))
     else:
         system('notify-send "Error for write notify <anime>"')
     txt = [' / '.join(i) for i in txt]
@@ -186,10 +185,9 @@ def numCheck(data, mass, ova, series, name, check=False):
     if txt != "":
         data['notify']['anime'].append(txt)
         if isinstance(data, dict):
-            for i in ('setting', 'default'):
-                with open(f'{current_path}/{i}.json', 'w') as js:
-                    js.write(dumps(data, sort_keys=False, indent=4,
-                               ensure_ascii=False, separators=(',', ': ')))
+            with open(f'{current_path}/setting.json', 'w') as js:
+                js.write(dumps(data, sort_keys=False, indent=4,
+                            ensure_ascii=False, separators=(',', ': ')))
         else:
             system('notify-send "Error for write notify <anime>"')
         check = True
@@ -199,8 +197,7 @@ def numCheck(data, mass, ova, series, name, check=False):
 
 def checkURL(data, url, series, ova, check=False):
     try:
-        link = get(url)
-        soup = BeautifulSoup(link.text, 'html.parser')
+        soup = BeautifulSoup(get(url).text, 'html.parser')
         names = soup.find('div', class_='shortstoryHead').text[22:-18:].split(' / ')
         name = names[0]
         mass = names[1].split('[')
@@ -213,8 +210,7 @@ def checkURL(data, url, series, ova, check=False):
 
 def getDescription(url):
     try:
-        link = get(url)
-        soup = BeautifulSoup(link.text, 'html.parser')
+        soup = BeautifulSoup(get(url).text, 'html.parser')
         desc = soup.find_all('p')
         description = desc[7].text if len(desc) == 10 else desc[8].text
         img = soup.find_all('img', class_='imgRadius')[0]["src"]
@@ -235,8 +231,7 @@ def getDescription(url):
 
 
 def loadImage(name):
-    width = 90
-    height = 110
+    width, height = (90, 110)
     img = Image.open(f'{current_path}/description/{name}')
     resizing = img.resize((width, height), Image.ANTIALIAS)
     resizing.save(f'{current_path}/description/{name}')
