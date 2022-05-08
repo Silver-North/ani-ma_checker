@@ -1,10 +1,11 @@
+from os import system, path
+from datetime import date
+from time import strftime, localtime
+from shutil import copyfileobj
+from json import dumps
+
 from requests import get
 from bs4 import BeautifulSoup
-from os import system, path
-from time import strftime, localtime
-from datetime import date
-from json import dumps
-from shutil import copyfileobj
 from pyttsx3 import init
 from PIL import Image
 
