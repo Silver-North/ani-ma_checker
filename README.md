@@ -19,9 +19,12 @@ And it is possible to view the description of tracked ongoings
 ```sh
 ❯ git clone https://github.com/Silver-North/ani-ma_tracker
 ❯ cd ani-ma_tracker
-❯ pip3 install -r requirements.txt
-# start application
+❯ ./install.sh
+```
+
+```sh
+  # start application
 ❯ python3 parser
-#or
+  #or
 ❯ ./parser
 ```

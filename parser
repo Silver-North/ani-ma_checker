@@ -32,6 +32,7 @@ from notifications import (checkURL, getDescription, loadImage,
 dead = life = enable = checker_tag = True
 down = while_var = tab_start = downloading = False
 checklist = ()
+notify = 'empty'
 
 
 def enableCheck(func):
@@ -62,7 +63,7 @@ class ThreadProgress(QThread):
         self.wait()
 
     def run(self):
-        global dead, checker_tag, tab_start
+        global dead, checker_tag, tab_start, notify
         tab_start = 0
         checker_tag = False
         title = 'Checking ->' if self.flag else 'Updating ->'
@@ -88,7 +89,7 @@ class ThreadProgress(QThread):
                 except Exception as e:
                     system(f'notify-send "Error checking anime\n{e}"')
                 bar()
-        self.data['notify']['notify'] = checkVoice(self.data, self.check)
+        notify = self.data['notify']['notify'] = checkVoice(self.data, self.check)
         if isinstance(self.data, dict):
             with open(f'{self.current_path}/setting.json', 'w') as js:
                 js.write(dumps(self.data, sort_keys=False, indent=4,
@@ -265,25 +266,21 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.message(self.uploadGlobalSettings()['about'],(600, 75, 300, 100))
 
     def getValueForSecond(self):
-        global checker_tag, enable, tab_start, down, while_var 
-        data = self.uploadGlobalSettings()['notify']['notify']
+        global checker_tag, enable, tab_start, down, while_var, notify 
         index = self.ui.tabWidget.currentIndex()
         updates = False if self.ui.checkBox_3.isChecked() else True
         checkbox = True if self.ui.checkBox_2.isChecked() else False   
         self.flag = False if while_var else True
-        return (data, enable, checkbox, checker_tag,
+        return (notify, enable, checkbox, checker_tag, updates,
                 index, tab_start, self.percent_all_anime,
                 self.percent, self.percent_all_manga, self.ranobe_percent,
-                while_var, down, updates)
+                while_var, down)
 
-    def everySecond(self): self.checkCash(*self.getValueForSecond())
+    def everySecond(self): self.checkCash(self.getValueForSecond())
 
-    def checkCash(self, data, enable, checkbox, tag, index, tabs,
-                  anime, percent, manga, ranobe_percent, var, down, up):
+    def checkCash(self, gets):
         """ Checking cashing of functions """
         global checklist
-        gets = (data, enable, checkbox, tag, up, index, tabs,
-                anime, percent, manga, ranobe_percent, var, down)
         indexs = [i for i in range(len(gets)) if not checklist or 
                                                      checklist[i] != gets[i]]
         if indexs:
@@ -352,9 +349,10 @@ class GlobalParser(QtWidgets.QMainWindow):
         """ Show all notifications """
         data = self.uploadGlobalSettings()
         data['notify']['notify'] = 'empty' if self.emptyNotify(data) else 'checked'
+        self.notify = data['notify']['notify']
         title = ('No notification..',(600, 95, 300, 100)) if self.emptyNotify(data) \
             else ("\n".join([''.join(data['notify'][i]) for i in data['notify']
-            if i not in 'notify']),(420, 95, 300, 100))
+            if i not in 'notify' or not data['notify'][i]]),(420, 95, 300, 100))
         self.setGlobalSettings(data, '', '', '', False, True)
         self.message(*title)
 
@@ -786,11 +784,11 @@ class GlobalParser(QtWidgets.QMainWindow):
     @enableCheck
     def checkingOfTrackerAnime(self):
         """ Checking tracker of my data and getting all data """
-        global tab_start
+        global tab_start, notify
         tab_start = 0
         data = self.uploadGlobalSettings()
         try:
-            names, links = checkFixedOutput(data, 0)
+            names, links, notify = checkFixedOutput(data, 0)
             self.setGlobalSettings(data, 'anime', 'track-name', names)
             self.setGlobalSettings(data, 'anime', 'track-link', links)
         except Exception as e:
@@ -842,7 +840,7 @@ class GlobalParser(QtWidgets.QMainWindow):
     @enableCheck
     def upUrls(self, data, update_check=False):
         """ Check or update data of manga """
-        global dead, tab_start
+        global dead, tab_start, notify
         tab_start, msg = (1, [])
         length = len(data['manga']['urls'])
         title = 'Update ' if update_check else 'Check '
@@ -916,7 +914,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                 system(f'notify-send "Error check manga\n{e}"')
         driver.quit()
         data['notify']['manga'] += msg if len(msg) > 0 else []
-        data['notify']['notify'] = checkVoice(data, len(msg))
+        notify = data['notify']['notify'] = checkVoice(data, len(msg))
         self.setGlobalSettings(data, '', '', '', False, True)
         sleep(0.8)
         self.percent_all_manga = 0
@@ -924,7 +922,7 @@ class GlobalParser(QtWidgets.QMainWindow):
     @enableCheck
     def setRanobe(self, check, data):
         """ Check or update data of ranobe """
-        global tab_start, dead
+        global tab_start, dead, notify
         tab_start = 2
         msg = self.ranobe_percent = 0
         length = len(data['ranobe']['urls'])
@@ -959,7 +957,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                 data['ranobe']['log'] = f'Error ==>\n{e}' 
                 system(f'notify-send "Error for get data about <ranobe>\n{e}"')
         data['ranobe']['log'] = ''
-        data['notify']['notify'] = checkVoice(data, msg)
+        notify = data['notify']['notify'] = checkVoice(data, msg)
         sleep(1.2)
         self.ranobe_percent = 0
         self.setGlobalSettings(data, '', '', '', False, True)

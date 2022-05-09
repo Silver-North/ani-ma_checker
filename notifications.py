@@ -160,7 +160,7 @@ def checkFixedOutput(dicts, count=0):
     else:
         system('notify-send "Error for write notify <anime>"')
     txt = [' / '.join(i) for i in txt]
-    return txt, link
+    return txt, link, dicts['notify']['notify']
 
 
 def numCheck(data, mass, ova, series, name, check=False):
