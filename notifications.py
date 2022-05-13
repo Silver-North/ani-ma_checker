@@ -89,16 +89,16 @@ def parseRanobe(link):
             print(f'{name}\n{img}\n{description}\n{chapter}')
 
         elif 'https://xn--80ac9aeh6f.xn--p1ai' in link:
-            n_head = 'cursor-default md:cursor-pointer font-bold text-2xl'
-            n_body = ' md:text-3xl sm:leading-7 lg:leading-10 xl:leading-9 pt-1 '
-            n_footer = 'text-black-0 dark:text-grayNormal-200 truncate'
+            n_head = 'cursor-default md:cursor-pointer font-bold text-2xl '
+            n_body = 'md:text-3xl sm:leading-7 lg:leading-10 xl:leading-9 pt-1'
+            n_footer = ' text-black-0 dark:text-grayNormal-200 truncate'
             name = soup.find('h1', class_=f"{n_head}{n_body}{n_footer}").text
             description = soup.find('div', class_="BookPage_desc__2rsZC").text
             img = soup.find('img',
                 class_="xs:rounded-md md:w-[180px] lg:w-[220px]")['src']
-            c_head = 'text-black-0 dark:text-grayNormal-200 hover:text-primary '
-            c_body = 'cursor-default md:cursor-pointer dark:hover:text-primary '
-            c_footer = 'truncate text-sm md:text-base'
+            c_head = 'text-black-0 dark:text-grayNormal-200 '
+            c_body = 'hover:text-primary cursor-default md:cursor-pointer'
+            c_footer = ' dark:hover:text-primary truncate text-sm md:text-base'
             chapters = soup.find_all('a', class_=f"{c_head}{c_body}{c_footer}")
             all = []
             for i in chapters[0].text:
@@ -110,7 +110,8 @@ def parseRanobe(link):
         elif 'ranobehub.org' in link:
             name = soup.find('h1', class_="ui huge header").text
             img = soup.find('img', class_="image")['data-src']
-            description = soup.find('div', class_="book-description__text").text
+            description = soup.find('div',
+                                    class_="book-description__text").text
             chapters = soup.find('div', class_="book-meta-value book-stats")
             chapter = chapters.find('strong').text
             print(f'{name}\n{img}\n{description[2:-2:]}\n{chapter}')
@@ -118,7 +119,8 @@ def parseRanobe(link):
         elif 'ruranobe.ru' in link:
             name = soup.find('span', class_="headline__text").text
             url_p = 'https://ruranobe.ru/'
-            img = f'{url_p}{soup.find_all("img", class_="detail__image")[0]["src"]}'
+            img = "{0}{1}".format(url_p,
+                    soup.find_all("img",class_="detail__image")[0]["src"])
             description = soup.find('div', class_="read-more").text
             chapters = soup.find('div', class_="detail__actions")
             chapter = chapters.find('a').text
@@ -136,7 +138,7 @@ def parseRanobe(link):
         system(f'notify-send "ERRor for parse Ranobe {link}\n{e}"')
 
 
-def checkFixedOutput(dicts, count=0):
+def checkFixedOutput(data, count=0):
     link = get('https://animevost.org')
     soup = BeautifulSoup(link.text, 'html.parser')
     raspisanie = soup.find_all('ul', class_='raspis_fixed')
@@ -144,23 +146,23 @@ def checkFixedOutput(dicts, count=0):
     txt = [i.split(' / ') for i in raspisanie[0].text.split('\n')[1:-1:]]
     link = [links[i[0]]["href"] for i in enumerate(txt)]
     for i,v in enumerate(link):
-        for j in dicts['anime']['urls']:
+        for j in data['anime']['urls']:
             if v == j:
                 mass = txt[i][1].split('[')
-                check = numCheck(dicts, mass,
-                            dicts['anime']['ova'][dicts['anime']['urls'].index(v)]+1,
-                            dicts['anime']['series'][dicts['anime']['urls'].index(v)]+1,
-                            txt[i][0])
+                check = numCheck(data, mass,
+                    data['anime']['ova'][data['anime']['urls'].index(v)]+1,
+                    data['anime']['series'][data['anime']['urls'].index(v)]+1,
+                    txt[i][0])
                 count += 1 if check else 0
-    dicts['notify']['notify'] = checkVoice(dicts, count)
-    if isinstance(dicts, dict):
+    data['notify']['notify'] = checkVoice(data, count)
+    if isinstance(data, dict):
         with open(f'{current_path}/setting.json', 'w') as js:
-            js.write(dumps(dicts, sort_keys=False, indent=4,
+            js.write(dumps(data, sort_keys=False, indent=4,
                        ensure_ascii=False, separators=(',', ': ')))
     else:
         system('notify-send "Error for write notify <anime>"')
     txt = [' / '.join(i) for i in txt]
-    return txt, link, dicts['notify']['notify']
+    return txt, link, data['notify']['notify']
 
 
 def numCheck(data, mass, ova, series, name, check=False):
@@ -170,8 +172,9 @@ def numCheck(data, mass, ova, series, name, check=False):
         arr = int(mass[-1].split()[0]) if '-' not in mass[-1] else -1 if \
               'Анонс' in mass[-1] else int(mass[-1].split()[0].split('-')[1])
     else:
-        arr = int(mass[ind].split()[0].split('-')[1]) if '-' in mass[ind] else \
-              -1 if 'Анонс' in mass[ind] else mass[ind][:1:]
+        arr = int(mass[ind].split()[0].split('-')[1]) \
+            if '-' in mass[ind] else -1 if 'Анонс' in mass[ind] else \
+            mass[ind][:1:]
     int_i = int(inti[1]) if ova == 1 and 'OVA' in mass[-1] else \
             int(inti[1].split('-')[1]) if 'OVA' in mass[-1] else 0
 
@@ -179,10 +182,10 @@ def numCheck(data, mass, ova, series, name, check=False):
     c_d = date.today()
     c_t = strftime("%H:%M", localtime())
     note = f'[A][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}] > {name}'
-    txt = f'{note} - new series {num} & new ova-{int_i}\n' if num >= series and \
-          ova <= int_i else f'{note} - new series {num}\n' if num >= series and \
-          ova != int_i else f'{note} - new ova-{int_i}\n' if ova <= int_i and \
-          series != num else ""
+    txt = f'{note} - new series {num} & new ova-{int_i}\n' \
+        if num >= series and ova <= int_i else f'{note} - new series {num}\n' \
+        if num >= series and ova != int_i else f'{note} - new ova-{int_i}\n' \
+        if ova <= int_i and series != num else ""
     if txt != "":
         data['notify']['anime'].append(txt)
         if isinstance(data, dict):
@@ -199,7 +202,8 @@ def numCheck(data, mass, ova, series, name, check=False):
 def checkURL(data, url, series, ova, check=False):
     try:
         soup = BeautifulSoup(get(url).text, 'html.parser')
-        names = soup.find('div', class_='shortstoryHead').text[22:-18:].split(' / ')
+        names = soup.find('div',
+                class_='shortstoryHead').text[22:-18:].split(' / ')
         name = names[0]
         mass = names[1].split('[')
         check = numCheck(data, mass, ova, series, name)
