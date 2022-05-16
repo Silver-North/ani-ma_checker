@@ -25,6 +25,4 @@ And it is possible to view the description of tracked ongoings
 ```sh
   # start application
 ❯ python3 parser
-  #or
-❯ ./parser
 ```

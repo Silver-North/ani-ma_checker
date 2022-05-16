@@ -1,4 +1,5 @@
 from os import system, path
+from re import split as splitr
 from datetime import date
 from time import strftime, localtime
 from shutil import copyfileobj
@@ -12,13 +13,13 @@ from PIL import Image
 
 check = False
 current_path = f'{path.dirname(path.realpath(__file__))}'
+tts = init()
 
 
 def checkVoice(data, check):
     if check > 0:
         data['notify']['notify'] = 'unchecked'
         system('notify-send "Вышло кое-что новенькое!!!"')
-        tts = init()
         tts.say("Something new came out... check the natification log...")
         tts.runAndWait()
     return data['notify']['notify']
@@ -145,14 +146,13 @@ def checkFixedOutput(data, count=0):
     links = raspisanie[0].find_all("a")
     txt = [i.split(' / ') for i in raspisanie[0].text.split('\n')[1:-1:]]
     link = [links[i[0]]["href"] for i in enumerate(txt)]
+    fzf = [splitr('\d-', i)[1].split('.')[0] for i in data['anime']['urls']]
     for i,v in enumerate(link):
-        for j in data['anime']['urls']:
-            if v == j:
+        for c,j in enumerate(fzf):
+            if j in v:
                 mass = txt[i][1].split('[')
-                check = numCheck(data, mass,
-                    data['anime']['ova'][data['anime']['urls'].index(v)]+1,
-                    data['anime']['series'][data['anime']['urls'].index(v)]+1,
-                    txt[i][0])
+                check = numCheck(data, mass, data['anime']['ova'][c]+1,
+                                 data['anime']['series'][c]+1, txt[i][0])
                 count += 1 if check else 0
     data['notify']['notify'] = checkVoice(data, count)
     if isinstance(data, dict):
@@ -186,7 +186,7 @@ def numCheck(data, mass, ova, series, name, check=False):
         if num >= series and ova <= int_i else f'{note} - new series {num}\n' \
         if num >= series and ova != int_i else f'{note} - new ova-{int_i}\n' \
         if ova <= int_i and series != num else ""
-    if txt != "":
+    if txt:
         data['notify']['anime'].append(txt)
         if isinstance(data, dict):
             with open(f'{current_path}/setting.json', 'w') as js:
