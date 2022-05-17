@@ -522,10 +522,8 @@ class GlobalParser(QtWidgets.QMainWindow):
         tmp = f'{text} - new ' if value is None else \
               f'{text} - new {char} {value}'
         temp = f'{text} - new ova' if ch in 'anime' else 'NOT CHECK'
-        print(data['notify'][ch])
         data['notify'][ch] = [i for i in data['notify'][ch] if tmp not in i]
         data['notify'][ch] = [i for i in data['notify'][ch] if temp not in i]
-        print(data['notify'][ch])
         return data
 
     def emptyNotify(self, data):
@@ -607,9 +605,9 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.comboBox_3.clear()
             self.ui.label_5.setPixmap(QPixmap())
         elif stop:
-            digit = data['anime']['series'][index]
-            fraction = data['anime']['ova'][index]
-            num = float(f"{digit}.{fraction}" if tab == 0 else 0)
+            digit = data['anime']['series'][index] if tab == 0 else 0
+            fraction = data['anime']['ova'][index] if tab == 0 else 0
+            num = float(f"{digit}.{fraction}")
             current = data[mode][child][index] if tab in (1,2) else num
             but = self.ui.toolButton_21 if tab == 1 else self.ui.toolButton_30
             if lcd_check is None:
