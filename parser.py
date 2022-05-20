@@ -10,7 +10,7 @@ from threading import Thread
 from urllib import request as url_request
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMessageBox as QMessage, QSystemTrayIcon
+from PyQt5.QtWidgets import QMessageBox as QMessage, QSystemTrayIcon, QComboBox
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtCore import QTimer, QThread, pyqtSignal
 from QLed import QLed
@@ -469,7 +469,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                 data['history'][mode].append(data[mode][throw][index])
                 mv = 'mv "{0}/{1}" "{0}/history/"'.format(self.path_down, dirs)
             rm = f'rm -r "{self.path_down}/{dirs}"'
-            system(mv if save_to_history == QMessage.Ok else rm) 
+            system(mv if save_to_history == QMessage.Ok else rm) \
+                    if tab == 0 else None
             remove = f'rm {self.current_path}/{data[mode]["images"][index]}'
             system(remove) if  data[mode]["images"][index] != icon else True
             data = self.checkNotify(data, mode, data[mode][throw][index])
@@ -541,7 +542,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         mask = 'animevost' if tab == 0 else 'mask' if tab == 1 else 'ranobe'
         icon = QIcon(f'{self.icon}/{mask}.png')
         catch = ('log', 'track-name', 'track-link') if tab == 0 else \
-                 'logs' if tab == 1 else 'log'
+                 '' if tab == 1 else 'log'
         series = self.ui.spinBox.value() if tab == 0 else \
                  self.ui.doubleSpinBox.value() if tab == 1 else \
                  self.ui.doubleSpinBox_2.value()
@@ -553,13 +554,14 @@ class GlobalParser(QtWidgets.QMainWindow):
                   and self.ui.checkBox.isChecked() else ''
         ico = f'icons/{mask}.png'
         dicts = {0: url, 1: series, 2: 0, 3: title, 5: '', 6: ico} \
-            if tab == 0 else {0: url, 1: series, 2: 0, 3: '', 6: '', 5: ico} \
+            if tab == 0 else \
+                {0: url, 1: series, 2: 0, 3: '', 4: '', 6: '', 5: ico} \
             if tab == 1 else \
                 {0: url, 2: series, 3: 0, 4: 0, 1: '', 5: '', 6: ico}
         if check_url(url):
             edit[tab].setStyleSheet('background: rgb(98, 255, 59)')
             [data[mode][v].append(dicts[i]) for i,v in enumerate(data[mode])
-                if i[1] not in catch]
+                if v not in catch]
             self.comboboxes[tab].addItem(title)
             self.comboboxes[tab].setItemIcon(len(data[mode][name])-1, icon)
             self.setGlobalSettings(data, '', '', '', False, True)
@@ -880,16 +882,15 @@ class GlobalParser(QtWidgets.QMainWindow):
                         desc = driver.find_element(By.ID, 'description').text
                     else:
                         manga = driver.find_element(By.CLASS_NAME,
-                                    'mt-3').text.split(' ')
-                        if manga[-1].isdigit():
-                            manga = int(manga[-1])
-                        elif manga[-2].isdigit():
-                            manga = int(manga[-2])
+                                    'mt-3').text.split()
+                        manga = manga[-2 if 'новое' in manga[-1] else -1]
+                        if 'Экстра' in manga:
+                            manga = float(
+                                f"{data['manga']['numbers'][i[0]]}.1")
+                        elif '.' not in manga:
+                            manga = int(manga)
                         else:
-                            try:
-                                manga = float(manga[-1])
-                            except:
-                                manga = float(manga[-2])
+                            manga = float(manga)
                         name = driver.find_element(By.CLASS_NAME, 'name').text
                         img = driver.find_elements(By.CLASS_NAME,
                             'fotorama__img')[0].get_attribute('src')
@@ -928,6 +929,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         data['notify']['manga'] += msg if len(msg) > 0 else []
         notify = data['notify']['notify'] = checkVoice(data, len(msg))
         self.setGlobalSettings(data, '', '', '', False, True)
+        self.showed(1, self.ui.comboBox_2) if update_check else None
         sleep(0.8)
         self.percent_all_manga = 0
 
