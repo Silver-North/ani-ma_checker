@@ -672,8 +672,6 @@ class GlobalParser(QtWidgets.QMainWindow):
         try:
             self.percent_all_anime = 5
             driver.get(url)
-            self.percent_all_anime = 15
-            sleep(3)
             count_series = driver.find_elements(By.CLASS_NAME, 'epizode')
             name = driver.find_element(By.CLASS_NAME, 'shortstoryHead').text
             next = driver.find_element(By.CLASS_NAME, 'next')
@@ -708,6 +706,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                 down = down[3 if self.ui.checkBox_4.isChecked() else 2]
                 let = down.get_attribute("href").split('?')[0].split('/')
                 self.percent_all_anime = 65
+                False if path.isdir(f'{self.path_down}') else \
+                    system(f'mkdir "{self.path_down}"')
                 self.Download(down.get_attribute('href'), let[-1], urls,
                               name_dir[0], url, name, series, data, click_i)
                 self.percent_all_anime = 97
@@ -734,8 +734,9 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ui.progressBar_2.setFormat('%p%')
 
     def checkUpload(self, f, url, dirs, link, name, series, data, search):
-        """ Final step after download of series:
+        """ 
 
+            Final step after download of series:
             creating folders, renaming file, moving file in folder
 
         """
@@ -746,8 +747,6 @@ class GlobalParser(QtWidgets.QMainWindow):
         ova = data['anime']['ova'][url.index(link)] if 'О' in search else None
         series = f"ova-{ova}" if 'ОВА' in search else f'{series} серия'
         system(f'notify-send "Вышла {series}! {name}\n{curent_time}"')
-        False if path.isdir(f'{self.path_down}') else \
-            system(f'mkdir "{self.path_down}"') 
         if not path.isdir(f'{self.path_down}/{names_dir}'):
             system(f'mkdir "{self.path_down}/{names_dir}"')
         system(f'mv "{self.path_down}/_{f}" \
@@ -795,12 +794,13 @@ class GlobalParser(QtWidgets.QMainWindow):
     def checkingOfTrackerAnime(self):
         """ Checking tracker of my data and getting all data """
         global tab_start, notify
-        tab_start = 0
-        data = self.uploadGlobalSettings()
         try:
+            tab_start, data = 0, self.uploadGlobalSettings()
             names, links, notify = checkFixedOutput(data, 0)
+            print(names, links, notify)
             self.setGlobalSettings(data, 'anime', 'track-name', names)
             self.setGlobalSettings(data, 'anime', 'track-link', links)
+            self.setGlobalSettings(data, 'notify', 'notify', notify)
         except Exception as e:
             system(f'notify-send "Error for update Checker Anime:\n{e}"')
         self.showed(3, self.ui.comboBox_7)

@@ -8,4 +8,5 @@ list_file=$(ls | grep setting.json | grep -v grep)
 if [[ $list_file != "settings.json" ]]; then
 	pip3 install -r requirements.txt;
 	echo $file_text > setting.json;
+    mkdir downloads, description
 fi

@@ -155,20 +155,14 @@ def checkFixedOutput(data, count=0):
                                  data['anime']['series'][c]+1, txt[i][0])
                 count += 1 if check else 0
     data['notify']['notify'] = checkVoice(data, count)
-    if isinstance(data, dict):
-        with open(f'{current_path}/setting.json', 'w') as js:
-            js.write(dumps(data, sort_keys=False, indent=4,
-                       ensure_ascii=False, separators=(',', ': ')))
-    else:
-        system('notify-send "Error for write notify <anime>"')
     txt = [' / '.join(i) for i in txt]
     return txt, link, data['notify']['notify']
 
 
 def numCheck(data, mass, ova, series, name, check=False):
     inti = mass[-1].split()
-    ind = -1 if len(mass) == 2 else -2 if len(mass) == 3 else -2
-    if len(mass) == 2:
+    ind = -1 if len(mass) == 2 else -2 if len(mass) == 3 else -3
+    if len(mass) == 2 or len(mass) == 1:
         arr = int(mass[-1].split()[0]) if '-' not in mass[-1] else -1 if \
               'Анонс' in mass[-1] else int(mass[-1].split()[0].split('-')[1])
     else:
