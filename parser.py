@@ -65,21 +65,28 @@ class ThreadProgress(QThread):
         with alive_bar(len(self.data['anime']['urls']), title=title) as bar:
             for i in enumerate(self.data['anime']['urls']):
                 try:
-                    if dead == False: break 
+                    if dead is False: break
+                    ind = i[0] + 1
+                    percent = int(ind / len(self.data['anime']['urls']) * 100)
+                    self._signal.emit(percent)
+                    if self.data['anime']['name'][i[0]] and \
+                       'desc' in self.data['anime']['images'][i[0]] and \
+                       self.data['anime']['description'][i[0]] and \
+                       not self.flag:
+                           sleep(0.5)
+                           bar()
+                           continue
                     series = self.data['anime']['series'][i[0]] + 1
                     ova = self.data['anime']['ova'][i[0]] + 1
                     name, check_output = checkURL(self.data, i[1], series, ova)
                     check += 1 if check_output else 0
-                    if name == '': raise Exception('ERROR FOR URL_CHECK..')
-                    if self.flag == False:
+                    if not name: raise Exception('ERROR FOR URL_CHECK..')
+                    if self.flag is False:
                         if 'icons/' in self.data['anime']['images'][i[0]]:
                             img, desc = getDescription(i[1])
                             self.data['anime']['images'][i[0]] = f'{fold}{img}'
                             self.data['anime']['description'][i[0]] = desc
                         self.data['anime']['name'][i[0]] = name
-                    ind = i[0] + 1
-                    percent = int(ind / len(self.data['anime']['urls']) * 100)
-                    self._signal.emit(percent)
                 except Exception as e:
                     system(f'notify-send "Error checking anime\n{e}"')
                 bar()
@@ -147,8 +154,9 @@ class GlobalParser(QtWidgets.QMainWindow):
         cl = ('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')
         func_time = (self.everySecond, self.tracked)
 
-        self.ui.dockWidget.hide()
-        self.ui.dockWidget.setGeometry(555,75, 164,80)
+        [i.hide() for i in (self.ui.dockWidget, self.ui.dockWidget_4)]
+        self.ui.dockWidget.setGeometry(555, 75, 164, 80)
+        self.ui.dockWidget_4.setGeometry(495, 55, 370, 211)
 
         self.timer = [QTimer() for _ in range(2)]
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
@@ -185,6 +193,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, QKeyEvent):
         self.hidded() if QKeyEvent.key() == 16777216 else None
+        # self.ui.dockWidget_4.hide() if QKeyEvent == 16777216 else None
 
     def uploadGlobalSettings(self):
         try:
@@ -198,16 +207,19 @@ class GlobalParser(QtWidgets.QMainWindow):
                                 flag=False, state=False):
         if not state:
             if flag:
-                to_json[mode].append(var) if tab == "" else \
+                to_json[mode].append(var) if not tab else \
                     to_json[tab][mode].append(var)
             else:
-                if not tab: to_json[mode] = var
-                else: to_json[tab][mode] = var
+                if not tab:
+                    to_json[mode] = var
+                else:
+                    to_json[tab][mode] = var
         if isinstance(to_json, dict):
             with open(f'{self.current_path}/setting.json', 'w') as js:
                 js.write(dumps(to_json, sort_keys=False, indent=4,
                         ensure_ascii=False, separators=(',', ': ')))
-        else: system(f'notify-send "No writing file <setting.json>"')
+        else:
+            system(f'notify-send "No writing file <setting.json>"')
 
     def startExport(self):
         """ Export data in selected format """
@@ -274,9 +286,10 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     def everySecond(self): self.checkCache(self.getValueForSecond())
 
-    def checkCache(self, gets, indexes=(5, 6, 11, 12)):
+    def checkCache(self, gets):
         """ Checking caching of functions """
         global cache
+        indexes=(5, 6, 11, 12)
         check = [i for i,v in enumerate(gets) if not cache or cache[i] != v]
         if check:
             for i in check:
@@ -345,12 +358,17 @@ class GlobalParser(QtWidgets.QMainWindow):
         data = self.uploadGlobalSettings()
         notify = data['notify']['notify'] = 'empty' \
                 if self.emptyNotify(data) else 'checked'
-        name = ('No notify..',(600, 95, 300, 100)) if self.emptyNotify(data) \
-            else ("\n".join([''.join(data['notify'][i]) 
-                    for i in data['notify'] if i not in 'notify' or 
-                        not data['notify'][i]]),(420, 95, 300, 100))
+        name = 'No notify..' if self.emptyNotify(data) else \
+            [data['notify'][i] for i in data['notify'] \
+                if i not in 'notify' and data['notify'][i]]
         self.setGlobalSettings(data, '', '', '', False, True)
-        self.message(*name)
+        self.ui.listWidget.clear()
+        if isinstance(name, list):
+            name = [*name[0], *name[1], *name[2]] if len(name) == 3 else \
+                   [*name[0], *name[1]] if len(name) == 2 else [*name[0]]
+            [self.ui.listWidget.addItem(i) for i in name]
+        else: self.ui.listWidget.addItem(name)
+        self.ui.dockWidget_4.show()
 
     def modeColorSheme(self):
         """ Switch color sheme """
@@ -603,7 +621,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6)
         lcd_check = lcd[:1:] if tab == 0 else lcd[1:3:] if tab == 1 else \
                     lcd[3::] if tab == 2 else None if tab == 3 else False
-        if stop == False and tab == 4:
+        if stop is False and tab == 4:
             self.ui.comboBox_3.clear()
             self.ui.label_5.setPixmap(QPixmap())
         elif stop:
@@ -760,8 +778,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         if totalsize > 0:
             down = True
             self.percent = int(readed_data * 100 / totalsize)
-            if dead == False:
-                raise Exception("Sorry, no numbers below zero")
+            if dead is False: raise Exception("Sorry, no numbers below zero")
             QtWidgets.QApplication.processEvents()
 
     def Download(self, dow, f, urls, dirs, link, name, serie, data, search):
@@ -797,7 +814,6 @@ class GlobalParser(QtWidgets.QMainWindow):
         try:
             tab_start, data = 0, self.uploadGlobalSettings()
             names, links, notify = checkFixedOutput(data, 0)
-            print(names, links, notify)
             self.setGlobalSettings(data, 'anime', 'track-name', names)
             self.setGlobalSettings(data, 'anime', 'track-link', links)
             self.setGlobalSettings(data, 'notify', 'notify', notify)
@@ -809,8 +825,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         """ Starting check or update of anime tracker """
         data = self.uploadGlobalSettings()
         self.ui.toolButton_12.hide()
-        flag = True if fl else False if self.ui.checkBox_3.isChecked() else \
-               True
+        flag = True if fl or not self.ui.checkBox_3.isChecked() else False
         Thread(target=self.selectingMode, args=(data, not flag)).start()
 
     @enableCheck
@@ -828,14 +843,13 @@ class GlobalParser(QtWidgets.QMainWindow):
         el = [i.split(' > ')[1].split(' - new')[0] 
                     for i in data['notify']['anime']]
         seti = list(set([data['anime']['name'].index(i) for i in el]))
-        value = self.ui.lcdNumber.intValue()
-        index = self.ui.comboBox.currentIndex()
+        value = (self.ui.comboBox.currentIndex(), self.ui.lcdNumber.intValue())
         args = (data, seti) if self.ui.checkBox_2.isChecked() else \
-               (data, data['anime']['urls'][index], value)
+               (data, data['anime']['urls'][value[0]], value[1])
         func = self.downloadAll if len(args) < 3 else self.oneParsing
         thread = Thread(target=func, args=args)
-        thread.start() if index in seti and len(args) > 2 or \
-                          len(seti) > 0 and len(args) < 3 else \
+        thread.start() if value[0] in seti and len(args) > 2 or \
+            len(seti) > 0 and len(args) < 3 else \
             (self.message('No data for update..', (560, 75, 100, 100),
                           True, False), self.visibled())
 
@@ -863,34 +877,32 @@ class GlobalParser(QtWidgets.QMainWindow):
                 with alive_bar(5, title=f'{title}{i[0]} -> ') as bar:
                     bar()
                     if dead == False: break
-                    ii = i[0] + 1
-                    self.percent_all_manga = int(ii / length * 100)
+                    self.percent_all_manga = int((i[0] + 1) / length * 100)
+                    if data['manga']['names'][i[0]] and \
+                       'description' in data['manga']['images'][i[0]] and \
+                       data['manga']['description'][i[0]] and update_check:
+                           sleep(0.5)
+                           [bar() for _ in range(4)]
+                           continue
                     driver.get(i[1])
                     sleep(2)
                     bar()
                     if 'https://manga-chan.me' in i[1]:
                         manga = driver.find_elements(By.CLASS_NAME,
                             'manga2')[0].text.split(' Глава ')[1].split()[0]
-                        if '.' in manga:
-                            manga = float(manga)
-                        else:
-                            manga = int(manga)
+                        manga = float(manga) if '.' in manga else int(manga)
                         name = driver.find_element(By.CLASS_NAME,
                             'title_top_a').text.split('(')[-1][:-1:]
                         img = driver.find_element(By.ID,
-                                                'cover').get_attribute('src')
+                                                  'cover').get_attribute('src')
                         desc = driver.find_element(By.ID, 'description').text
                     else:
                         manga = driver.find_element(By.CLASS_NAME,
                                     'mt-3').text.split()
                         manga = manga[-2 if 'новое' in manga[-1] else -1]
-                        if 'Экстра' in manga:
-                            manga = float(
-                                f"{data['manga']['numbers'][i[0]]}.1")
-                        elif '.' not in manga:
-                            manga = int(manga)
-                        else:
-                            manga = float(manga)
+                        manga = float(f"{data['manga']['numbers'][i[0]]}.1") \
+                                if 'Экстра' in manga else int(manga) \
+                                if '.' not in manga else float(manga)
                         name = driver.find_element(By.CLASS_NAME, 'name').text
                         img = driver.find_elements(By.CLASS_NAME,
                             'fotorama__img')[0].get_attribute('src')
@@ -904,7 +916,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                         c_t = strftime("%H:%M", localtime())
                         log = f'{name} → {manga}'
                         head = f'[M][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}]'
-                        body = f'{head} > {name} - new chapter {manga}\n'
+                        body = f'{head} > {name} - new chapter {manga}'
                         msg.append(body)
                     data['manga']['logs'][i[0]] = log
                     bar()
@@ -950,7 +962,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                     c_t = strftime("%H:%M", localtime())
                     msg += 1
                     head = f'[R][{c_d.day}/{c_d.month}/{c_d.year} - {c_t}]'
-                    body = f'> {name} - new chapter {chapter}\n'
+                    body = f'> {name} - new chapter {chapter}'
                     note = f'{head} {body}'
                     data['notify']['ranobe'].append(note)
                 if check == False:

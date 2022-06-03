@@ -672,8 +672,8 @@
      <widget class="QDockWidget" name="dockWidget">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>0</y>
+        <x>0</x>
+        <y>70</y>
         <width>164</width>
         <height>80</height>
        </rect>
@@ -774,6 +774,7 @@
        </widget>
       </widget>
      </widget>
+     <zorder>dockWidget</zorder>
      <zorder>frame</zorder>
      <zorder>label_2</zorder>
      <zorder>label_3</zorder>
@@ -795,7 +796,6 @@
      <zorder>toolButton_7</zorder>
      <zorder>dial_3</zorder>
      <zorder>toolButton_14</zorder>
-     <zorder>dockWidget</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -1676,14 +1676,59 @@ p, li { white-space: pre-wrap; }
      </size>
     </property>
    </widget>
+   <widget class="QDockWidget" name="dockWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>370</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="windowIcon">
+     <iconset>
+      <normaloff>icons/bell.png</normaloff>icons/bell.png</iconset>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="windowTitle">
+     <string>Notifications</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents_4">
+     <widget class="QListWidget" name="listWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>370</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="viewMode">
+       <enum>QListView::ListMode</enum>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="currentRow">
+       <number>-1</number>
+      </property>
+     </widget>
+    </widget>
+   </widget>
    <zorder>toolButton_3</zorder>
-   <zorder>tabWidget</zorder>
    <zorder>toolButton_18</zorder>
    <zorder>toolButton_24</zorder>
    <zorder>toolButton_11</zorder>
    <zorder>toolButton_10</zorder>
    <zorder>toolButton_6</zorder>
    <zorder>toolButton_25</zorder>
+   <zorder>dockWidget_4</zorder>
+   <zorder>tabWidget</zorder>
   </widget>
  </widget>
  <resources/>
@@ -1791,12 +1836,12 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>234</x>
-     <y>96</y>
+     <x>126</x>
+     <y>177</y>
     </hint>
     <hint type="destinationlabel">
-     <x>209</x>
-     <y>109</y>
+     <x>101</x>
+     <y>179</y>
     </hint>
    </hints>
   </connection>
@@ -1811,8 +1856,8 @@ p, li { white-space: pre-wrap; }
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>81</y>
+     <x>165</x>
+     <y>179</y>
     </hint>
    </hints>
   </connection>
