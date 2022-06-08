@@ -156,7 +156,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
         [i.hide() for i in (self.ui.dockWidget, self.ui.dockWidget_4)]
         self.ui.dockWidget.setGeometry(555, 75, 164, 80)
-        self.ui.dockWidget_4.setGeometry(495, 55, 370, 211)
+        self.ui.dockWidget_4.setGeometry(490, 55, 370, 211)
 
         self.timer = [QTimer() for _ in range(2)]
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
@@ -579,7 +579,8 @@ class GlobalParser(QtWidgets.QMainWindow):
         if check_url(url):
             edit[tab].setStyleSheet('background: rgb(98, 255, 59)')
             [data[mode][v].append(dicts[i]) for i,v in enumerate(data[mode])
-                if v not in catch]
+                if v not in catch or v not in 'ended']
+            data[mode]['ended'].append('ongoing')
             self.comboboxes[tab].addItem(title)
             self.comboboxes[tab].setItemIcon(len(data[mode][name])-1, icon)
             self.setGlobalSettings(data, '', '', '', False, True)
@@ -880,7 +881,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                     self.percent_all_manga = int((i[0] + 1) / length * 100)
                     if data['manga']['names'][i[0]] and \
                        'description' in data['manga']['images'][i[0]] and \
-                       data['manga']['description'][i[0]] and update_check:
+                       data['manga']['description'][i[0]] and update_check or \
+                       data['manga']['ended'][i[0]] == 'end':
                            sleep(0.5)
                            [bar() for _ in range(4)]
                            continue
@@ -888,6 +890,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                     sleep(2)
                     bar()
                     if 'https://manga-chan.me' in i[1]:
+                        end = (driver.find_elements(By.CLASS_NAME,
+                                'item2')[4].text, 'продолжается')
                         manga = driver.find_elements(By.CLASS_NAME,
                             'manga2')[0].text.split(' Глава ')[1].split()[0]
                         manga = float(manga) if '.' in manga else int(manga)
@@ -897,6 +901,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                                                   'cover').get_attribute('src')
                         desc = driver.find_element(By.ID, 'description').text
                     else:
+                        end = (driver.find_element(By.CLASS_NAME,
+                                'subject-meta').text, 'продолжается')
                         manga = driver.find_element(By.CLASS_NAME,
                                     'mt-3').text.split()
                         manga = manga[-2 if 'новое' in manga[-1] else -1]
@@ -909,6 +915,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                         desc = driver.find_element(By.CLASS_NAME,
                             'manga-description').text
                     bar()
+                    data['manga']['ended'][i[0]] = 'ongoing' \
+                            if end[1] in end[0] else 'end'
                     data['manga']['change_numbers'][i[0]] = manga
                     log = f'{name} = {manga}'
                     if data['manga']['numbers'][i[0]] < manga:
