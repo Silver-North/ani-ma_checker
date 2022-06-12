@@ -78,7 +78,7 @@
      <string/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -198,34 +198,12 @@
        <rect>
         <x>2</x>
         <y>1</y>
-        <width>221</width>
+        <width>309</width>
         <height>26</height>
        </rect>
       </property>
       <property name="placeholderText">
        <string>Write URL:</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="spinBox">
-      <property name="geometry">
-       <rect>
-        <x>226</x>
-        <y>1</y>
-        <width>58</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Series</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::NoButtons</enum>
-      </property>
-      <property name="maximum">
-       <number>100000</number>
       </property>
      </widget>
      <widget class="QToolButton" name="toolButton_8">
@@ -619,31 +597,6 @@
        </size>
       </property>
      </widget>
-     <widget class="QDial" name="dial_3">
-      <property name="geometry">
-       <rect>
-        <x>284</x>
-        <y>1</y>
-        <width>27</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>128</number>
-      </property>
-      <property name="pageStep">
-       <number>1</number>
-      </property>
-      <property name="wrapping">
-       <bool>true</bool>
-      </property>
-      <property name="notchTarget">
-       <double>8.699999999999999</double>
-      </property>
-      <property name="notchesVisible">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_14">
       <property name="geometry">
        <rect>
@@ -784,7 +737,6 @@
      <zorder>toolButton_5</zorder>
      <zorder>toolButton</zorder>
      <zorder>lineEdit</zorder>
-     <zorder>spinBox</zorder>
      <zorder>toolButton_8</zorder>
      <zorder>toolButton_12</zorder>
      <zorder>progressBar</zorder>
@@ -794,7 +746,6 @@
      <zorder>checkBox_2</zorder>
      <zorder>toolButton_4</zorder>
      <zorder>toolButton_7</zorder>
-     <zorder>dial_3</zorder>
      <zorder>toolButton_14</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -873,43 +824,6 @@
        </size>
       </property>
      </widget>
-     <widget class="QDoubleSpinBox" name="doubleSpinBox">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>5</y>
-        <width>115</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Numbers</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::NoButtons</enum>
-      </property>
-      <property name="specialValueText">
-       <string/>
-      </property>
-      <property name="prefix">
-       <string/>
-      </property>
-      <property name="suffix">
-       <string/>
-      </property>
-      <property name="decimals">
-       <number>3</number>
-      </property>
-      <property name="maximum">
-       <double>9999.989999999999782</double>
-      </property>
-      <property name="value">
-       <double>0.000000000000000</double>
-      </property>
-     </widget>
      <widget class="QLCDNumber" name="lcdNumber_2">
       <property name="geometry">
        <rect>
@@ -935,7 +849,7 @@
      <widget class="QToolButton" name="toolButton_19">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>276</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -956,7 +870,7 @@
        <rect>
         <x>2</x>
         <y>36</y>
-        <width>235</width>
+        <width>272</width>
         <height>26</height>
        </rect>
       </property>
@@ -1011,7 +925,7 @@
      <widget class="QToolButton" name="toolButton_21">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>303</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1032,7 +946,7 @@
        <rect>
         <x>2</x>
         <y>5</y>
-        <width>235</width>
+        <width>353</width>
         <height>26</height>
        </rect>
       </property>
@@ -1098,7 +1012,6 @@
      <zorder>toolButton_13</zorder>
      <zorder>toolButton_15</zorder>
      <zorder>toolButton_17</zorder>
-     <zorder>doubleSpinBox</zorder>
      <zorder>lcdNumber_2</zorder>
      <zorder>toolButton_19</zorder>
      <zorder>comboBox_2</zorder>
@@ -1218,7 +1131,7 @@
      <widget class="QToolButton" name="toolButton_29">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>276</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1239,7 +1152,7 @@
        <rect>
         <x>2</x>
         <y>5</y>
-        <width>235</width>
+        <width>353</width>
         <height>26</height>
        </rect>
       </property>
@@ -1252,7 +1165,7 @@
        <rect>
         <x>2</x>
         <y>36</y>
-        <width>235</width>
+        <width>272</width>
         <height>26</height>
        </rect>
       </property>
@@ -1278,46 +1191,6 @@
        <number>0</number>
       </property>
      </widget>
-     <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>5</y>
-        <width>115</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Tom &amp; Chapter</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::NoButtons</enum>
-      </property>
-      <property name="specialValueText">
-       <string/>
-      </property>
-      <property name="prefix">
-       <string/>
-      </property>
-      <property name="suffix">
-       <string/>
-      </property>
-      <property name="decimals">
-       <number>4</number>
-      </property>
-      <property name="maximum">
-       <double>9999.999900000000707</double>
-      </property>
-      <property name="stepType">
-       <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
-      </property>
-      <property name="value">
-       <double>0.000000000000000</double>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_32">
       <property name="geometry">
        <rect>
@@ -1340,7 +1213,7 @@
      <widget class="QToolButton" name="toolButton_30">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>303</x>
         <y>36</y>
         <width>25</width>
         <height>25</height>
@@ -1454,7 +1327,6 @@
      <zorder>lineEdit_3</zorder>
      <zorder>comboBox_6</zorder>
      <zorder>progressBar_7</zorder>
-     <zorder>doubleSpinBox_2</zorder>
      <zorder>toolButton_32</zorder>
      <zorder>toolButton_30</zorder>
      <zorder>lcdNumber_5</zorder>
@@ -1720,6 +1592,72 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </widget>
+   <widget class="QDockWidget" name="dockWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>80</y>
+      <width>171</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="windowTitle">
+     <string>Editing chapters</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents_2">
+     <widget class="QSpinBox" name="spinBox_2">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>10</y>
+        <width>80</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Chapters</string>
+      </property>
+      <property name="maximum">
+       <number>99999999</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="spinBox_3">
+      <property name="geometry">
+       <rect>
+        <x>86</x>
+        <y>10</y>
+        <width>80</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Sub Chapters</string>
+      </property>
+      <property name="maximum">
+       <number>99999999</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>40</y>
+        <width>164</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Editing count readed chapters</string>
+      </property>
+      <property name="text">
+       <string>Save chapter</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
    <zorder>toolButton_3</zorder>
    <zorder>toolButton_18</zorder>
    <zorder>toolButton_24</zorder>
@@ -1729,6 +1667,7 @@ p, li { white-space: pre-wrap; }
    <zorder>toolButton_25</zorder>
    <zorder>dockWidget_4</zorder>
    <zorder>tabWidget</zorder>
+   <zorder>dockWidget_2</zorder>
   </widget>
  </widget>
  <resources/>
@@ -1762,38 +1701,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>235</x>
      <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>dial_3</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>299</x>
-     <y>49</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>277</x>
-     <y>42</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>dial_3</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>253</x>
-     <y>50</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>306</x>
-     <y>54</y>
     </hint>
    </hints>
   </connection>
@@ -1858,6 +1765,102 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>165</x>
      <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_21</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>407</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_30</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>407</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>434</x>
+     <y>323</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_15</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>356</x>
+     <y>277</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_32</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>345</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>429</x>
+     <y>260</y>
     </hint>
    </hints>
   </connection>

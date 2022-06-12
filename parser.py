@@ -7,10 +7,10 @@ from json import dumps, load
 from datetime import date
 from shutil import copyfileobj
 from threading import Thread
-from urllib import request as url_request
+from urllib.request import urlretrieve
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMessageBox as QMessage, QSystemTrayIcon, QComboBox
+from PyQt5.QtWidgets import QMessageBox as QMessage, QSystemTrayIcon
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtCore import QTimer, QThread, pyqtSignal
 from QLed import QLed
@@ -110,7 +110,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.current_path = path.dirname(path.realpath(__file__))
         self.setGeometry(*self.uploadGlobalSettings()['geometry'])
 
-        self.flag = True
+        self.flag, self.choise = True, False
         self.click = self.percent = self.percent_all_anime = self.color = 0
         self.percent_all_manga = self.percent_desc_manga = 0
         self.ranobe_percent = 0
@@ -153,10 +153,13 @@ class GlobalParser(QtWidgets.QMainWindow):
                  self.openURL,self.aboutInfo)
         cl = ('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')
         func_time = (self.everySecond, self.tracked)
+        dock = (self.ui.dockWidget, self.ui.dockWidget_4, self.ui.dockWidget_2)
+        geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91))
 
-        [i.hide() for i in (self.ui.dockWidget, self.ui.dockWidget_4)]
-        self.ui.dockWidget.setGeometry(555, 75, 164, 80)
-        self.ui.dockWidget_4.setGeometry(490, 55, 370, 211)
+        [i.hide() for i in dock]
+        [v.setGeometry(*geo[i]) for i, v in enumerate(dock)]
+
+        self.ui.pushButton_3.clicked.connect(self.actionChoise)
 
         self.timer = [QTimer() for _ in range(2)]
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
@@ -185,8 +188,9 @@ class GlobalParser(QtWidgets.QMainWindow):
             match i[0]:
                 case 0 | 1 | 2: i[1].clicked.connect(self.deleted)
                 case 3 | 4 | 5: i[1].clicked.connect(self.loged)
-                case 6 | 7: i[1].clicked.connect(self.edited)
-                case 8 | 9 | 10: i[1].clicked.connect(self.saved)
+                case 6 | 7: i[1].clicked.connect(self.currentValue)
+                # case 8 | 9 | 10: i[1].clicked.connect(self.saved)
+                case 8 | 9 | 10: continue
                 case _: i[1].clicked.connect(self.checkItems)
         [j.clicked.connect(partial(self.checkingItems, (True if i % 2 == 1 
             else False, i))) for i,j in enumerate(self.up)]
@@ -389,7 +393,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         lbg = (self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3,
             self.ui.textEdit, *self.comboboxes, self.ui.comboBox_3,
             self.ui.comboBox_4, self.ui.comboBox_5, self.ui.comboBox_8,
-            self.ui.spinBox, self.ui.doubleSpinBox, self.ui.doubleSpinBox_2,
+            self.ui.spinBox_2, self.ui.spinBox_3, self.ui.pushButton_3,
             self.ui.lcdNumber, self.ui.lcdNumber_2, self.ui.lcdNumber_3,
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
@@ -441,6 +445,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.show() if self.click % 2 == 0 else self.hide()
             self.click += 1
 
+# FIX: not working, think that for solution
     def openPlayer(self):
         """ Open video player MPV """
         index = self.ui.lcdNumber.intValue() \
@@ -511,6 +516,20 @@ class GlobalParser(QtWidgets.QMainWindow):
               else data[mode][log] if data[mode][log] else 'No file exist...'
         self.message(txt, (420, 95, 300, 100))
 
+    def currentValue(self):
+        """ Getting current value for editing data. """
+        self.choise = True
+        tab = self.ui.tabWidget.currentIndex()
+        data = self.uploadGlobalSettings()
+        child = ('manga','numbers') if tab == 1 else ('ranobe','chapters')
+        index = self.ui.comboBox_2.currentIndex() if tab == 1 else \
+                self.ui.comboBox_6.currentIndex()
+        string = str(data[child[0]][child[1]][index])
+        div = string.split('.') if '.' in string else (int(string), 0)
+        self.ui.spinBox_2.setValue(int(div[0]))
+        self.ui.spinBox_3.setValue(int(div[1]))
+
+
     def edited(self):
         """ Editing value for list manga or ranobe """
         global notify
@@ -521,11 +540,10 @@ class GlobalParser(QtWidgets.QMainWindow):
                 self.ui.comboBox_6.currentIndex()
         text = self.ui.comboBox_2.currentText() if tab == 1 else \
                 self.ui.comboBox_6.currentText()
-        value = self.ui.doubleSpinBox.value() if tab == 1 else \
-                self.ui.doubleSpinBox_2.value()
-        if value != 0.0:
-            decimal = int(str(value).split('.')[1])
-            value = int(value) if decimal == 0 else float(value)
+        value = f'{self.ui.spinBox_2.value()}.{self.ui.spinBox_3.value()}'
+        if float(value) > 0:
+            decimal = self.ui.spinBox_3.value()
+            value = int(float(value)) if not decimal else float(value)
             data[child[0]][child[1]][index] = value
             data = self.checkNotify(data, child[0], text, value)
             notify = data['notify']['notify'] = 'empty' \
@@ -534,6 +552,8 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.doubleSpinBox.setValue(0) if child[0] == 'manga' else \
             self.ui.doubleSpinBox_2.setValue(0)
             self.changed(tab)
+        self.choise = False
+        [i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)]
 
     def checkNotify(self, data, ch, text, value=None, check=True):
         """ Childing check of notifications for it deleting """
@@ -550,6 +570,9 @@ class GlobalParser(QtWidgets.QMainWindow):
         el = [len(data['notify'][i]) for i in data['notify'] if i != 'notify']
         return True if sum(el) == 0 else False
 
+    def actionChoise(self):
+        self.edited() if self.choise else self.saved() 
+
     @enableCheck
     def saved(self, flag=None):
         """ Saving URL in one from lists: anime, manga or ranobe """
@@ -559,11 +582,11 @@ class GlobalParser(QtWidgets.QMainWindow):
         mode = 'anime' if tab == 0 else 'manga' if tab == 1 else 'ranobe'
         mask = 'animevost' if tab == 0 else 'mask' if tab == 1 else 'ranobe'
         icon = QIcon(f'{self.icon}/{mask}.png')
-        catch = ('log', 'track-name', 'track-link') if tab == 0 else \
-                 '' if tab == 1 else 'log'
-        series = self.ui.spinBox.value() if tab == 0 else \
-                 self.ui.doubleSpinBox.value() if tab == 1 else \
-                 self.ui.doubleSpinBox_2.value()
+        catch = ('log', 'track-name', 'track-link', 'ended') if tab == 0 else \
+                'ended' if tab == 1 else ('log', 'ended')
+        series = f'{self.ui.spinBox_2.value()}.{self.ui.spinBox_3.value()}' \
+                 if tab in (1, 2) and self.ui.spinBox_3.value() else \
+                 self.ui.spinBox_2.value()
         edit = (self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3)
         track = self.ui.comboBox_7.currentIndex()
         url = data['anime']['track-link'][track] if tab == 0 \
@@ -579,7 +602,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         if check_url(url):
             edit[tab].setStyleSheet('background: rgb(98, 255, 59)')
             [data[mode][v].append(dicts[i]) for i,v in enumerate(data[mode])
-                if v not in catch or v not in 'ended']
+                if v not in catch]
             data[mode]['ended'].append('ongoing')
             self.comboboxes[tab].addItem(title)
             self.comboboxes[tab].setItemIcon(len(data[mode][name])-1, icon)
@@ -790,7 +813,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         try:
             self.ui.progressBar.setToolTip(txt)
             self.ui.progressBar.setFormat('Complete %p%')
-            url_request.urlretrieve(dow, save_loc, self.handleProgress)
+            urlretrieve(dow, save_loc, self.handleProgress)
             downloading = True
             self.ui.progressBar.setFormat('Completed')
             data = self.checkNotify(data, 'anime', dirs, serie, False)
