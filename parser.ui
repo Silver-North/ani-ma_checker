@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Ani-Ma tracker</string>
+   <string>Ani-Ma</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QToolButton" name="toolButton_3">
@@ -49,22 +49,6 @@
       <normaloff>icons/close.png</normaloff>icons/close.png</iconset>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton_11">
-    <property name="geometry">
-     <rect>
-      <x>364</x>
-      <y>69</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Update</string>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
@@ -78,7 +62,7 @@
      <string/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -206,28 +190,6 @@
        <string>Write URL:</string>
       </property>
      </widget>
-     <widget class="QToolButton" name="toolButton_8">
-      <property name="geometry">
-       <rect>
-        <x>314</x>
-        <y>106</y>
-        <width>41</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Log file</string>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>36</width>
-        <height>36</height>
-       </size>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_12">
       <property name="geometry">
        <rect>
@@ -315,7 +277,7 @@
        <rect>
         <x>2</x>
         <y>113</y>
-        <width>221</width>
+        <width>265</width>
         <height>25</height>
        </rect>
       </property>
@@ -332,7 +294,7 @@
      <widget class="QCheckBox" name="checkBox">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>270</x>
         <y>112</y>
         <width>14</width>
         <height>14</height>
@@ -386,137 +348,10 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QFrame" name="frame">
-      <property name="geometry">
-       <rect>
-        <x>-5</x>
-        <y>103</y>
-        <width>391</width>
-        <height>80</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="lineWidth">
-       <number>1</number>
-      </property>
-      <property name="midLineWidth">
-       <number>0</number>
-      </property>
-      <widget class="QToolButton" name="toolButton_16">
-       <property name="geometry">
-        <rect>
-         <x>290</x>
-         <y>10</y>
-         <width>26</width>
-         <height>14</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Track &amp; Update</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: none</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>icons/checkbox-3.png</normaloff>icons/checkbox-3.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>53</width>
-         <height>35</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkBox_3">
-       <property name="geometry">
-        <rect>
-         <x>275</x>
-         <y>10</y>
-         <width>14</width>
-         <height>14</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Tracker mode</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkBox_4">
-       <property name="geometry">
-        <rect>
-         <x>275</x>
-         <y>25</y>
-         <width>14</width>
-         <height>14</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>Format mode</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>41</width>
-         <height>49</height>
-        </size>
-       </property>
-       <property name="autoRepeatDelay">
-        <number>300</number>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="toolButton_9">
-       <property name="geometry">
-        <rect>
-         <x>290</x>
-         <y>25</y>
-         <width>26</width>
-         <height>14</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>5</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Downloading: SD &amp; HD</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border: none</string>
-       </property>
-       <property name="text">
-        <string>HD | SD</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>35</width>
-         <height>53</height>
-        </size>
-       </property>
-      </widget>
-     </widget>
      <widget class="QCheckBox" name="checkBox_2">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>270</x>
         <y>127</y>
         <width>14</width>
         <height>14</height>
@@ -532,7 +367,7 @@
      <widget class="QToolButton" name="toolButton_4">
       <property name="geometry">
        <rect>
-        <x>241</x>
+        <x>285</x>
         <y>112</y>
         <width>26</width>
         <height>14</height>
@@ -566,7 +401,7 @@
      <widget class="QToolButton" name="toolButton_7">
       <property name="geometry">
        <rect>
-        <x>241</x>
+        <x>285</x>
         <y>127</y>
         <width>26</width>
         <height>14</height>
@@ -622,113 +457,111 @@
        </size>
       </property>
      </widget>
-     <widget class="QDockWidget" name="dockWidget">
+     <widget class="QToolButton" name="toolButton_16">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>70</y>
-        <width>164</width>
-        <height>80</height>
+        <x>329</x>
+        <y>112</y>
+        <width>26</width>
+        <height>14</height>
        </rect>
       </property>
-      <property name="floating">
-       <bool>true</bool>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
       </property>
-      <property name="windowTitle">
-       <string>       Export History</string>
+      <property name="toolTip">
+       <string>Track &amp; Update</string>
       </property>
-      <widget class="QWidget" name="dockWidgetContents">
-       <widget class="QComboBox" name="comboBox_5">
-        <property name="geometry">
-         <rect>
-          <x>2</x>
-          <y>4</y>
-          <width>79</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>List export</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>anime</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>manga</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ranobe</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QComboBox" name="comboBox_8">
-        <property name="geometry">
-         <rect>
-          <x>83</x>
-          <y>4</y>
-          <width>79</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Format export</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>md</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>txt</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>json</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>xlsx</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QPushButton" name="pushButton">
-        <property name="geometry">
-         <rect>
-          <x>2</x>
-          <y>32</y>
-          <width>79</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Continue</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_2">
-        <property name="geometry">
-         <rect>
-          <x>83</x>
-          <y>32</y>
-          <width>79</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Cancel</string>
-        </property>
-       </widget>
-      </widget>
+      <property name="styleSheet">
+       <string notr="true">border: none</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/checkbox-3.png</normaloff>icons/checkbox-3.png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>53</width>
+        <height>35</height>
+       </size>
+      </property>
      </widget>
-     <zorder>dockWidget</zorder>
-     <zorder>frame</zorder>
+     <widget class="QCheckBox" name="checkBox_4">
+      <property name="geometry">
+       <rect>
+        <x>314</x>
+        <y>127</y>
+        <width>14</width>
+        <height>14</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Format mode</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>41</width>
+        <height>49</height>
+       </size>
+      </property>
+      <property name="autoRepeatDelay">
+       <number>300</number>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_9">
+      <property name="geometry">
+       <rect>
+        <x>329</x>
+        <y>127</y>
+        <width>26</width>
+        <height>14</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>5</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Downloading: SD &amp; HD</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: none</string>
+      </property>
+      <property name="text">
+       <string>HD | SD</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>35</width>
+        <height>53</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_3">
+      <property name="geometry">
+       <rect>
+        <x>314</x>
+        <y>112</y>
+        <width>14</width>
+        <height>14</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Tracker mode</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
      <zorder>label_2</zorder>
      <zorder>label_3</zorder>
      <zorder>toolButton_2</zorder>
@@ -737,16 +570,19 @@
      <zorder>toolButton_5</zorder>
      <zorder>toolButton</zorder>
      <zorder>lineEdit</zorder>
-     <zorder>toolButton_8</zorder>
      <zorder>toolButton_12</zorder>
      <zorder>progressBar</zorder>
      <zorder>progressBar_2</zorder>
-     <zorder>comboBox_7</zorder>
      <zorder>checkBox</zorder>
      <zorder>checkBox_2</zorder>
      <zorder>toolButton_4</zorder>
      <zorder>toolButton_7</zorder>
      <zorder>toolButton_14</zorder>
+     <zorder>comboBox_7</zorder>
+     <zorder>toolButton_16</zorder>
+     <zorder>checkBox_4</zorder>
+     <zorder>toolButton_9</zorder>
+     <zorder>checkBox_3</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -755,31 +591,6 @@
      <attribute name="toolTip">
       <string>Manga</string>
      </attribute>
-     <widget class="QToolButton" name="toolButton_13">
-      <property name="geometry">
-       <rect>
-        <x>314</x>
-        <y>105</y>
-        <width>41</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Log</string>
-      </property>
-      <property name="statusTip">
-       <string/>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>36</width>
-        <height>36</height>
-       </size>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_15">
       <property name="geometry">
        <rect>
@@ -802,7 +613,7 @@
      <widget class="QToolButton" name="toolButton_17">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -829,7 +640,7 @@
        <rect>
         <x>2</x>
         <y>105</y>
-        <width>109</width>
+        <width>131</width>
         <height>41</height>
        </rect>
       </property>
@@ -878,7 +689,7 @@
      <widget class="QToolButton" name="toolButton_20">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>270</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -903,9 +714,9 @@
      <widget class="QLCDNumber" name="lcdNumber_3">
       <property name="geometry">
        <rect>
-        <x>114</x>
+        <x>136</x>
         <y>105</y>
-        <width>109</width>
+        <width>131</width>
         <height>41</height>
        </rect>
       </property>
@@ -978,7 +789,7 @@
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>226</x>
+        <x>270</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -994,7 +805,7 @@
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1009,7 +820,6 @@
      </widget>
      <zorder>label_8</zorder>
      <zorder>label_9</zorder>
-     <zorder>toolButton_13</zorder>
      <zorder>toolButton_15</zorder>
      <zorder>toolButton_17</zorder>
      <zorder>lcdNumber_2</zorder>
@@ -1028,37 +838,12 @@
      <attribute name="toolTip">
       <string>Ranobe</string>
      </attribute>
-     <widget class="QToolButton" name="toolButton_27">
-      <property name="geometry">
-       <rect>
-        <x>314</x>
-        <y>105</y>
-        <width>41</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Log</string>
-      </property>
-      <property name="statusTip">
-       <string/>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>36</width>
-        <height>36</height>
-       </size>
-      </property>
-     </widget>
      <widget class="QLCDNumber" name="lcdNumber_4">
       <property name="geometry">
        <rect>
         <x>2</x>
         <y>105</y>
-        <width>75</width>
+        <width>87</width>
         <height>41</height>
        </rect>
       </property>
@@ -1081,7 +866,7 @@
      <widget class="QToolButton" name="toolButton_26">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>270</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1106,7 +891,7 @@
      <widget class="QToolButton" name="toolButton_31">
       <property name="geometry">
        <rect>
-        <x>272</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1232,9 +1017,9 @@
      <widget class="QLCDNumber" name="lcdNumber_5">
       <property name="geometry">
        <rect>
-        <x>78</x>
+        <x>92</x>
         <y>105</y>
-        <width>75</width>
+        <width>86</width>
         <height>41</height>
        </rect>
       </property>
@@ -1254,9 +1039,9 @@
      <widget class="QLCDNumber" name="lcdNumber_6">
       <property name="geometry">
        <rect>
-        <x>154</x>
+        <x>181</x>
         <y>105</y>
-        <width>75</width>
+        <width>86</width>
         <height>41</height>
        </rect>
       </property>
@@ -1288,7 +1073,7 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>272</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1304,7 +1089,7 @@
      <widget class="QLabel" name="label_11">
       <property name="geometry">
        <rect>
-        <x>272</x>
+        <x>314</x>
         <y>105</y>
         <width>41</width>
         <height>41</height>
@@ -1319,7 +1104,6 @@
      </widget>
      <zorder>label_10</zorder>
      <zorder>label_11</zorder>
-     <zorder>toolButton_27</zorder>
      <zorder>lcdNumber_4</zorder>
      <zorder>toolButton_26</zorder>
      <zorder>toolButton_31</zorder>
@@ -1470,13 +1254,13 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>364</x>
-      <y>154</y>
+      <y>152</y>
       <width>25</width>
       <height>25</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>About</string>
+     <string>Other Settings</string>
     </property>
     <property name="text">
      <string>...</string>
@@ -1488,33 +1272,11 @@ p, li { white-space: pre-wrap; }
      </size>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton_6">
-    <property name="geometry">
-     <rect>
-      <x>364</x>
-      <y>48</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Close Connect</string>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>19</width>
-      <height>19</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QToolButton" name="toolButton_10">
     <property name="geometry">
      <rect>
       <x>364</x>
-      <y>88</y>
+      <y>48</y>
       <width>25</width>
       <height>25</height>
      </rect>
@@ -1526,33 +1288,11 @@ p, li { white-space: pre-wrap; }
      <string>...</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="toolButton_25">
-    <property name="geometry">
-     <rect>
-      <x>364</x>
-      <y>109</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Export History</string>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>24</width>
-      <height>24</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QDockWidget" name="dockWidget_4">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>0</y>
+      <x>0</x>
+      <y>180</y>
       <width>370</width>
       <height>211</height>
      </rect>
@@ -1595,8 +1335,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QDockWidget" name="dockWidget_2">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>80</y>
+      <x>380</x>
+      <y>250</y>
       <width>171</width>
       <height>91</height>
      </rect>
@@ -1658,16 +1398,242 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </widget>
+   <widget class="QDockWidget" name="dockWidget">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>170</y>
+      <width>164</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="windowTitle">
+     <string>       Export History</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents">
+     <widget class="QComboBox" name="comboBox_5">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>4</y>
+        <width>79</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>List export</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>anime</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>manga</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ranobe</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QComboBox" name="comboBox_8">
+      <property name="geometry">
+       <rect>
+        <x>83</x>
+        <y>4</y>
+        <width>79</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Format export</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>md</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>json</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>xlsx</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>32</y>
+        <width>79</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Continue</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>83</x>
+        <y>32</y>
+        <width>79</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QDockWidget" name="dockWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>30</y>
+      <width>181</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="floating">
+     <bool>true</bool>
+    </property>
+    <property name="windowTitle">
+     <string>Settings:</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents_3">
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="geometry">
+       <rect>
+        <x>1</x>
+        <y>30</y>
+        <width>178</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="plainText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_6">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>2</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Close Connect</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>19</width>
+        <height>19</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_11">
+      <property name="geometry">
+       <rect>
+        <x>35</x>
+        <y>2</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Update</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_25">
+      <property name="geometry">
+       <rect>
+        <x>65</x>
+        <y>2</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export History</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>24</width>
+        <height>24</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="toolButton_8">
+      <property name="geometry">
+       <rect>
+        <x>95</x>
+        <y>2</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Log file</string>
+      </property>
+      <property name="text">
+       <string>...</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <zorder>dockWidget_3</zorder>
    <zorder>toolButton_3</zorder>
    <zorder>toolButton_18</zorder>
    <zorder>toolButton_24</zorder>
-   <zorder>toolButton_11</zorder>
    <zorder>toolButton_10</zorder>
-   <zorder>toolButton_6</zorder>
-   <zorder>toolButton_25</zorder>
    <zorder>dockWidget_4</zorder>
    <zorder>tabWidget</zorder>
    <zorder>dockWidget_2</zorder>
+   <zorder>dockWidget</zorder>
   </widget>
  </widget>
  <resources/>
@@ -1679,12 +1645,12 @@ p, li { white-space: pre-wrap; }
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>268</x>
+     <x>312</x>
      <y>155</y>
     </hint>
     <hint type="destinationlabel">
-     <x>238</x>
-     <y>152</y>
+     <x>284</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -1695,44 +1661,12 @@ p, li { white-space: pre-wrap; }
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>268</x>
+     <x>312</x>
      <y>170</y>
     </hint>
     <hint type="destinationlabel">
-     <x>235</x>
-     <y>165</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButton_16</sender>
-   <signal>clicked()</signal>
-   <receiver>checkBox_3</receiver>
-   <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>307</x>
-     <y>149</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>283</x>
-     <y>146</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>toolButton_9</sender>
-   <signal>clicked()</signal>
-   <receiver>checkBox_4</receiver>
-   <slot>toggle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>303</x>
-     <y>166</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>283</x>
-     <y>169</y>
+     <x>281</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
@@ -1743,12 +1677,12 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>177</y>
+     <x>516</x>
+     <y>247</y>
     </hint>
     <hint type="destinationlabel">
-     <x>101</x>
-     <y>179</y>
+     <x>491</x>
+     <y>250</y>
     </hint>
    </hints>
   </connection>
@@ -1759,12 +1693,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>374</x>
-     <y>126</y>
+     <x>475</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel">
-     <x>165</x>
-     <y>179</y>
+     <x>553</x>
+     <y>250</y>
     </hint>
    </hints>
   </connection>
@@ -1775,8 +1709,8 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>288</x>
-     <y>84</y>
+     <x>305</x>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
      <x>407</x>
@@ -1791,8 +1725,8 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>287</x>
-     <y>77</y>
+     <x>305</x>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
      <x>407</x>
@@ -1827,8 +1761,8 @@ p, li { white-space: pre-wrap; }
      <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>356</x>
-     <y>277</y>
+     <x>516</x>
+     <y>340</y>
     </hint>
    </hints>
   </connection>
@@ -1843,8 +1777,8 @@ p, li { white-space: pre-wrap; }
      <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>322</x>
-     <y>271</y>
+     <x>482</x>
+     <y>340</y>
     </hint>
    </hints>
   </connection>
@@ -1861,6 +1795,54 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>429</x>
      <y>260</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_24</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_3</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>378</x>
+     <y>159</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>411</x>
+     <y>78</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_16</sender>
+   <signal>clicked()</signal>
+   <receiver>checkBox_3</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>344</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>328</x>
+     <y>145</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolButton_9</sender>
+   <signal>clicked()</signal>
+   <receiver>checkBox_4</receiver>
+   <slot>toggle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>351</x>
+     <y>168</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>326</x>
+     <y>165</y>
     </hint>
    </hints>
   </connection>

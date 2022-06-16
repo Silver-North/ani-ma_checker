@@ -138,10 +138,8 @@ class GlobalParser(QtWidgets.QMainWindow):
         labels_movie = (self.ui.label_2, self.ui.label_3, self.ui.label_8,
                         self.ui.label_9, self.ui.label_10, self.ui.label_11)
         gen = (self.ui.toolButton_2, self.ui.toolButton_19,
-            self.ui.toolButton_29,self.ui.toolButton_8, self.ui.toolButton_13,
-            self.ui.toolButton_27, self.ui.toolButton_21,
-            self.ui.toolButton_30, self.ui.toolButton, self.ui.toolButton_15,
-            self.ui.toolButton_32, self.ui.toolButton_12)
+            self.ui.toolButton_29,self.ui.toolButton_8, self.ui.toolButton_21,
+            self.ui.toolButton_30, self.ui.toolButton_12)
         new_box = (*self.comboboxes[:3:],self.ui.comboBox_3,self.ui.comboBox_4)
         tuple_none = (self.ui.toolButton_24,self.ui.toolButton_10,
                       self.ui.toolButton_11,self.ui.toolButton_25)
@@ -153,8 +151,10 @@ class GlobalParser(QtWidgets.QMainWindow):
                  self.openURL,self.aboutInfo)
         cl = ('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')
         func_time = (self.everySecond, self.tracked)
-        dock = (self.ui.dockWidget, self.ui.dockWidget_4, self.ui.dockWidget_2)
-        geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91))
+        dock = (self.ui.dockWidget, self.ui.dockWidget_4, self.ui.dockWidget_2,
+                self.ui.dockWidget_3)
+        geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91),
+               (555, 75, 181, 121))
 
         [i.hide() for i in dock]
         [v.setGeometry(*geo[i]) for i, v in enumerate(dock)]
@@ -187,10 +187,8 @@ class GlobalParser(QtWidgets.QMainWindow):
         for i in enumerate(gen):
             match i[0]:
                 case 0 | 1 | 2: i[1].clicked.connect(self.deleted)
-                case 3 | 4 | 5: i[1].clicked.connect(self.loged)
-                case 6 | 7: i[1].clicked.connect(self.currentValue)
-                # case 8 | 9 | 10: i[1].clicked.connect(self.saved)
-                case 8 | 9 | 10: continue
+                case 3: i[1].clicked.connect(self.loged)
+                case 4 | 5: i[1].clicked.connect(self.currentValue)
                 case _: i[1].clicked.connect(self.checkItems)
         [j.clicked.connect(partial(self.checkingItems, (True if i % 2 == 1 
             else False, i))) for i,j in enumerate(self.up)]
@@ -275,7 +273,9 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     def aboutInfo(self):
         """ Getting small info about working of application """
-        self.message(self.uploadGlobalSettings()['about'],(600, 75, 300, 100))
+        self.ui.plainTextEdit.appendPlainText(
+            self.uploadGlobalSettings()['about']
+        )
 
     def getValueForSecond(self):
         global checker_tag, enable, tab_start, down, while_var, notify 
@@ -387,9 +387,10 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.color = 0 if reads == 'lightmode' else 1
         self.changeSheme(*self.sheme[0 if self.color % 2 == 1 else 1])
 
-    def changeSheme(self, ico, window, bg, tip=('Lightmode', 'Darktmode')):
+    def changeSheme(self, ico, window, bg):
         """ Setting color sheme """
         self.setStyleSheet(window)
+        about, tip = 'Other Settings', ('Lightmode', 'Darktmode')
         lbg = (self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3,
             self.ui.textEdit, *self.comboboxes, self.ui.comboBox_3,
             self.ui.comboBox_4, self.ui.comboBox_5, self.ui.comboBox_8,
@@ -397,14 +398,14 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.lcdNumber, self.ui.lcdNumber_2, self.ui.lcdNumber_3,
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
-            self.ui.pushButton_2)
+            self.ui.pushButton_2, self.ui.plainTextEdit)
         licon = (f'{self.icon}/{ico}.png', f'{self.icon}/{ico}-about.png')
         lcheck = (self.ui.checkBox,self.ui.checkBox_2,
                   self.ui.checkBox_3,self.ui.checkBox_4)
         tool = {'lamp': (tip[0], '#0b76ef'), 'dark': (tip[1], '#8B33B5')}
         [v.setStyleSheet(bg) for i,v in enumerate(lbg) if i not in (21,22)]
         [v.setIcon(QIcon(licon[i])) for i,v in enumerate(lbg[21:23:])]
-        [lbg[i].setToolTip(v) for i,v in {22:'About', 21:tool[ico][0]}.items()]
+        [lbg[i].setToolTip(v) for i,v in {22: about, 21: tool[ico][0]}.items()]
         [i.setStyleSheet(f'background-color:{tool[ico][1]};') for i in lcheck]
 
     def defaultIcon(self):
@@ -416,27 +417,26 @@ class GlobalParser(QtWidgets.QMainWindow):
                 self.ui.comboBox_4.setItemIcon(i, QIcon(f'{self.icon}/{v}'))
         list_tool = (self.ui.toolButton_2, self.ui.toolButton_19,
             self.ui.toolButton_29, self.ui.toolButton_26,
-            self.ui.toolButton_20, self.ui.toolButton_8, self.ui.toolButton_27,
-            self.ui.toolButton_13, self.ui.toolButton, self.ui.toolButton_15,
-            self.ui.toolButton_32, self.ui.toolButton_17,
-            self.ui.toolButton_31, self.ui.toolButton_21,
-            self.ui.toolButton_30, self.ui.toolButton_7, self.ui.toolButton_4,
-            self.ui.toolButton_18, self.ui.toolButton_3, self.ui.toolButton_6,
-            self.ui.toolButton_14, self.ui.toolButton_16,
+            self.ui.toolButton_20, self.ui.toolButton_8, self.ui.toolButton,
+            self.ui.toolButton_15, self.ui.toolButton_32,
+            self.ui.toolButton_17, self.ui.toolButton_31,
+            self.ui.toolButton_21, self.ui.toolButton_30, self.ui.toolButton_7,
+            self.ui.toolButton_4, self.ui.toolButton_18, self.ui.toolButton_3,
+            self.ui.toolButton_6, self.ui.toolButton_14, self.ui.toolButton_16,
             self.ui.toolButton_25)
         lists = ('trash', 'circle', 'log-one', 'diskette', 'checking', 'edit',
                  'checkbox-1', 'checkbox-2', 'web', 'close', 'lose', 'player',
                  'checkbox-3', 'history')
         licon = [QIcon(f'{self.current_path}/icons/{i}.png') for i in lists]
-        list_tool[18].setToolTip('Exit')
+        list_tool[16].setToolTip('Exit')
         for i,v in enumerate(list_tool):
             match i:
                 case 0 | 1 | 2: value = 0
                 case 3 | 4: value = 1
-                case 5 | 6 | 7: value = 2
-                case 8 | 9 | 10: value = 3
-                case 11 | 12: value = 4
-                case 13| 14: value = 5
+                case 5: value = 2
+                case 6 | 7 | 8: value = 3
+                case 9 | 10: value = 4
+                case 11| 12: value = 5
                 case _: value += 1
             v.setIcon(licon[value])
 
@@ -549,8 +549,6 @@ class GlobalParser(QtWidgets.QMainWindow):
             notify = data['notify']['notify'] = 'empty' \
                 if self.emptyNotify(data) else data['notify']['notify']
             self.setGlobalSettings(data, '', '', '', False, True)
-            self.ui.doubleSpinBox.setValue(0) if child[0] == 'manga' else \
-            self.ui.doubleSpinBox_2.setValue(0)
             self.changed(tab)
         self.choise = False
         [i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)]
@@ -670,16 +668,19 @@ class GlobalParser(QtWidgets.QMainWindow):
             else:
                 for i,v in enumerate(lcd_check):
                     v.display(current if i == 0 else data[mode][twin][index] \
-                          if i == 1 else data[mode]['future-chapters'][index])
+                        if i == 1 else data[mode]['future-chapters'][index])
                 one, two = (data[mode][child][index], data[mode][twin][index])
                 back = ('rgb(50, 233, 37)', False) if one == two else \
                        ('rgb(192, 16, 16)', True)
                 [i.setStyleSheet(f'background: {back[0]}') for i in lcd_check
                     if i != lcd_check[0]]
+                [i.setStyleSheet('background: #0D57C6') for i in lcd_check
+                    if i != lcd_check[0] and \
+                       'end' in data[mode]['ended'][index]]
                 tup = (1,2) if tab == 1 else (3,4) if tab == 2 else False
-                False if tup == False else but.setEnabled(True) if \
-                    lcd[tup[0]].value() < lcd[tup[1]].value() else \
-                    but.setEnabled(False)
+                False if tup == False else but.setEnabled(True) \
+                      if lcd[tup[0]].value() < lcd[tup[1]].value() else \
+                         but.setEnabled(False)
 
     def visibled(self):
         """ Setting visible buttons """
@@ -906,11 +907,10 @@ class GlobalParser(QtWidgets.QMainWindow):
                        'description' in data['manga']['images'][i[0]] and \
                        data['manga']['description'][i[0]] and update_check or \
                        data['manga']['ended'][i[0]] == 'end':
-                           sleep(0.5)
+                           sleep(0.2)
                            [bar() for _ in range(4)]
                            continue
                     driver.get(i[1])
-                    sleep(2)
                     bar()
                     if 'https://manga-chan.me' in i[1]:
                         end = (driver.find_elements(By.CLASS_NAME,
