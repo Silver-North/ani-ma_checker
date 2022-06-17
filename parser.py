@@ -1,4 +1,4 @@
-from os import path, system
+from os import path, system, listdir
 from sys import exit
 from functools import partial
 from time import sleep, localtime, strftime
@@ -145,21 +145,21 @@ class GlobalParser(QtWidgets.QMainWindow):
                       self.ui.toolButton_11,self.ui.toolButton_25)
         buts =(self.ui.pushButton,self.ui.toolButton_3,self.ui.toolButton_5,
             self.ui.toolButton_6,self.ui.toolButton_10,self.ui.toolButton_11,
-            self.ui.toolButton_14,self.ui.toolButton_18,self.ui.toolButton_24)
+            self.ui.toolButton_14,self.ui.toolButton_18,self.ui.toolButton_24,
+            self.ui.pushButton_3, self.ui.pushButton_4)
         funcs = (self.startExport,self.closed,self.oneDown,self.stoped,
                  self.notifyCheck,self.modeColorSheme,self.openPlayer,
-                 self.openURL,self.aboutInfo)
+                 self.openURL,self.aboutInfo, self.actionChoise,
+                 self.lookVideo)
         cl = ('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')
         func_time = (self.everySecond, self.tracked)
         dock = (self.ui.dockWidget, self.ui.dockWidget_4, self.ui.dockWidget_2,
-                self.ui.dockWidget_3)
+                self.ui.dockWidget_3, self.ui.dockWidget_5)
         geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91),
-               (555, 75, 181, 121))
+               (555, 75, 181, 121), (555, 75, 171, 84))
 
         [i.hide() for i in dock]
         [v.setGeometry(*geo[i]) for i, v in enumerate(dock)]
-
-        self.ui.pushButton_3.clicked.connect(self.actionChoise)
 
         self.timer = [QTimer() for _ in range(2)]
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
@@ -372,6 +372,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                    [*name[0], *name[1]] if len(name) == 2 else [*name[0]]
             [self.ui.listWidget.addItem(i) for i in name]
         else: self.ui.listWidget.addItem(name)
+        self.ui.dockWidget_4.setWindowTitle('Notifications:')
         self.ui.dockWidget_4.show()
 
     def modeColorSheme(self):
@@ -398,7 +399,8 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.lcdNumber, self.ui.lcdNumber_2, self.ui.lcdNumber_3,
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
-            self.ui.pushButton_2, self.ui.plainTextEdit)
+            self.ui.pushButton_2, self.ui.plainTextEdit, self.ui.comboBox_9,
+            self.ui.comboBox_10, self.ui.pushButton_4)
         licon = (f'{self.icon}/{ico}.png', f'{self.icon}/{ico}-about.png')
         lcheck = (self.ui.checkBox,self.ui.checkBox_2,
                   self.ui.checkBox_3,self.ui.checkBox_4)
@@ -445,17 +447,23 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.show() if self.click % 2 == 0 else self.hide()
             self.click += 1
 
-# FIX: not working, think that for solution
     def openPlayer(self):
-        """ Open video player MPV """
-        index = self.ui.lcdNumber.intValue() \
-            if self.ui.spinBox.value() == 0 else self.ui.spinBox.value()
+        """ Open dock for choise video player. """
+        self.ui.comboBox_9.clear()
         name = "_".join(self.ui.comboBox.currentText().split())
-        if index > 0 and index <= self.ui.lcdNumber.intValue():
-            link = f"{self.path_down}/{name}/{name}-{index} серия.mp4"
-            Thread(target=system, args=(f'mpv "{link}"',)).start()
-        else:
-            self.message('No file..', (514, 107, 200, 200))
+        list_path = listdir(f'{self.path_down}/{name}/')
+        replace_list = [i.split('-')[-1].split()[0] for i in list_path]
+        [self.ui.comboBox_9.addItem(i) for i in replace_list]
+
+    def lookVideo(self):
+        """ Open anime in video player. """
+        series = self.ui.comboBox_9.currentText()
+        player = self.ui.comboBox_10.currentText()
+        player = 'xdg-open' if player in 'default' else 'cvlc' \
+                            if player in 'vlc' else player
+        name = '_'.join(self.ui.comboBox.currentText().split())
+        link = f'{self.path_down}/{name}/{name}-{series} серия.mp4'
+        Thread(target=system, args=(f'{player} "{link}"',)).start()
 
     def openURL(self):
         """ Open URL in browser for view info """
@@ -512,9 +520,17 @@ class GlobalParser(QtWidgets.QMainWindow):
         data = self.uploadGlobalSettings()
         log = 'logs' if tab == 1 else 'log'
         mode = 'anime' if tab == 0 else 'manga' if tab == 1 else 'ranobe'
-        txt = '\n'.join(data[mode][log]) if tab == 1 and data[mode][log] \
-              else data[mode][log] if data[mode][log] else 'No file exist...'
-        self.message(txt, (420, 95, 300, 100))
+        # txt = '\n'.join(data[mode][log]) if tab == 1 and data[mode][log] \
+              # else data[mode][log] if data[mode][log] else 'No file exist...'
+        txt = data[mode][log] if data[mode][log] else 'No file exist...'
+        self.ui.listWidget.clear()
+        if isinstance(txt, str):
+            self.ui.listWidget.addItem(txt)
+        # self.message(txt, (420, 95, 300, 100))
+        else:
+            [self.ui.listWidget.addItem(i) for i in txt]
+        self.ui.dockWidget_4.setWindowTitle('Log file:')
+        self.ui.dockWidget_4.show()
 
     def currentValue(self):
         """ Getting current value for editing data. """

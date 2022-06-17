@@ -478,6 +478,26 @@ class Ui_MainWindow(object):
         self.toolButton_8.setIconSize(QtCore.QSize(36, 36))
         self.toolButton_8.setObjectName("toolButton_8")
         self.dockWidget_3.setWidget(self.dockWidgetContents_3)
+        self.dockWidget_5 = QtWidgets.QDockWidget(self.centralwidget)
+        self.dockWidget_5.setGeometry(QtCore.QRect(380, 340, 171, 88))
+        self.dockWidget_5.setFloating(True)
+        self.dockWidget_5.setObjectName("dockWidget_5")
+        self.dockWidgetContents_5 = QtWidgets.QWidget()
+        self.dockWidgetContents_5.setObjectName("dockWidgetContents_5")
+        self.comboBox_9 = QtWidgets.QComboBox(self.dockWidgetContents_5)
+        self.comboBox_9.setGeometry(QtCore.QRect(5, 5, 71, 26))
+        self.comboBox_9.setObjectName("comboBox_9")
+        self.comboBox_10 = QtWidgets.QComboBox(self.dockWidgetContents_5)
+        self.comboBox_10.setGeometry(QtCore.QRect(81, 5, 81, 26))
+        self.comboBox_10.setObjectName("comboBox_10")
+        self.comboBox_10.addItem("")
+        self.comboBox_10.addItem("")
+        self.comboBox_10.addItem("")
+        self.comboBox_10.addItem("")
+        self.pushButton_4 = QtWidgets.QPushButton(self.dockWidgetContents_5)
+        self.pushButton_4.setGeometry(QtCore.QRect(5, 36, 157, 26))
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.dockWidget_5.setWidget(self.dockWidgetContents_5)
         self.dockWidget_3.raise_()
         self.toolButton_3.raise_()
         self.toolButton_18.raise_()
@@ -506,6 +526,7 @@ class Ui_MainWindow(object):
         self.toolButton_24.clicked.connect(self.dockWidget_3.show) # type: ignore
         self.toolButton_16.clicked.connect(self.checkBox_3.toggle) # type: ignore
         self.toolButton_9.clicked.connect(self.checkBox_4.toggle) # type: ignore
+        self.toolButton_14.clicked.connect(self.dockWidget_5.show) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -616,3 +637,11 @@ class Ui_MainWindow(object):
         self.toolButton_25.setText(_translate("MainWindow", "..."))
         self.toolButton_8.setToolTip(_translate("MainWindow", "Log file"))
         self.toolButton_8.setText(_translate("MainWindow", "..."))
+        self.dockWidget_5.setWindowTitle(_translate("MainWindow", "Change Player"))
+        self.comboBox_9.setToolTip(_translate("MainWindow", "Change Series"))
+        self.comboBox_10.setToolTip(_translate("MainWindow", "Change player"))
+        self.comboBox_10.setItemText(0, _translate("MainWindow", "default"))
+        self.comboBox_10.setItemText(1, _translate("MainWindow", "mpv"))
+        self.comboBox_10.setItemText(2, _translate("MainWindow", "vlc"))
+        self.comboBox_10.setItemText(3, _translate("MainWindow", "ffplay"))
+        self.pushButton_4.setText(_translate("MainWindow", "Open"))
