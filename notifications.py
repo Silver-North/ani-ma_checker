@@ -17,7 +17,7 @@ tts = init()
 
 
 def checkVoice(data, check):
-    """ Sound alerts"""
+    """ Sound alerts. """
     if check > 0:
         data['notify']['notify'] = 'unchecked'
         system('notify-send "Вышло кое-что новенькое!!!"')

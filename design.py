@@ -455,13 +455,6 @@ class Ui_MainWindow(object):
         self.dockWidget_3.setObjectName("dockWidget_3")
         self.dockWidgetContents_3 = QtWidgets.QWidget()
         self.dockWidgetContents_3.setObjectName("dockWidgetContents_3")
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.dockWidgetContents_3)
-        self.plainTextEdit.setGeometry(QtCore.QRect(1, 30, 178, 70))
-        self.plainTextEdit.setFrameShape(QtWidgets.QFrame.Box)
-        self.plainTextEdit.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.plainTextEdit.setReadOnly(True)
-        self.plainTextEdit.setPlainText("")
-        self.plainTextEdit.setObjectName("plainTextEdit")
         self.toolButton_6 = QtWidgets.QToolButton(self.dockWidgetContents_3)
         self.toolButton_6.setGeometry(QtCore.QRect(5, 2, 25, 25))
         self.toolButton_6.setIconSize(QtCore.QSize(19, 19))
@@ -477,6 +470,10 @@ class Ui_MainWindow(object):
         self.toolButton_8.setGeometry(QtCore.QRect(95, 2, 25, 25))
         self.toolButton_8.setIconSize(QtCore.QSize(36, 36))
         self.toolButton_8.setObjectName("toolButton_8")
+        self.listWidget_2 = QtWidgets.QListWidget(self.dockWidgetContents_3)
+        self.listWidget_2.setGeometry(QtCore.QRect(1, 30, 178, 70))
+        self.listWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.listWidget_2.setObjectName("listWidget_2")
         self.dockWidget_3.setWidget(self.dockWidgetContents_3)
         self.dockWidget_5 = QtWidgets.QDockWidget(self.centralwidget)
         self.dockWidget_5.setGeometry(QtCore.QRect(380, 340, 171, 88))
@@ -498,6 +495,7 @@ class Ui_MainWindow(object):
         self.pushButton_4.setGeometry(QtCore.QRect(5, 36, 157, 26))
         self.pushButton_4.setObjectName("pushButton_4")
         self.dockWidget_5.setWidget(self.dockWidgetContents_5)
+        self.dockWidget_5.raise_()
         self.dockWidget_3.raise_()
         self.toolButton_3.raise_()
         self.toolButton_18.raise_()
@@ -527,6 +525,7 @@ class Ui_MainWindow(object):
         self.toolButton_16.clicked.connect(self.checkBox_3.toggle) # type: ignore
         self.toolButton_9.clicked.connect(self.checkBox_4.toggle) # type: ignore
         self.toolButton_14.clicked.connect(self.dockWidget_5.show) # type: ignore
+        self.pushButton_4.clicked.connect(self.dockWidget_5.close) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

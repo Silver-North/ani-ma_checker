@@ -33,7 +33,7 @@ notify = 'empty'
 
 
 def enableCheck(func):
-    """ Tracking for execute and intersection of functions """
+    """ Tracking for execute and intersection of functions. """
     def wrapper(*flag):
         global enable, while_var, dead, life
         if enable:
@@ -46,7 +46,7 @@ def enableCheck(func):
 
 
 class ThreadProgress(QThread):
-    """ Checking or updating data of anime tracker """
+    """ Checking or updating data of anime tracker. """
     _signal = pyqtSignal(int)
 
     def __init__(self, data, flag=True):
@@ -73,7 +73,7 @@ class ThreadProgress(QThread):
                        'desc' in self.data['anime']['images'][i[0]] and \
                        self.data['anime']['description'][i[0]] and \
                        not self.flag:
-                           sleep(0.5)
+                           sleep(0.3)
                            bar()
                            continue
                     series = self.data['anime']['series'][i[0]] + 1
@@ -82,10 +82,9 @@ class ThreadProgress(QThread):
                     check += 1 if check_output else 0
                     if not name: raise Exception('ERROR FOR URL_CHECK..')
                     if self.flag is False:
-                        if 'icons/' in self.data['anime']['images'][i[0]]:
-                            img, desc = getDescription(i[1])
-                            self.data['anime']['images'][i[0]] = f'{fold}{img}'
-                            self.data['anime']['description'][i[0]] = desc
+                        img, desc = getDescription(i[1])
+                        self.data['anime']['images'][i[0]] = f'{fold}{img}'
+                        self.data['anime']['description'][i[0]] = desc
                         self.data['anime']['name'][i[0]] = name
                 except Exception as e:
                     system(f'notify-send "Error checking anime\n{e}"')
@@ -95,14 +94,14 @@ class ThreadProgress(QThread):
             with open(f'{self.current_path}/setting.json', 'w') as js:
                 js.write(dumps(self.data, sort_keys=False, indent=4,
                                ensure_ascii=False, separators=(',', ': ')))
-        sleep(1)
+        sleep(0.6)
         percent, checker_tag = (0, True)
         self._signal.emit(percent)
         del(check)
 
 
 class GlobalParser(QtWidgets.QMainWindow):
-    """ Parsing data under the terms """
+    """ Parsing data under the terms. """
     def __init__(self):
         super(GlobalParser, self).__init__()
         self.ui = Ui_MainWindow()
@@ -131,6 +130,8 @@ class GlobalParser(QtWidgets.QMainWindow):
                            8: lambda e: self.ui.progressBar.setValue(e),
                            9: lambda e: self.ui.progressBar_3.setValue(e),
                            10: lambda e: self.ui.progressBar_7.setValue(e)}
+        self.dock = (self.ui.dockWidget, self.ui.dockWidget_4,
+            self.ui.dockWidget_2, self.ui.dockWidget_3, self.ui.dockWidget_5)
         bar = (self.ui.progressBar.setStyleSheet,
                self.ui.progressBar_2.setStyleSheet,
                self.ui.progressBar_3.setStyleSheet,
@@ -153,13 +154,11 @@ class GlobalParser(QtWidgets.QMainWindow):
                  self.lookVideo)
         cl = ('#00e916', '#8BC6EC;', '#FFE53B;', '#FF3CAC;')
         func_time = (self.everySecond, self.tracked)
-        dock = (self.ui.dockWidget, self.ui.dockWidget_4, self.ui.dockWidget_2,
-                self.ui.dockWidget_3, self.ui.dockWidget_5)
         geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91),
                (555, 75, 181, 121), (555, 75, 171, 84))
 
-        [i.hide() for i in dock]
-        [v.setGeometry(*geo[i]) for i, v in enumerate(dock)]
+        [i.hide() for i in self.dock]
+        [v.setGeometry(*geo[i]) for i, v in enumerate(self.dock)]
 
         self.timer = [QTimer() for _ in range(2)]
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
@@ -194,19 +193,17 @@ class GlobalParser(QtWidgets.QMainWindow):
             else False, i))) for i,j in enumerate(self.up)]
 
     def keyPressEvent(self, QKeyEvent):
+        """ Hide application at press Esc. """
         self.hidded() if QKeyEvent.key() == 16777216 else None
-        # self.ui.dockWidget_4.hide() if QKeyEvent == 16777216 else None
 
     def uploadGlobalSettings(self):
-        try:
-            with open(f'{self.current_path}/setting.json', 'r') as reads:
-                data = load(reads)
-        except Exception:
-            data = self.uploadGlobalSettings()
-        return data
+        """ Loading a config file. """
+        with open(f'{self.current_path}/setting.json', 'r') as reads:
+            return load(reads)
 
     def setGlobalSettings(self, to_json, tab, mode, var,
                                 flag=False, state=False):
+        """ Updating a config file. """
         if not state:
             if flag:
                 to_json[mode].append(var) if not tab else \
@@ -221,10 +218,10 @@ class GlobalParser(QtWidgets.QMainWindow):
                 js.write(dumps(to_json, sort_keys=False, indent=4,
                         ensure_ascii=False, separators=(',', ': ')))
         else:
-            system(f'notify-send "No writing file <setting.json>"')
+            system(f'notify-send "No writing a config file"')
 
     def startExport(self):
-        """ Export data in selected format """
+        """ Export data in selected format. """
         mode = self.ui.comboBox_5.currentText()
         format = self.ui.comboBox_8.currentText()
         data = self.uploadGlobalSettings()['history']
@@ -245,7 +242,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ui.dockWidget.close()
 
     def stoped(self):
-        """ Forced ending work of functions """
+        """ Forced ending work of functions. """
         global while_var
         if while_var:
             rezult = self.message('Do you really want to finished process?',
@@ -257,25 +254,25 @@ class GlobalParser(QtWidgets.QMainWindow):
     def hidded(self):
         self.hide()
         self.click += 1
+        [i.hide() for i in self.dock]
 
     def extraClose(self):
-        """ Kill process of active working functions """
+        """ Kill process of active working functions. """
         global dead, life
         dead = life = False
         system('killall -s 9 chromedriver')
         self.defaultIcon()
 
     def closed(self):
-        """Shutdown of application """
+        """Shutdown of application. """
         rezult = self.message('Do you really want to leave?',
                               (541, 107, 200, 200), True, True)
         (self.extraClose(),self.close()) if rezult == QMessage.Ok else None
 
     def aboutInfo(self):
-        """ Getting small info about working of application """
-        self.ui.plainTextEdit.appendPlainText(
-            self.uploadGlobalSettings()['about']
-        )
+        """ Getting small info about working of application. """
+        for i in self.uploadGlobalSettings()['about'].split('\n'):
+            self.ui.listWidget_2.addItem(i)
 
     def getValueForSecond(self):
         global checker_tag, enable, tab_start, down, while_var, notify 
@@ -291,7 +288,7 @@ class GlobalParser(QtWidgets.QMainWindow):
     def everySecond(self): self.checkCache(self.getValueForSecond())
 
     def checkCache(self, gets):
-        """ Checking caching of functions """
+        """ Checking caching of functions. """
         global cache
         indexes=(5, 6, 11, 12)
         check = [i for i,v in enumerate(gets) if not cache or cache[i] != v]
@@ -303,7 +300,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             cache = gets
 
     def iconTab(self, index, tab, while_var=False, down=False):
-        """ Installing dinamic of icons """
+        """ Installing dinamic of icons. """
         pre = {0: 'AnimeVost tracker', 1: 'Manga tracker',
                2: 'Ranobe tracker', 3: 'View descriptions'}
         if self.flag:
@@ -318,52 +315,52 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.tray.setIcon(QIcon(f'{self.icon}/{ico}.png'))
 
     def wrapperData(self, data):
-        """ Checking and setting icon of notifications """
+        """ Checking and setting icon of notifications. """
         ico = 'notification' if data == 'checked' else 'notify' \
                              if data == 'unchecked' else 'bell'
         self.ui.toolButton_10.setIcon(QIcon(f'{self.icon}/{ico}.png'))
 
     def wrapperEnable(self, enable):
-        """ Starting processes for execute main of functions """
+        """ Starting processes for execute main of functions. """
         self.movie.stop() if enable else self.movie.start()
         self.led.value = False if enable else True
         self.led.setToolTip('Not Working..' if enable else 'Working..')
         self.visibled() if enable else None
 
     def wrapperCheckbox(self, checkbox):
-        """ Switch for one or all of downloads anime """
+        """ Switch for one or all of downloads anime. """
         ico = 'all-click' if checkbox else 'click'
         tool = 'Download All Items' if checkbox else 'Download Current Item'
         self.ui.toolButton_5.setIcon(QIcon(f'{self.icon}/{ico}.png'))
         self.ui.toolButton_5.setToolTip(tool)
     
     def wrapperBar(self, check, anime_percent):
-        """ Setting value for progresBar_2"""
+        """ Setting value for progresBar_2. """
         self.percent_all_anime = anime_percent if check else 0
         self.ui.progressBar_2.setValue(anime_percent) if check else False
 
     def wrapperUpdate(self, checkbox):
-        """ Switch for check or update of anime tracker """
+        """ Switch for check or update of anime tracker. """
         ico = 'checking' if checkbox else 'circle'
         tool = 'Tracking Elements' if checkbox else 'Update Elements'
         self.ui.toolButton_12.setIcon(QIcon(f'{self.icon}/{ico}.png'))
         self.ui.toolButton_12.setToolTip(tool)
 
     def editLineEdit(self, edit, bg="background: "):
-        """ Setting default color sheme for all QLineEdit"""
+        """ Setting default color sheme for all QLineEdit. """
         sleep(2.5)
         edit.setText('')
         data = self.uploadGlobalSettings()['mode']
         edit.setStyleSheet(f'{bg}' '#888888' if "dark" in data else "#dcdcdc") 
 
     def notifyCheck(self):
-        """ Show all notifications """
+        """ Show all notifications. """
         global notify
         data = self.uploadGlobalSettings()
         notify = data['notify']['notify'] = 'empty' \
                 if self.emptyNotify(data) else 'checked'
         name = 'No notify..' if self.emptyNotify(data) else \
-            [data['notify'][i] for i in data['notify'] \
+                [data['notify'][i][::-1] for i in data['notify'] \
                 if i not in 'notify' and data['notify'][i]]
         self.setGlobalSettings(data, '', '', '', False, True)
         self.ui.listWidget.clear()
@@ -376,20 +373,20 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ui.dockWidget_4.show()
 
     def modeColorSheme(self):
-        """ Switch color sheme """
+        """ Switch color sheme. """
         mode = 'darkmode' if self.color % 2 == 0 else 'lightmode'
         self.changeSheme(*self.sheme[0 if self.color % 2 == 0 else 1])
         self.setGlobalSettings(self.uploadGlobalSettings(), '', 'mode', mode)
         self.color += 1
 
     def checkModeSheme(self):
-        """ Checking color sheme from global settings """
+        """ Checking color sheme from global settings. """
         reads = self.uploadGlobalSettings()['mode']
         self.color = 0 if reads == 'lightmode' else 1
         self.changeSheme(*self.sheme[0 if self.color % 2 == 1 else 1])
 
     def changeSheme(self, ico, window, bg):
-        """ Setting color sheme """
+        """ Setting color sheme. """
         self.setStyleSheet(window)
         about, tip = 'Other Settings', ('Lightmode', 'Darktmode')
         lbg = (self.ui.lineEdit, self.ui.lineEdit_2, self.ui.lineEdit_3,
@@ -399,7 +396,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.lcdNumber, self.ui.lcdNumber_2, self.ui.lcdNumber_3,
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
-            self.ui.pushButton_2, self.ui.plainTextEdit, self.ui.comboBox_9,
+            self.ui.pushButton_2, self.ui.listWidget_2, self.ui.comboBox_9,
             self.ui.comboBox_10, self.ui.pushButton_4)
         licon = (f'{self.icon}/{ico}.png', f'{self.icon}/{ico}-about.png')
         lcheck = (self.ui.checkBox,self.ui.checkBox_2,
@@ -411,7 +408,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         [i.setStyleSheet(f'background-color:{tool[ico][1]};') for i in lcheck]
 
     def defaultIcon(self):
-        """ Setting default values for all icons """
+        """ Setting default values for all icons. """
         list_tab = ('animevost.png', 'mask.png', 'ranobe.png', 'a-desc.png')
         for i,v in enumerate(list_tab):
             self.ui.tabWidget.setTabIcon(i, QIcon(f'{self.icon}/{v}'))
@@ -444,6 +441,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     def trayExecute(self, reason):
         if reason == QSystemTrayIcon.Trigger:
+            [i.hide() for i in self.dock]
             self.show() if self.click % 2 == 0 else self.hide()
             self.click += 1
 
@@ -466,7 +464,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         Thread(target=system, args=(f'{player} "{link}"',)).start()
 
     def openURL(self):
-        """ Open URL in browser for view info """
+        """ Open URL in browser for view info. """
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
         child = 'track-link' if tab == 0 and \
@@ -480,7 +478,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def deleted(self, flag=None):
-        """ Delete one item from lists: anime, manga or ranobe """
+        """ Delete one item from lists: anime, manga or ranobe. """
         global notify
         data = self.uploadGlobalSettings()
         tab = self.ui.tabWidget.currentIndex()
@@ -515,18 +513,15 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.showed(tab, self.comboboxes[tab])
 
     def loged(self):
-        """ Show log file """
+        """ Show log file. """
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
         log = 'logs' if tab == 1 else 'log'
         mode = 'anime' if tab == 0 else 'manga' if tab == 1 else 'ranobe'
-        # txt = '\n'.join(data[mode][log]) if tab == 1 and data[mode][log] \
-              # else data[mode][log] if data[mode][log] else 'No file exist...'
         txt = data[mode][log] if data[mode][log] else 'No file exist...'
         self.ui.listWidget.clear()
         if isinstance(txt, str):
             self.ui.listWidget.addItem(txt)
-        # self.message(txt, (420, 95, 300, 100))
         else:
             [self.ui.listWidget.addItem(i) for i in txt]
         self.ui.dockWidget_4.setWindowTitle('Log file:')
@@ -547,7 +542,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
 
     def edited(self):
-        """ Editing value for list manga or ranobe """
+        """ Editing value for list manga or ranobe. """
         global notify
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
@@ -570,7 +565,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         [i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)]
 
     def checkNotify(self, data, ch, text, value=None, check=True):
-        """ Childing check of notifications for it deleting """
+        """ Childing check of notifications for it deleting. """
         char = 'chapter' if check else 'series'
         tmp = f'{text} - new ' if value is None else \
               f'{text} - new {char} {value}'
@@ -580,7 +575,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         return data
 
     def emptyNotify(self, data):
-        """ Checking cont of notifications """
+        """ Checking cont of notifications. """
         el = [len(data['notify'][i]) for i in data['notify'] if i != 'notify']
         return True if sum(el) == 0 else False
 
@@ -589,7 +584,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def saved(self, flag=None):
-        """ Saving URL in one from lists: anime, manga or ranobe """
+        """ Saving URL in one from lists: anime, manga or ranobe. """
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
         name = 'names' if tab in (1,2) else 'name'
@@ -628,7 +623,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         Thread(target=self.editLineEdit, args=(edit[tab],)).start()
 
     def showed(self, index, combo):
-        """ Show items in comboboxes """
+        """ Show items in comboboxes. """
         name = 'name' if index == 0 else 'names' if index in (1,2) else \
                'track-name'
         child = 'anime' if index in (0,3) else 'manga' if index == 1 else \
@@ -642,7 +637,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             combo.setItemIcon(i[0], QIcon(f'{self.icon}/{ico}.png'))
 
     def changed(self, tab, stop = False):
-        """ Changing values in comboboxes """
+        """ Changing values in comboboxes. """
         data = self.uploadGlobalSettings()
         mode = 'anime' if tab == 0 else 'manga' if tab == 1 else \
                'ranobe' if tab == 2 else self.ui.comboBox_4.currentText()
@@ -699,12 +694,12 @@ class GlobalParser(QtWidgets.QMainWindow):
                          but.setEnabled(False)
 
     def visibled(self):
-        """ Setting visible buttons """
+        """ Setting visible buttons. """
         visible = (self.ui.toolButton_5, self.ui.toolButton_12, *self.up)
         [i.show() for i in visible]
 
     def checkingItems(self, tup):
-        """ Check or update lists manga or ranobe """
+        """ Check or update lists manga or ranobe. """
         data = self.uploadGlobalSettings()
         self.up[tup[1]].hide()
         func = self.upUrls if tup[1] in (0,1) else self.setRanobe
@@ -712,7 +707,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         Thread(target=func, args=args).start()
 
     def message(self, txt, geo, ico=False, but=False):
-        """ Global function for alert """
+        """ Global function for alert. """
         al = QMessage()
         al.setIcon(QMessage.Information) if ico else None
         al.setText(txt)
@@ -722,7 +717,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def oneParsing(self, data, url, digit):
-        """ Download series of anime for URL """
+        """ Download series of anime for URL. """
         global dead, tab_start
         tab_start = 0
         driver = webdriver.Chrome(path.join(path.dirname(__file__),
@@ -739,7 +734,6 @@ class GlobalParser(QtWidgets.QMainWindow):
             series = digit + 1 + data['anime']['ova'][urls.index(url)]
 
             def continueDownload(count=0, repeat=False):
-                """ Getting all arguments for starting download """
                 nonlocal count_series, series, name, \
                           next, name_dir, data, log
                 count = series
@@ -796,7 +790,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         """ 
 
             Final step after download of series:
-            creating folders, renaming file, moving file in folder
+            creating folders, renaming file, moving file in folder.
 
         """
         curent_time = strftime("%H:%M", localtime())
@@ -813,7 +807,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.setGlobalSettings(data, '', '', '', False, True)
 
     def handleProgress(self, blocknum, blocksize, totalsize):
-        """ Getting value for progress bar of download """
+        """ Getting value for progress bar of download. """
         global dead, down
         readed_data = blocknum * blocksize
         if totalsize > 0:
@@ -823,7 +817,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             QtWidgets.QApplication.processEvents()
 
     def Download(self, dow, f, urls, dirs, link, name, serie, data, search):
-        """ Starting download """
+        """ Starting download. """
         global dead, down, downloading, notify
         save_loc = f'{self.current_path}/downloads/_{f}'
         txt = f'Download:\n{dirs} -> {serie}'
@@ -850,7 +844,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def checkingOfTrackerAnime(self):
-        """ Checking tracker of my data and getting all data """
+        """ Checking tracker of my data and getting all data. """
         global tab_start, notify
         try:
             tab_start, data = 0, self.uploadGlobalSettings()
@@ -863,7 +857,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.showed(3, self.ui.comboBox_7)
 
     def checkItems(self, fl=False):
-        """ Starting check or update of anime tracker """
+        """ Starting check or update of anime tracker. """
         data = self.uploadGlobalSettings()
         self.ui.toolButton_12.hide()
         flag = True if fl or not self.ui.checkBox_3.isChecked() else False
@@ -878,7 +872,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.thread_class.wait()
 
     def oneDown(self):
-        """ Start one or all downloads of anime """
+        """ Start one or all downloads of anime. """
         data = self.uploadGlobalSettings()
         self.ui.toolButton_5.hide()
         el = [i.split(' > ')[1].split(' - new')[0] 
@@ -895,7 +889,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                           True, False), self.visibled())
 
     def downloadAll(self, data, seti):
-        """ Checking of download all anime """
+        """ Checking of download all anime. """
         global life, downloading
         while len(seti) > 0:
             url = data['anime']['urls'][seti[0]]
@@ -906,7 +900,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def upUrls(self, data, update_check=False):
-        """ Check or update data of manga """
+        """ Check or update data of manga. """
         global dead, tab_start, notify
         tab_start, msg = (1, [])
         length = len(data['manga']['urls'])
@@ -968,18 +962,17 @@ class GlobalParser(QtWidgets.QMainWindow):
                     data['manga']['logs'][i[0]] = log
                     bar()
                     if update_check:
-                        if 'description/' not in data['manga']['images'][i[0]]:
-                            image = ('description/', img.split('/')[-1])
-                            r = get(img, stream=True)
-                            if r.status_code == 200:
-                                with open(
-                                    f'{self.current_path}/{"".join(image)}',
-                                    'wb') as f:
-                                    r.raw.decode_content = True
-                                    copyfileobj(r.raw, f)
-                            loadImage(image[1])
-                            data['manga']['images'][i[0]] = "".join(image)
-                            data['manga']['description'][i[0]] = desc
+                        image = ('description/', img.split('/')[-1])
+                        r = get(img, stream=True)
+                        if r.status_code == 200:
+                            with open(
+                                f'{self.current_path}/{"".join(image)}',
+                                'wb') as f:
+                                r.raw.decode_content = True
+                                copyfileobj(r.raw, f)
+                        loadImage(image[1])
+                        data['manga']['images'][i[0]] = "".join(image)
+                        data['manga']['description'][i[0]] = desc
                         data['manga']['names'][i[0]] = name
                     bar()
             except Exception as e:
@@ -994,7 +987,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     @enableCheck
     def setRanobe(self, check, data):
-        """ Check or update data of ranobe """
+        """ Check or update data of ranobe. """
         global tab_start, dead, notify
         tab_start = 2
         msg = self.ranobe_percent = 0

@@ -1519,28 +1519,6 @@ p, li { white-space: pre-wrap; }
      <string>Settings:</string>
     </property>
     <widget class="QWidget" name="dockWidgetContents_3">
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="geometry">
-       <rect>
-        <x>1</x>
-        <y>30</y>
-        <width>178</width>
-        <height>70</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-      <property name="plainText">
-       <string/>
-      </property>
-     </widget>
      <widget class="QToolButton" name="toolButton_6">
       <property name="geometry">
        <rect>
@@ -1623,6 +1601,19 @@ p, li { white-space: pre-wrap; }
        </size>
       </property>
      </widget>
+     <widget class="QListWidget" name="listWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>1</x>
+        <y>30</y>
+        <width>178</width>
+        <height>70</height>
+       </rect>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QDockWidget" name="dockWidget_5">
@@ -1702,6 +1693,7 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </widget>
+   <zorder>dockWidget_5</zorder>
    <zorder>dockWidget_3</zorder>
    <zorder>toolButton_3</zorder>
    <zorder>toolButton_18</zorder>
@@ -1936,6 +1928,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>383</x>
      <y>366</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>dockWidget_5</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>467</x>
+     <y>409</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>423</y>
     </hint>
    </hints>
   </connection>
