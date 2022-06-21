@@ -1,4 +1,4 @@
-from os import path, system, listdir
+from os import path, system, listdir, popen
 from sys import exit
 from functools import partial
 from time import sleep, localtime, strftime
@@ -15,11 +15,14 @@ from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtCore import QTimer, QThread, pyqtSignal
 from QLed import QLed
 from requests import get
-from selenium import webdriver
+from selenium.webdriver import Chrome, ChromeOptions
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager as Manager
 from validators import url as check_url
 from alive_progress import alive_bar
 from xlwt import Workbook
+from art import tprint
 
 from design import Ui_MainWindow
 from notifications import (checkURL, getDescription, loadImage, 
@@ -28,8 +31,9 @@ from notifications import (checkURL, getDescription, loadImage,
 
 dead = life = enable = checker_tag = True
 down = while_var = tab_start = downloading = False
-cache = ()
-notify = 'empty'
+cache, notify, option = (), 'empty', ChromeOptions()
+option.add_argument('--headless')
+drive = lambda: Chrome(service=Service(Manager().install()), options=option)
 
 
 def enableCheck(func):
@@ -115,8 +119,6 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ranobe_percent = 0
         self.ui.tabWidget.setCurrentIndex(0)
         self.path_down = f'{self.current_path}/downloads'
-        self.option = webdriver.ChromeOptions()
-        self.option.add_argument('--headless')
         self.icon = f'{self.current_path}/icons'
         self.movie = QMovie(f"{self.icon}/free.gif")
         self.sheme = (('dark', 'background: #313131', 'background: #888888'),
@@ -156,17 +158,20 @@ class GlobalParser(QtWidgets.QMainWindow):
         func_time = (self.everySecond, self.tracked)
         geo = ((555, 75, 164, 80), (490, 55, 370, 211), (580, 85, 171, 91),
                (555, 75, 181, 121), (555, 75, 171, 84))
+        cmd = 'ps -ax | grep -v grep | grep chromedriver'
 
-        [i.hide() for i in self.dock]
-        [v.setGeometry(*geo[i]) for i, v in enumerate(self.dock)]
+        tuple((i.hide() for i in self.dock))
+        tuple((v.setGeometry(*geo[i]) for i, v in enumerate(self.dock)))
 
-        self.timer = [QTimer() for _ in range(2)]
+        self.timer = tuple((QTimer() for _ in range(2)))
         [self.timer[i].timeout.connect(v) for i,v in enumerate(func_time)]
-        [self.timer[i].start(v) for i,v in enumerate((1000, 420_000))]
+        tuple((self.timer[i].start(v) for i,v in enumerate((1000, 420_000))))
         self.tracked()
-        
+
+        self.chrome = lambda: popen(cmd, 'r')
         self.tray = QSystemTrayIcon(self)
         self.tray.activated.connect(self.trayExecute)
+        self.tray.setIcon(QIcon(f'{self.current_path}/icon/animevost.png'))
         self.tray.show()
 
         self.led = QLed(self, onColour=QLed.Green, shape=QLed.Circle)
@@ -175,21 +180,21 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.defaultIcon()
         self.checkModeSheme()
 
-        [i.setMovie(self.movie) for i in labels_movie]
-        [i.setStyleSheet('border: none;') for i in tuple_none]
+        tuple((i.setMovie(self.movie) for i in labels_movie))
+        tuple((i.setStyleSheet('border: none;') for i in tuple_none))
         [bar[i](f'selection-background-color: {v}') for i,v in enumerate(cl)]
-        [self.showed(*i) for i in enumerate(self.comboboxes)]
-        [(self.changed(i), v.activated.connect(partial(self.changed, i)))
-            for i,v in enumerate(new_box)]
+        tuple((self.showed(*i) for i in enumerate(self.comboboxes)))
+        tuple(((self.changed(i), v.activated.connect(partial(self.changed, i)))
+            for i,v in enumerate(new_box)))
+        tuple((v.clicked.connect(funcs[i]) for i,v in enumerate(buts)))
 
-        [v.clicked.connect(funcs[i]) for i,v in enumerate(buts)]
         for i in enumerate(gen):
             match i[0]:
                 case 0 | 1 | 2: i[1].clicked.connect(self.deleted)
                 case 3: i[1].clicked.connect(self.loged)
                 case 4 | 5: i[1].clicked.connect(self.currentValue)
                 case _: i[1].clicked.connect(self.checkItems)
-        [j.clicked.connect(partial(self.checkingItems, (True if i % 2 == 1 
+        [j.clicked.connect(partial(self.checkingItems, (True if i % 2 == 1
             else False, i))) for i,j in enumerate(self.up)]
 
     def keyPressEvent(self, QKeyEvent):
@@ -254,13 +259,13 @@ class GlobalParser(QtWidgets.QMainWindow):
     def hidded(self):
         self.hide()
         self.click += 1
-        [i.hide() for i in self.dock]
+        tuple((i.hide() for i in self.dock))
 
     def extraClose(self):
         """ Kill process of active working functions. """
         global dead, life
         dead = life = False
-        system('killall -s 9 chromedriver')
+        system('killall -s 9 chromedriver') if self.chrome().read() else None
         self.defaultIcon()
 
     def closed(self):
@@ -367,7 +372,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         if isinstance(name, list):
             name = [*name[0], *name[1], *name[2]] if len(name) == 3 else \
                    [*name[0], *name[1]] if len(name) == 2 else [*name[0]]
-            [self.ui.listWidget.addItem(i) for i in name]
+            tuple((self.ui.listWidget.addItem(i) for i in name))
         else: self.ui.listWidget.addItem(name)
         self.ui.dockWidget_4.setWindowTitle('Notifications:')
         self.ui.dockWidget_4.show()
@@ -441,7 +446,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
     def trayExecute(self, reason):
         if reason == QSystemTrayIcon.Trigger:
-            [i.hide() for i in self.dock]
+            tuple((i.hide() for i in self.dock))
             self.show() if self.click % 2 == 0 else self.hide()
             self.click += 1
 
@@ -450,8 +455,8 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ui.comboBox_9.clear()
         name = "_".join(self.ui.comboBox.currentText().split())
         list_path = listdir(f'{self.path_down}/{name}/')
-        replace_list = [i.split('-')[-1].split()[0] for i in list_path]
-        [self.ui.comboBox_9.addItem(i) for i in replace_list]
+        replace_list = tuple((i.split('-')[-1].split()[0] for i in list_path))
+        tuple((self.ui.comboBox_9.addItem(i) for i in replace_list))
 
     def lookVideo(self):
         """ Open anime in video player. """
@@ -523,7 +528,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         if isinstance(txt, str):
             self.ui.listWidget.addItem(txt)
         else:
-            [self.ui.listWidget.addItem(i) for i in txt]
+            tuple((self.ui.listWidget.addItem(i) for i in txt))
         self.ui.dockWidget_4.setWindowTitle('Log file:')
         self.ui.dockWidget_4.show()
 
@@ -562,7 +567,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, '', '', '', False, True)
             self.changed(tab)
         self.choise = False
-        [i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)]
+        tuple((i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)))
 
     def checkNotify(self, data, ch, text, value=None, check=True):
         """ Childing check of notifications for it deleting. """
@@ -696,7 +701,7 @@ class GlobalParser(QtWidgets.QMainWindow):
     def visibled(self):
         """ Setting visible buttons. """
         visible = (self.ui.toolButton_5, self.ui.toolButton_12, *self.up)
-        [i.show() for i in visible]
+        tuple((i.show() for i in visible))
 
     def checkingItems(self, tup):
         """ Check or update lists manga or ranobe. """
@@ -718,11 +723,8 @@ class GlobalParser(QtWidgets.QMainWindow):
     @enableCheck
     def oneParsing(self, data, url, digit):
         """ Download series of anime for URL. """
-        global dead, tab_start
-        tab_start = 0
-        driver = webdriver.Chrome(path.join(path.dirname(__file__),
-                                    'chromedriver'), options=self.option)
-        urls = data['anime']['urls']
+        global dead, tab_start, drive
+        tab_start, driver, urls = 0, drive(), data['anime']['urls']
         try:
             self.percent_all_anime = 5
             driver.get(url)
@@ -849,9 +851,9 @@ class GlobalParser(QtWidgets.QMainWindow):
         try:
             tab_start, data = 0, self.uploadGlobalSettings()
             names, links, notify = checkFixedOutput(data, 0)
-            self.setGlobalSettings(data, 'anime', 'track-name', names)
-            self.setGlobalSettings(data, 'anime', 'track-link', links)
-            self.setGlobalSettings(data, 'notify', 'notify', notify)
+            setting = self.setGlobalSettings
+            tuple((setting(data, *i) for i in (('anime', 'track-name',names),
+                ('anime', 'track-link', links), ('notify', 'notify', notify))))
         except Exception as e:
             system(f'notify-send "Error for update Checker Anime:\n{e}"')
         self.showed(3, self.ui.comboBox_7)
@@ -901,12 +903,10 @@ class GlobalParser(QtWidgets.QMainWindow):
     @enableCheck
     def upUrls(self, data, update_check=False):
         """ Check or update data of manga. """
-        global dead, tab_start, notify
-        tab_start, msg = (1, [])
+        global dead, tab_start, notify, drive
+        tab_start, msg, driver = (1, [], drive())
         length = len(data['manga']['urls'])
         title = 'Update ' if update_check else 'Check '
-        driver = webdriver.Chrome(path.join(path.dirname(__file__),
-                                        'chromedriver'), options=self.option)
         for i in enumerate(data['manga']['urls']):
             try:
                 with alive_bar(5, title=f'{title}{i[0]} -> ') as bar:
@@ -918,7 +918,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                        data['manga']['description'][i[0]] and update_check or \
                        data['manga']['ended'][i[0]] == 'end':
                            sleep(0.2)
-                           [bar() for _ in range(4)]
+                           tuple((bar() for _ in range(4)))
                            continue
                     driver.get(i[1])
                     bar()
@@ -1030,6 +1030,7 @@ class GlobalParser(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    tprint("AniMa")
     app = QtWidgets.QApplication([])
     application = GlobalParser()
     exit(app.exec())
