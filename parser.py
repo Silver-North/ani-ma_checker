@@ -134,6 +134,7 @@ class GlobalParser(QtWidgets.QMainWindow):
                            10: lambda e: self.ui.progressBar_7.setValue(e)}
         self.dock = (self.ui.dockWidget, self.ui.dockWidget_4,
             self.ui.dockWidget_2, self.ui.dockWidget_3, self.ui.dockWidget_5)
+        self.valueBox = (self.ui.spinBox_2, self.ui.spinBox_3)
         bar = (self.ui.progressBar.setStyleSheet,
                self.ui.progressBar_2.setStyleSheet,
                self.ui.progressBar_3.setStyleSheet,
@@ -402,7 +403,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.ui.lcdNumber_4, self.ui.lcdNumber_5, self.ui.lcdNumber_6,
             self.ui.toolButton_11, self.ui.toolButton_24, self.ui.pushButton,
             self.ui.pushButton_2, self.ui.listWidget_2, self.ui.comboBox_9,
-            self.ui.comboBox_10, self.ui.pushButton_4)
+            self.ui.comboBox_10, self.ui.pushButton_4, self.ui.listWidget)
         licon = (f'{self.icon}/{ico}.png', f'{self.icon}/{ico}-about.png')
         lcheck = (self.ui.checkBox,self.ui.checkBox_2,
                   self.ui.checkBox_3,self.ui.checkBox_4)
@@ -532,19 +533,24 @@ class GlobalParser(QtWidgets.QMainWindow):
         self.ui.dockWidget_4.setWindowTitle('Log file:')
         self.ui.dockWidget_4.show()
 
+    def setEdited(self, min, max):
+        """ Additional setting for function of edited. """
+        for i, v in enumerate(self.valueBox):
+            (v.setMaximum(max[i]), v.setMinimum(min[i]), v.setValue(min[i]))
+
     def currentValue(self):
         """ Getting current value for editing data. """
         self.choise = True
         tab = self.ui.tabWidget.currentIndex()
         data = self.uploadGlobalSettings()
         child = ('manga','numbers') if tab == 1 else ('ranobe','chapters')
+        sub = 'change_numbers' if tab == 1 else 'future-chapters'
         index = self.ui.comboBox_2.currentIndex() if tab == 1 else \
                 self.ui.comboBox_6.currentIndex()
         string = str(data[child[0]][child[1]][index])
+        max = str(data[child[0]][sub][index])
         div = string.split('.') if '.' in string else (int(string), 0)
-        self.ui.spinBox_2.setValue(int(div[0]))
-        self.ui.spinBox_3.setValue(int(div[1]))
-
+        self.setEdited(div, max.split('.') if '.' in max else (int(max), 0))
 
     def edited(self):
         """ Editing value for list manga or ranobe. """
@@ -555,7 +561,7 @@ class GlobalParser(QtWidgets.QMainWindow):
         index = self.ui.comboBox_2.currentIndex() if tab == 1 else \
                 self.ui.comboBox_6.currentIndex()
         text = self.ui.comboBox_2.currentText() if tab == 1 else \
-                self.ui.comboBox_6.currentText()
+               self.ui.comboBox_6.currentText()
         value = f'{self.ui.spinBox_2.value()}.{self.ui.spinBox_3.value()}'
         if float(value) > 0:
             decimal = self.ui.spinBox_3.value()
@@ -567,7 +573,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             self.setGlobalSettings(data, '', '', '', False, True)
             self.changed(tab)
         self.choise = False
-        tuple((i.setValue(0) for i in (self.ui.spinBox_2, self.ui.spinBox_3)))
+        self.setEdited([0, 0], [9999999, 9999999])
 
     def checkNotify(self, data, ch, text, value=None, check=True):
         """ Childing check of notifications for it deleting. """

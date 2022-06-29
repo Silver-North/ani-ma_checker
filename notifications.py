@@ -167,8 +167,8 @@ def numCheck(data, mass, ova, series, name, check=False):
     inti = mass[-1].split()
     ind = -1 if len(mass) == 2 else -2 if len(mass) == 3 else -3
     if len(mass) == 2 or len(mass) == 1:
-        arr = int(mass[-1].split()[0]) if '-' not in mass[-1] else -1 if \
-              'Анонс' in mass[-1] else int(mass[-1].split()[0].split('-')[1])
+        arr = -1 if 'Анонс' in mass[-1] else int(mass[-1].split()[0]) \
+            if '-' not in mass[-1] else int(mass[-1].split()[0].split('-')[1])
     else:
         arr = int(mass[ind].split()[0].split('-')[1]) \
             if '-' in mass[ind] else -1 if 'Анонс' in mass[ind] else \
