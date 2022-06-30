@@ -173,8 +173,8 @@ def numCheck(data, mass, ova, series, name, check=False):
         arr = int(mass[ind].split()[0].split('-')[1]) \
             if '-' in mass[ind] else -1 if 'Анонс' in mass[ind] else \
             mass[ind][:1:]
-    int_i = int(inti[1]) if ova == 1 and 'OVA' in mass[-1] else \
-            int(inti[1].split('-')[1]) if 'OVA' in mass[-1] else 0
+    int_i = int(inti[1]) if 'ОВА 1 из' in mass[-1] else \
+            int(inti[1].split('-')[1]) if 'ОВА 1-' in mass[-1] else 0
 
     num = arr if isinstance(arr, int) else int(arr[-1].split()[0])
     c_d = date.today()

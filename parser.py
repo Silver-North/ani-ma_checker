@@ -845,7 +845,7 @@ class GlobalParser(QtWidgets.QMainWindow):
             system(f'notify-send "Error download: {dirs}\n{e}" && {rm}')
             self.ui.progressBar.setToolTip(f'Error {txt}')
         down = False
-    
+
     def setProgressBar(self, percent): self.ui.progressBar_2.setValue(percent)
 
     def tracked(self): Thread(target=self.checkingOfTrackerAnime).start()
